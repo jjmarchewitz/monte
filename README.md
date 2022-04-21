@@ -1,4 +1,5 @@
 # algo-playground #
+*Autodidactic to a fault.*
 
 ## Contributors ##
 * Viren Gadkari<br>

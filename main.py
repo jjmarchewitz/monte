@@ -1,6 +1,6 @@
 import yfinance
-from algorithms.naive_star_boat.alg import *
-from algorithms.bang_bang.alg import *
+from algorithms.naive_star_boat.alg import NaiveStarBoat
+from algorithms.bang_bang.alg import BangBang
 
 
 def main():

@@ -11,7 +11,7 @@ def main():
     # Create an instance of each algorithm listed in algorithm_class_list
     algorithm_instance_list = [alg_class() for alg_class in algorithm_class_list]
 
-    data_getter.get_stock_data(ticker="MSFT", period="max")
+    data = data_getter.get_stock_data("MSFT", "max")
 
     breakpoint()
 

@@ -1,4 +1,3 @@
-import yfinance
 import data.stocks_get as data_getter
 from algorithms.naive_star_boat.alg import NaiveStarBoat
 from algorithms.bang_bang.alg import BangBang

@@ -9,7 +9,8 @@ def main():
     algorithm_class_list = [NaiveStarBoat, BangBang]
 
     # Create an instance of each algorithm listed in algorithm_class_list
-    algorithm_instance_list = [alg_class() for alg_class in algorithm_class_list]
+    algorithm_instance_list = [alg_class()
+                               for alg_class in algorithm_class_list]
 
     data = data_getter.get_stock_data("MSFT", "max")
 

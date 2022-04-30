@@ -1,11 +1,11 @@
-# We need this in every file that is run as the main file because Python's import system
-# is a steaming pile of garbage, don't ask...
+# We need this in every file that is run as a script because Python's import system is a
+# steaming pile of garbage, don't ask...
 import os
 import re
 import sys
 sys.path.append(re.findall("^.*algo-playground", os.getcwd())[0])
 
-# Project imports
+# Regular imports
 import data.get_stocks as data_getter
 from algorithms.naive_star_boat.alg import NaiveStarBoat
 from algorithms.bang_bang.alg import BangBang

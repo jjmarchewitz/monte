@@ -16,7 +16,7 @@
     * Add your API key to your environment variables as instructed in the guide
 <br>
 
-## Reminders ##
+## Notes and Reminders ##
 * Don't forget to pull before working<br>
 <br>
 

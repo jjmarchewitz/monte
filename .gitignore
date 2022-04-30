@@ -4,6 +4,25 @@
 # macOS
 *.DS_Store
 
+# Project specific
+API_KEY.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+######################################
+# DEFAULT/RECOMMENDED PYTHON IGNORES #
+######################################
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

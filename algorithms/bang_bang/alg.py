@@ -3,4 +3,4 @@ import yfinance
 
 class BangBang():
     def __init__(self):
-        pass
+        self.prev_days_data = []

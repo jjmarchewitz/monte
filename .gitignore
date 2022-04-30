@@ -1,3 +1,7 @@
+################################
+# OUR PROJECT'S CUSTOM IGNORES #
+################################
+
 # VS Code
 *.code-workspace
 
@@ -6,17 +10,6 @@
 
 # Project specific
 API_KEY.txt
-
-
-
-
-
-
-
-
-
-
-
 
 
 ######################################

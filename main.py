@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+# TODO: Replace this with packaging and installing the project into current environment
 sys.path.append(re.findall("^.*algo-playground", os.getcwd())[0])
 
 # Regular imports
@@ -20,6 +21,8 @@ def main():
                                for alg_class in algorithm_class_list]
 
     data = data_getter.get_stock_data("MSFT", "max")
+
+    # TODO: Use the logging library as seen in that mCoding video. Set up CLI args
 
     breakpoint()
 

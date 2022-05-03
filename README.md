@@ -12,7 +12,7 @@
 * ***NEW*** To install the project as a local package
     * On Windows: "python -m pip install -e ."<br>
     * On macOS: "python3 -m pip install -e ."<br>
-* ***NEW*** To update packages later down the line, re-install the package locally as above<br>
+* ***NEW*** To update dependencies later down the line, re-install the package locally as above<br>
 * [Instructions for getting an Alpaca API key](https://algotrading101.com/learn/alpaca-trading-api-guide/)
     * Add your API key to your environment variables as instructed in the guide
 <br>

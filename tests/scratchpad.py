@@ -1,15 +1,6 @@
-# We need this in every file that is run as a script because Python's import system is a
-# steaming pile of garbage, don't ask...
-import os
-import re
-import sys
-# TODO: Replace this with packaging and installing the project into current environment
-sys.path.append(re.findall("^.*algo-playground", os.getcwd())[0])
-
-# Regular imports
-import data.get_stocks as data_getter
-from algorithms.naive_star_boat.alg import NaiveStarBoat
-from algorithms.bang_bang.alg import BangBang
+from trading.data.get_stocks import get_stock_data as data_getter
+from trading.algorithms.naive_star_boat.alg import NaiveStarBoat
+from trading.algorithms.bang_bang.alg import BangBang
 
 
 def main():

@@ -1,4 +1,4 @@
-from trading.data.get_stocks import get_stock_data as data_getter
+from trading.data.get_stocks import get_stock_data
 from trading.algorithms.naive_star_boat.alg import NaiveStarBoat
 from trading.algorithms.bang_bang.alg import BangBang
 
@@ -11,7 +11,7 @@ def main():
     algorithm_instance_list = [alg_class()
                                for alg_class in algorithm_class_list]
 
-    data = data_getter.get_stock_data("MSFT", "max")
+    data = get_stock_data("MSFT", "max")
 
     # TODO: Use the logging library as seen in that mCoding video. Set up CLI args
 

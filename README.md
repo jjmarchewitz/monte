@@ -9,18 +9,16 @@
 <br>
 
 ## Instructions ##
-* **NEW** To install the project as a local package
+* ***NEW*** To install the project as a local package
     * On Windows: "python -m pip install -e ."<br>
     * On macOS: "python3 -m pip install -e ."<br>
-* **NEW** To update packages later down the line from requirements.txt<br>
-    * On Windows: "python -m pip install -r requirements.txt"<br>
-    * On macOS: "python3 -m pip install -r requirements.txt"<br>
+* ***NEW*** To update packages later down the line, re-install the package locally as above<br>
 * [Instructions for getting an Alpaca API key](https://algotrading101.com/learn/alpaca-trading-api-guide/)
     * Add your API key to your environment variables as instructed in the guide
 <br>
 
 ## Notes and Reminders ##
-* **NEW** Run the new instructions
+* ***NEW*** Run the new instructions
 * There is no main.py anymore, create your scratchpads in tests/
 * Don't forget to pull before working<br>
 <br>

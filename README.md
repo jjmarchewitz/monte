@@ -18,9 +18,9 @@
 * [Create an Alpaca account](https://app.alpaca.markets/signup)
     * Once the account is created, switch your view (top left corner) to the paper trading dashboard instead of live.
     * On the right hand side, click "show" on "Your API keys"
-    * Copy the file "ALPACA_CONFIG.txt" from the doc folder inside of the repo to the main repository folder itself (so it should be in the same directory as this README)
-        * Note that "ALPACA_CONFIG.txt" is in the .gitignore so your file with your keys should not be committed with the rest of your work. The filename should be greyed out in VS Code
-    * Open the pasted "ALPACA_CONFIG.txt" file and copy/paste your API key ID and secret key inside of the quotations that say "paste here"
+    * Copy the file "alpaca.config" from the doc folder inside of the repo to the main repository folder itself (so it should be in the same directory as this README)
+        * Note that "alpaca.config" is in the .gitignore so your file with your keys should not be committed with the rest of your work. The filename should be greyed out in VS Code
+    * Open the pasted "alpaca.config" file and copy/paste your API key ID and secret key inside of the quotations that say "paste here"
     * Run the python script "scratchpad_example.py" inside of the tests folder, and it should print out your account information without any errors
 <br><br>
 

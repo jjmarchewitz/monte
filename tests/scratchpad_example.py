@@ -1,4 +1,3 @@
-# Example imports
 from config.alpaca import alpaca_setup
 
 

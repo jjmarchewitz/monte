@@ -15,10 +15,10 @@ class APISettings():
 def alpaca_setup():
 
     api_settings = APISettings()
-    repo_dir = re.findall("^.*algo-playground", os.getcwd())[0]
+    repo_dir = re.findall("^.*algo-playground", os.getcwd())[0] + os.sep
 
-    # Grab all of the info contained in ALPACA_CONFIG.txt
-    with open(f"{repo_dir}/ALPACA_CONFIG.txt", "r") as api_config_file:
+    # Grab all of the info contained in alpaca.config
+    with open(f"{repo_dir}alpaca.config", "r") as api_config_file:
         api_config_file_str = api_config_file.read()
 
         # Load the trading context

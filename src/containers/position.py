@@ -5,7 +5,7 @@
 import alpaca_trade_api
 
 
-class Asset():
+class Position():
     def __init__(self, name=None):
         self.name = name if name is not None else "Unnamed"
         self.quantity_held = 0

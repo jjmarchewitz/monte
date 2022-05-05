@@ -9,7 +9,7 @@
 *.DS_Store
 
 # Project specific
-API_KEY.txt
+/ALPACA_CONFIG.txt
 
 
 ######################################

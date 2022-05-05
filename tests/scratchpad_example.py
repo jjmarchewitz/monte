@@ -1,5 +1,5 @@
 # Example imports
-from config_alpaca import config_alpaca
+from config.alpaca import alpaca_setup
 
 
 ##################################################################################
@@ -8,7 +8,7 @@ from config_alpaca import config_alpaca
 
 
 def main():
-    tradeapi = config_alpaca()
+    tradeapi = alpaca_setup()
     print(tradeapi.get_account())
 
 

@@ -1,10 +1,10 @@
-from config_alpaca import config_alpaca
+from config.alpaca import alpaca_setup
 
 
 def main():
-    tradeapi = config_alpaca()
+    tradeapi = alpaca_setup()
     account = tradeapi.get_account()
-    breakpoint()
+    # breakpoint()
 
 
 if __name__ == "__main__":

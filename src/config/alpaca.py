@@ -12,7 +12,7 @@ class APISettings():
     trading_website: str = ""
 
 
-def config_alpaca():
+def alpaca_setup():
 
     api_settings = APISettings()
     repo_dir = re.findall("^.*algo-playground", os.getcwd())[0]

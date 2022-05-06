@@ -4,6 +4,7 @@
 
 
 class TradingContext():
-    def __init__(self):
+    def __init__(self, tradeapi):
+        self.tradeapi = tradeapi
         self.portfolio = None
         self.trading_algorithm = None

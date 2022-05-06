@@ -1,17 +1,16 @@
-# DEFINITION: A portfolio is simply a collection of individual assets, and/or a collection
-# of sub-portfolios
+# DEFINITION: A portfolio is simply a collection of individual assets
 
 
 class Portfolio():
-    def __init__(self):
-        self.child_portfolios = []
-        self.assets = []
+    def __init__(self, tradeapi):
+        self.tradeapi = tradeapi
+        self.positions = []
+
+    def __get_positions_from_alpaca(self):
+        self.positions = self.tradeapi.list_positions()
 
     def total_value(self):
         total = 0
-
-        for child_portfolio in self.child_portfolios:
-            total += child_portfolio.total_value()
 
         for asset in self.assets:
             total += asset.current_value()

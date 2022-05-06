@@ -11,8 +11,7 @@ class Position():
         self.market_data_api = market_data_api
         self.symbol = symbol
         self.quantity = 0
-        self.current_price = 0
-        self.bar_generator = None
+        self.price = 0
 
     def total_value(self):
         return self.quantity * self.current_price

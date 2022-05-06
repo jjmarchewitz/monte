@@ -1,20 +1,23 @@
-from config.alpaca import alpaca_setup
 from alpaca_trade_api import TimeFrame
+from config.alpaca import alpaca_setup
+from containers.portfolio import Portfolio
+from containers.position import Position
+from containers.trading_context import TradingContext
 
 
 def main():
-    tradeapi = alpaca_setup()
-    account = tradeapi.get_account()
+    trading_api, market_data_api = alpaca_setup()
 
-    # Demo buy order
-    tradeapi.submit_order(
-        symbol="IVV",
-        qty="1",
-        side="buy",
-        type="market",
-    )
+    demo_context = TradingContext(
+        trading_api, market_data_api, "2006-01-02", "2006-05-05")
 
-    tradeapi.list_positions()
+    demo_port = Portfolio(market_data_api)
+    demo_pos = Position(market_data_api, "AAPL")
+    demo_pos2 = Position(market_data_api, "GOOG")
+
+    demo_port.add_position(demo_pos)
+    demo_port.add_position(demo_pos2)
+
     breakpoint()
 
 

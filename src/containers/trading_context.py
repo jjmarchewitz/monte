@@ -3,8 +3,19 @@
 # historical data) as well as running an algorithm live.
 
 
+from enum import Enum
+from alpaca_trade_api import TimeFrame
+
+
 class TradingContext():
-    def __init__(self, tradeapi):
-        self.tradeapi = tradeapi
-        self.portfolio = None
-        self.trading_algorithm = None
+    def __init__(
+            self, trading_api, market_data_api, start_date, end_date,
+            time_frame=TimeFrame.Minute):
+        self.trading_api = trading_api
+        self.market_data_api = market_data_api
+        self.start_date = start_date
+        self.end_date = end_date
+        self.time_frame = time_frame
+
+        # Pairs of algorithms and portfolios
+        self.alg_port_pairs = {}

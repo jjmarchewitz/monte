@@ -49,15 +49,25 @@ def alpaca_setup():
             "The trading context in ALPACA_CONFIG.txt can only be either "
             + "\"paper\" or \"live\".")
 
+    # A variable for the historical market data website
+    market_data_website = "https://data.alpaca.markets"
+
     # Set the API key ID and secret key as an environment variables
     os.environ["APCA-API-KEY-ID"] = api_settings.api_key_ID
     os.environ["APCA-API-SECRET-KEY"] = api_settings.secret_key
 
-    # Create the instance of the alpaca API with the given keys and website
-    api = tradeapi.REST(
+    # Create the instance of the alpaca trading API with the given keys and website
+    trading_api = tradeapi.REST(
         api_settings.api_key_ID,
         api_settings.secret_key,
         api_settings.trading_website
     )
 
-    return api
+    # Create the instance of the alpaca market data API
+    market_data_api = tradeapi.REST(
+        api_settings.api_key_ID,
+        api_settings.secret_key,
+        market_data_website
+    )
+
+    return trading_api, market_data_api

@@ -92,18 +92,26 @@ class TradingMachine():
 
     def run(self):
 
+        # For every day that the market will be open
         for market_day in self.market_days:
 
+            # Update the current date variable in the machine
             self.current_market_date = market_day.date
 
+            # For every algo - portfolio pair, simulate an entire day no matter what the
+            # time frame is.
             for algorithm, portfolio in self.algo_port_pairs.items():
 
+                # Create the day's price generator objects
                 portfolio.create_new_price_generators(
                     self.time_frame,
                     market_day.open_time_iso,
                     market_day.close_time_iso
                 )
 
+                # Increment all of the price generators so that they are on the first value
+                # for the day. They begin as "None" and must be incremented to have an
+                # initial value.
                 portfolio.increment_all_price_generators()
 
                 # While the trading machine has not yet hit the end of the day

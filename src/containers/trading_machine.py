@@ -12,6 +12,7 @@ import pytz
 
 @dataclass
 class MarketDay():
+    date: str
     open_time_iso: str
     close_time_iso: str
 
@@ -30,10 +31,11 @@ class TradingMachine():
 
         # Create a list of all market days in range with start and end times
         self.market_days = []
+        self.current_market_date = None
         self._generate_market_day_list()
 
         # Pairs of algorithms and portfolios
-        self.alg_port_pairs = {}
+        self.algo_port_pairs = {}
 
     def _generate_market_day_list(self):
 
@@ -42,6 +44,13 @@ class TradingMachine():
         raw_market_days = self.trading_api.get_calendar(self.start_date, self.end_date)
 
         for day in raw_market_days:
+
+            # Create a datetime object for the date of the market day
+            market_date = date(
+                day.date.year,
+                day.date.month,
+                day.date.day
+            )
 
             # Grab the DST-aware timezone object for eastern time
             timezone = pytz.timezone("America/New_York")
@@ -73,5 +82,35 @@ class TradingMachine():
             # Create a MarketDay object with the right open/close times and append it to
             # the list of all such MarketDay objects within the span between start_date and
             # end_date
-            market_day = MarketDay(open_time, close_time)
+            market_day = MarketDay(market_date, open_time, close_time)
             self.market_days.append(market_day)
+
+    def add_algo_port_pair(self, algorithm, portfolio):
+        # TODO: Add a check to make sure the algorithm and portfolio are set up correctly
+        # before adding
+        self.algo_port_pairs.update({algorithm: portfolio})
+
+    def run(self):
+
+        for market_day in self.market_days:
+
+            self.current_market_date = market_day.date
+
+            for algorithm, portfolio in self.algo_port_pairs.items():
+
+                portfolio.create_new_price_generators(
+                    self.time_frame,
+                    market_day.open_time_iso,
+                    market_day.close_time_iso
+                )
+
+                portfolio.increment_all_price_generators()
+
+                # While the trading machine has not yet hit the end of the day
+                while not portfolio.market_day_needs_to_be_incremented():
+                    print(
+                        f"{portfolio.name} -- {portfolio.time_of_last_price_gen_increment} :"
+                        + f" ${portfolio.total_value()}")
+
+                    # This must be at the end of the loop
+                    portfolio.increment_all_price_generators()

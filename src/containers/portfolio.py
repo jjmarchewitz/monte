@@ -9,6 +9,7 @@ class Portfolio():
         self.name = name if name is not None else "Unnamed"
         self.positions = []
         self.cash = 0
+        self.time_of_last_price_gen_increment = None
 
     def add_position(self, new_position):
         # Check that the new_position is a position object
@@ -42,13 +43,25 @@ class Portfolio():
         for position in self.positions:
             position.increment_price_generator()
 
+            # This is a bit of an odd piece of code but if a position has just been
+            # incremented and it doesn't need a new price generator, then the increment
+            # succeeded and the time when last updated for the position was just updated.
+            # I am stealing that recently-updated time and making it the "most recent time
+            # of an update" for the portfolio itself.
+            if position.needs_new_price_generator == False:
+                self.time_of_last_price_gen_increment = position.time_when_price_last_updated
+
     def create_new_price_generators(self, time_frame, start_time, end_time):
         for position in self.positions:
-            position.update_daily_price_generator(time_frame, start_time, end_time)
+            position.create_new_daily_price_generator(time_frame, start_time, end_time)
 
-    def check_if_all_positions_need_new_price_generators(self):
+    def market_day_needs_to_be_incremented(self):
+        # If all of the positions need new generators, that means the end of the day has
+        # been reached
         need_new_generators = True
 
+        # Check if any of the positions don't need a new generator (i.e. they haven't
+        # reached the end of their generation yet/haven't hit the end of the day)
         for position in self.positions:
             if position.needs_new_price_generator == False:
                 need_new_generators = False

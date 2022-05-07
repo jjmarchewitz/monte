@@ -8,32 +8,22 @@ from containers.trading_machine import TradingMachine
 def main():
     trading_api, market_data_api = alpaca_setup()
 
-    demo_context = TradingMachine(
+    machine = TradingMachine(
         trading_api, market_data_api, "2022-03-08", "2022-03-20",
-        time_frame=TimeFrame.Hour)
+        time_frame=TimeFrame.Day)
 
-    demo_port = Portfolio(market_data_api)
-    demo_pos = Position(market_data_api, "AAPL", 1)
-    # demo_pos2 = Position(market_data_api, "GOOG", 1)
+    portfolio1 = Portfolio(market_data_api, name="P1")
+    portfolio1.add_position(Position(market_data_api, "AAPL", 5))
+    portfolio1.add_position(Position(market_data_api, "GOOG", 1))
 
-    demo_port.add_position(demo_pos)
-    # demo_port.add_position(demo_pos2)
+    portfolio2 = Portfolio(market_data_api, name="P2")
+    portfolio2.add_position(Position(market_data_api, "IVV", 10.75))
+    portfolio2.add_position(Position(market_data_api, "QQQ", 2.33))
 
-    for market_day in demo_context.market_days:
-        demo_port.create_new_price_generators(
-            demo_context.time_frame,
-            market_day.open_time_iso,
-            market_day.close_time_iso
-        )
+    machine.add_algo_port_pair("DummyAlgo1", portfolio1)
+    machine.add_algo_port_pair("DummyAlgo2", portfolio2)
 
-        while True:
-            demo_port.increment_all_price_generators()
-
-        breakpoint()
-
-    # for market_day in demo_context.market_days:
-    #     print(market_data_api.get_bars_iter("AAPL", TimeFrame.Hour,
-    #                                         market_day.open_time_iso, market_day.close_time_iso))
+    machine.run()
 
     breakpoint()
 

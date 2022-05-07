@@ -2,6 +2,11 @@
 # is meant to be stored inside of a portfolio, so the asset has a quantity currently held
 # associated with it.
 
+from alpaca_trade_api import TimeFrame
+from datetime import timedelta
+from dateutil.parser import isoparse
+from pyrsistent import inc
+
 
 class Position():
     def __init__(self, market_data_api, symbol, initial_quantity):
@@ -30,7 +35,20 @@ class Position():
         except StopIteration:
             self.needs_new_price_generator = True
 
-    def update_daily_price_generator(self, time_frame, start_time, end_time):
-        self.price_generator = self.market_data_api.get_bars_iter(
-            self.symbol, time_frame, start_time, end_time)
+    def create_new_daily_price_generator(self, time_frame, start_time, end_time):
+
+        if time_frame == TimeFrame.Day:
+            start_time_dt_obj = isoparse(start_time)
+            incremented_start_time = start_time_dt_obj - timedelta(days=1)
+            iso_inc_start_time = incremented_start_time.isoformat()
+            self.price_generator = self.market_data_api.get_bars_iter(
+                self.symbol, time_frame, iso_inc_start_time, end_time)
+
+        else:
+            self.price_generator = self.market_data_api.get_bars_iter(
+                self.symbol, time_frame, start_time, end_time)
+
         self.needs_new_price_generator = False
+
+    # def time_frame_day_generator(self, time_frame, start_time, end_time):
+    #     yield self.market_data_api.get_bars(self.symbol, time_frame, start_time, end_time)

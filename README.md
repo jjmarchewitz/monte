@@ -3,9 +3,9 @@
 <br><br>
 
 ## Contributors ##
-* Viren Gadkari
-* Surya Gupta
-* Jake Marchewitz
+* J. Marchewitz
+* S. Gupta
+* V. Gadkari
 <br><br>
 
 ## Instructions ##

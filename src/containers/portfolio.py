@@ -4,11 +4,11 @@ from containers.position import Position
 
 
 class Portfolio():
-    def __init__(self, market_data_api, name=None):
+    def __init__(self, market_data_api, starting_cash=10000, name=None):
         self.market_data_api = market_data_api
         self.name = name if name is not None else "Unnamed"
         self.positions = []
-        self.cash = 0
+        self.cash = starting_cash
         self.time_of_last_price_gen_increment = None
 
     def add_position(self, new_position):

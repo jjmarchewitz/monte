@@ -14,12 +14,12 @@ def main():
         time_frame=TimeFrame.Day)
 
     # Create the first portfolio
-    portfolio1 = Portfolio(market_data_api, name="P1")
+    portfolio1 = Portfolio(market_data_api, starting_cash=10000, name="P1")
     portfolio1.add_position(Position(market_data_api, "AAPL", 5))
     portfolio1.add_position(Position(market_data_api, "GOOG", 1))
 
     # Create the second portfolio
-    portfolio2 = Portfolio(market_data_api, name="P2")
+    portfolio2 = Portfolio(market_data_api, starting_cash=10000, name="P2")
     portfolio2.add_position(Position(market_data_api, "IVV", 10.75))
     portfolio2.add_position(Position(market_data_api, "QQQ", 2.33))
 

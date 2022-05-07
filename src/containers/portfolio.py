@@ -38,7 +38,24 @@ class Portfolio():
 
         return total
 
+    def increment_all_price_generators(self):
+        for position in self.positions:
+            position.increment_price_generator()
+
+    def create_new_price_generators(self, time_frame, start_time, end_time):
+        for position in self.positions:
+            position.update_daily_price_generator(time_frame, start_time, end_time)
+
+    def check_if_all_positions_need_new_price_generators(self):
+        need_new_generators = True
+
+        for position in self.positions:
+            if position.needs_new_price_generator == False:
+                need_new_generators = False
+
+        return need_new_generators
+
     def copy(self, name=None):
         # TODO: Implement copy here and in Position
         new_name = name if name is not None else self.name
-        copy_of_portfolio = Portfolio(self.market_data_api, name=self.name)
+        copy_of_portfolio = Portfolio(self.market_data_api, name=new_name)

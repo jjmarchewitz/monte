@@ -27,6 +27,7 @@
 ## Notes and Reminders ##
 * There is no main.py anymore, create your scratchpads in tests/
 * Don't forget to pull before working
+* Download the autoDocstring extension for VS Code, and use (CMD/CTRL) + SHIFT + 2 to generate a docstring for a function automatically
 <br><br>
 
 ## Experiments ##

@@ -10,6 +10,16 @@ from pyrsistent import inc
 
 class Position():
     def __init__(self, market_data_api, symbol, initial_quantity):
+        """
+        Constructor for the Position class
+
+        Arguments:
+            market_data_api -- An instance of the alpaca_trade_api package's own REST API
+                set up to retrieve historical market data
+            symbol -- A string for the market symbol of this position (i.e. "AAPL" or "GOOG")
+            initial_quantity -- The quantity of this asset that should be held when this
+                instance is finished being constructed
+        """
         self.market_data_api = market_data_api
         self.symbol = symbol
         self.quantity = initial_quantity
@@ -20,6 +30,12 @@ class Position():
         self.needs_new_price_generator = False
 
     def total_value(self):
+        """
+        Gets the total value of this position with the current market price
+
+        Returns:
+            The total value of this position with the current market price
+        """
         return self.quantity * self.price
 
     def _get_price_from_bar(self, bar):

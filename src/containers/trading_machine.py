@@ -85,7 +85,7 @@ class TradingMachine():
             market_day = MarketDay(market_date, open_time, close_time)
             self.market_days.append(market_day)
 
-    def add_algo_port_pair(self, algorithm, portfolio):
+    def add_algo_portfolio_pair(self, algorithm, portfolio):
         # TODO: Add a check to make sure the algorithm and portfolio are set up correctly
         # before adding
         self.algo_port_pairs.update({algorithm: portfolio})

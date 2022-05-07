@@ -27,8 +27,8 @@ def main():
     # are dummy strings (for now) because they are keys in a dictionary, so if you add
     # more make sure to make the name unique from all others. Later, the actual instance
     # of the algorithm will be able to be the key in the dict.
-    machine.add_algo_port_pair("DummyAlgo1", portfolio1)
-    machine.add_algo_port_pair("DummyAlgo2", portfolio2)
+    machine.add_algo_portfolio_pair("DummyAlgo1", portfolio1)
+    machine.add_algo_portfolio_pair("DummyAlgo2", portfolio2)
 
     # Rage against the machine
     machine.run()

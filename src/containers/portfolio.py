@@ -1,4 +1,4 @@
-# DEFINITION: A portfolio is simply a collection of individual assets
+# DEFINITION: A portfolio is simply a collection of individual positions
 
 from containers.position import Position
 
@@ -6,17 +6,17 @@ from containers.position import Position
 class Portfolio():
     def __init__(self, market_data_api, starting_cash=10000, name=None):
         """
-        Constructor for the Portfolio class
+        Constructor for the Portfolio class.
 
         Arguments:
             market_data_api -- An instance of the alpaca_trade_api package's own REST API
-                set up to retrieve historical market data
+                set up to retrieve historical market data.
 
         Keyword Arguments:
             starting_cash -- The starting cash that the portfolio will have before any
-                orders are placed or any positions are held (default: {10000})
+                orders are placed or any positions are held. (default: {10000})
             name -- A string name to give the portfolio, purely for aesthetic/debugging
-                purposes (default: {None})
+                purposes. (default: {None})
         """
         self.market_data_api = market_data_api
         self.name = name if name is not None else "Unnamed"
@@ -30,12 +30,12 @@ class Portfolio():
 
         Arguments:
             new_position -- The incoming and already initialized Position object to be added
-                to the Portfolio
+                to the Portfolio.
 
         Raises:
             ValueError: Raises when there is a Position object for the same symbol as a
-                Position already in the Portfolio
-            TypeError: Raises when new_position is not of type containers.position.Position
+                Position already in the Portfolio.
+            TypeError: Raises when new_position is not of type containers.position.Position.
         """
         # Check that the new_position is a Position object
         if type(new_position) is Position:
@@ -58,10 +58,10 @@ class Portfolio():
 
     def total_value(self):
         """
-        Generates the total value of the Portfolio, including Positions and total cash
+        Generates the total value of the Portfolio, including Positions and total cash.
 
         Returns:
-            The total value of the Portfolio, including Positions and total cash
+            The total value of the Portfolio, including Positions and total cash.
         """
         total = self.cash
 
@@ -70,19 +70,19 @@ class Portfolio():
 
         return total
 
-    def increment_all_price_generators(self):
+    def increment_all_bar_generators(self):
         """
-        Steps every position's price generator forward by one time increment (TimeFrame)
+        Steps every position's bar generator forward by one time increment (TimeFrame).
         """
         for position in self.positions:
-            position.increment_price_generator()
+            position.generate_next_price()
 
             # This is a bit of an odd piece of code but if a position has just been
-            # incremented and it doesn't need a new price generator, then the increment
+            # incremented and it doesn't need a new bar generator, then the increment
             # succeeded and the time when last updated for the position was just updated.
             # I am stealing that recently-updated time and making it the "most recent time
             # of an update" for the portfolio itself.
-            if position.needs_new_price_generator == False:
+            if position.needs_new_bar_generator == False:
                 self.time_of_last_price_gen_increment = position.time_when_price_last_updated
 
     def add_order(self):
@@ -94,24 +94,24 @@ class Portfolio():
     def process_pending_orders(self):
         pass
 
-    def create_new_price_generators(self, time_frame, start_time, end_time):
+    def create_new_bar_generators(self, time_frame, start_time, end_time):
         """
-        Replaces the price generators in every Position with new ones for a new date/time
+        Replaces the bar generators in every Position with new ones for a new date/time.
 
         Arguments:
             time_frame -- An alpaca_trade_api.TimeFrame value corresponding to the time
-                delta between price values
+                delta between price values.
             start_time -- An ISO-8061-compliant date and time to start the new generators
-                at
+                at.
             end_time -- An ISO-8061-compliant date and time to start the new generators
-                at
+                at.
         """
         for position in self.positions:
-            position.create_new_daily_price_generator(time_frame, start_time, end_time)
+            position.create_new_daily_bar_generator(time_frame, start_time, end_time)
 
     def market_day_needs_to_be_incremented(self):
         """
-        Determines whether or not all of the price generators have hit the end of the market
+        Determines whether or not all of the bar generators have hit the end of the market
         day, meaning the simulated market day is over and needs to be replaced with the next
         market day.
 
@@ -126,7 +126,7 @@ class Portfolio():
         # Check if any of the positions don't need a new generator (i.e. they haven't
         # reached the end of their generation yet/haven't hit the end of the day)
         for position in self.positions:
-            if position.needs_new_price_generator == False:
+            if position.needs_new_bar_generator == False:
                 need_new_generators = False
 
         return need_new_generators

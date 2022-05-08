@@ -2,12 +2,12 @@
 # and trading algorithm are being run on. This encompasses backtesting (testing on
 # historical data) as well as running an algorithm live.
 
-
-from enum import Enum
-from alpaca_trade_api import TimeFrame
-from dataclasses import dataclass
-from datetime import date, time, datetime
 import pytz
+from alpaca_trade_api import TimeFrame
+from containers.trading_algorithm import TradingAlgorithm
+from containers.portfolio import Portfolio
+from dataclasses import dataclass
+from datetime import date, datetime
 
 
 @dataclass
@@ -17,10 +17,32 @@ class MarketDay():
     close_time_iso: str
 
 
+@dataclass
+class AlgoPortfolioPair():
+    algo: TradingAlgorithm
+    portfolio: Portfolio
+
+
 class TradingMachine():
     def __init__(
             self, trading_api, market_data_api, start_date, end_date,
             time_frame=TimeFrame.Minute):
+        """
+        Constructor for the TradingMachine class.
+
+        Arguments:
+            trading_api -- An instance of the alpaca_trade_api package's own REST API
+                set up to retrieve live trading data. Here, it is used for calendar data.
+            market_data_api -- An instance of the alpaca_trade_api package's own REST API
+                set up to retrieve historical market data.
+            start_date -- The YYYY-MM-DD formatted date for the trading machine to start its
+                run at. 
+            end_date -- The YYYY-MM-DD formatted date for the trading machine to end its
+                run at. 
+
+        Keyword Arguments:
+            time_frame -- _description_ (default: {TimeFrame.Minute})
+        """
         self.trading_api = trading_api
         self.market_data_api = market_data_api
         self.start_date = start_date
@@ -35,10 +57,13 @@ class TradingMachine():
         self._generate_market_day_list()
 
         # Pairs of algorithms and portfolios
-        self.algo_port_pairs = {}
+        self.algo_portfolio_pairs = []
 
     def _generate_market_day_list(self):
-
+        """
+        Generates a list of MarketDay instances in order from self.start_date to self.end_date
+        to represent all of the days the market is open, and *only* the days the market is open
+        """
         # Get a list of all market days between start_date and end_date, including their
         # open and close times
         raw_market_days = self.trading_api.get_calendar(self.start_date, self.end_date)
@@ -86,12 +111,25 @@ class TradingMachine():
             self.market_days.append(market_day)
 
     def add_algo_portfolio_pair(self, algorithm, portfolio):
+        """
+        Adds an algorithm-portfolio pair to the list of all such pairs for the trading
+        machine. This is useful because the run() function can iterate over these pairs and
+        all of the provided algorithms against their corresponding portfolios.
+
+        Arguments:
+            algorithm -- A TradingAlgorithm instance or instance of a sub-class.
+            portfolio -- A Portfolio instance.
+        """
         # TODO: Add a check to make sure the algorithm and portfolio are set up correctly
         # before adding
-        self.algo_port_pairs.update({algorithm: portfolio})
+        algo_portfolio_pair = AlgoPortfolioPair(algorithm, portfolio)
+        self.algo_portfolio_pairs.append(algo_portfolio_pair)
 
     def run(self):
-
+        """
+        Run the trading machine and run all of the algorithm portfolio pairs from the start
+        date to the end date.
+        """
         # For every day that the market will be open
         for market_day in self.market_days:
 
@@ -100,19 +138,19 @@ class TradingMachine():
 
             # For every algo - portfolio pair, simulate an entire day no matter what the
             # time frame is.
-            for algorithm, portfolio in self.algo_port_pairs.items():
+            for algorithm, portfolio in self.algo_portfolio_pairs.items():
 
-                # Create the day's price generator objects
-                portfolio.create_new_price_generators(
+                # Create the day's bar generator objects
+                portfolio.create_new_bar_generators(
                     self.time_frame,
                     market_day.open_time_iso,
                     market_day.close_time_iso
                 )
 
-                # Increment all of the price generators so that they are on the first value
+                # Increment all of the bar generators so that they are on the first value
                 # for the day. They begin as "None" and must be incremented to have an
                 # initial value.
-                portfolio.increment_all_price_generators()
+                portfolio.increment_all_bar_generators()
 
                 # While the trading machine has not yet hit the end of the day
                 while not portfolio.market_day_needs_to_be_incremented():
@@ -121,4 +159,4 @@ class TradingMachine():
                         + f" ${portfolio.total_value()}")
 
                     # This must be at the end of the loop
-                    portfolio.increment_all_price_generators()
+                    portfolio.increment_all_bar_generators()

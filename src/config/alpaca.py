@@ -13,7 +13,16 @@ class APISettings():
 
 
 def alpaca_setup():
+    """
+    Grab the Alpaca API keys from alpaca.config and create an Alpaca trading REST API instance
+    and an Alpaca market history REST API instance.
 
+    Raises:
+        ValueError: Is raised when the trading context in alpaca.config is invalid.
+
+    Returns:
+        An Alpaca trading REST API instance and an Alpaca market history REST API instance.
+    """
     api_settings = APISettings()
     repo_dir = re.findall("^.*algo-playground", os.getcwd())[0] + os.sep
 
@@ -46,7 +55,7 @@ def alpaca_setup():
         api_settings.trading_website = "https://api.alpaca.markets"
     else:
         raise ValueError(
-            "The trading context in ALPACA_CONFIG.txt can only be either "
+            "The trading context in alpaca.config can only be either "
             + "\"paper\" or \"live\".")
 
     # A variable for the historical market data website

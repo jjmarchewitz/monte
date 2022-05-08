@@ -138,7 +138,10 @@ class TradingMachine():
 
             # For every algo - portfolio pair, simulate an entire day no matter what the
             # time frame is.
-            for algorithm, portfolio in self.algo_portfolio_pairs.items():
+            for algo_portfolio_pair in self.algo_portfolio_pairs:
+
+                algo = algo_portfolio_pair.algo
+                portfolio = algo_portfolio_pair.portfolio
 
                 # Create the day's bar generator objects
                 portfolio.create_new_bar_generators(

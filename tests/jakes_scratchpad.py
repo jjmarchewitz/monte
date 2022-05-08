@@ -1,8 +1,8 @@
 from alpaca_trade_api import TimeFrame
-from config.alpaca import alpaca_setup
 from containers.portfolio import Portfolio
 from containers.position import Position
 from containers.trading_machine import TradingMachine
+from util.alpaca import alpaca_setup
 
 
 def main():
@@ -15,13 +15,18 @@ def main():
 
     # Create the first portfolio
     portfolio1 = Portfolio(market_data_api, starting_cash=10000, name="P1")
-    portfolio1.add_position(Position(market_data_api, "AAPL", 5))
-    portfolio1.add_position(Position(market_data_api, "GOOG", 1))
+
+    # Create a new position directly into the portfolio
+    portfolio1.create_new_position("AAPL", 5)
+
+    # Add an existing position to the portfolio
+    position1 = Position(market_data_api, "GOOG", 1)
+    portfolio1.add_existing_position(position1)
 
     # Create the second portfolio
     portfolio2 = Portfolio(market_data_api, starting_cash=10000, name="P2")
-    portfolio2.add_position(Position(market_data_api, "IVV", 10.75))
-    portfolio2.add_position(Position(market_data_api, "QQQ", 2.33))
+    portfolio2.add_existing_position(Position(market_data_api, "IVV", 10.75))
+    portfolio2.add_existing_position(Position(market_data_api, "QQQ", 2.33))
 
     # Add both portfolios along with fake algorithms to the trading machine. The algos
     # are dummy strings (for now) because they are keys in a dictionary, so if you add

@@ -1,4 +1,4 @@
-from config.alpaca import alpaca_setup
+from util.alpaca import alpaca_setup
 
 
 ##################################################################################

@@ -24,7 +24,19 @@ class Portfolio():
         self.cash = starting_cash
         self.time_of_last_price_gen_increment = None
 
-    def add_position(self, new_position):
+    def create_new_position(self, symbol, initial_quantity):
+        """
+        Create a new Position from the provided args and add it to the Portfolio.
+
+        Arguments:
+            symbol -- A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+            initial_quantity -- The quantity of this asset that should be held when this
+                instance is finished being constructed.
+        """
+        new_position = Position(self.market_data_api, symbol, initial_quantity)
+        self.add_existing_position(new_position)
+
+    def add_existing_position(self, new_position):
         """
         Adds an initialized Position object to the Portfolio.
 
@@ -55,6 +67,18 @@ class Portfolio():
         else:
             raise TypeError(
                 "The object passed is not of type containers.position.Position")
+
+    def delete_empty_positions(self):
+        """
+        Delete all positions in the portfolio that have 0 quantity currently held.
+        """
+        non_empty_positions = []
+
+        for position in self.positions:
+            if position.quantity != 0:
+                non_empty_positions.append(position)
+
+        self.positions = non_empty_positions
 
     def total_value(self):
         """

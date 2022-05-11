@@ -1,6 +1,12 @@
 # DEFINITION: A portfolio is simply a collection of individual positions
 
 from containers.position import Position
+from enum import Enum
+
+
+class OrderType(Enum):
+    BUY = 1
+    SELL = 2
 
 
 class Portfolio():
@@ -23,6 +29,7 @@ class Portfolio():
         self.positions = []
         self.cash = starting_cash
         self.time_of_last_price_gen_increment = None
+        self.most_recent_order_number = 0
 
     def create_new_position(self, symbol, initial_quantity):
         """
@@ -109,8 +116,30 @@ class Portfolio():
             if position.needs_new_bar_generator == False:
                 self.time_of_last_price_gen_increment = position.time_when_price_last_updated
 
-    def add_order(self):
-        pass
+    def place_order(self, symbol, quantity, order_type=OrderType.BUY):
+        """
+        Places an order to buy or sell some quantity of an asset. Adds the order to an order
+        queue and does not directly execute the order. That is done by process_pending_orders(). 
+
+        Arguments:
+            symbol -- A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+            quantity -- The quantity of the asset to be bought or sold.
+
+        Keyword Arguments:
+            order_type -- A value from the enum OrderType that represents if the order is a 
+                buy or a sell order (default: {OrderType.BUY})
+
+        Raises:
+            ValueError: Raises when the value passed into order_type is not in the enum
+                OrderType.
+        """
+        # TODO: Finish implementing this
+        if order_type == OrderType.BUY:
+            pass
+        elif order_type == OrderType.SELL:
+            pass
+        else:
+            raise ValueError("Invalid order type.")
 
     def cancel_order(self):
         pass

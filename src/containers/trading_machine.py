@@ -2,12 +2,12 @@
 # and trading algorithm are being run on. This encompasses backtesting (testing on
 # historical data) as well as running an algorithm live.
 
-import pytz
 from alpaca_trade_api import TimeFrame
 from containers.trading_algorithm import TradingAlgorithm
 from containers.portfolio import Portfolio
 from dataclasses import dataclass
 from datetime import date, datetime
+from pytz import timezone
 
 
 @dataclass
@@ -41,7 +41,8 @@ class TradingMachine():
                 run at. 
 
         Keyword Arguments:
-            time_frame -- _description_ (default: {TimeFrame.Minute})
+            time_frame -- An alpaca_trade_api.TimeFrame value corresponding to the time
+                delta between price values. (default: {TimeFrame.Minute})
         """
         self.trading_api = trading_api
         self.market_data_api = market_data_api
@@ -78,10 +79,10 @@ class TradingMachine():
             )
 
             # Grab the DST-aware timezone object for eastern time
-            timezone = pytz.timezone("America/New_York")
+            timezone_ET = timezone("America/New_York")
 
             # Create a datetime object for the opening time with the timezone info attached
-            open_time = timezone.localize(datetime(
+            open_time = timezone_ET.localize(datetime(
                 day.date.year,
                 day.date.month,
                 day.date.day,
@@ -90,7 +91,7 @@ class TradingMachine():
             ))
 
             # Create a datetime object for the closing time with the timezone info attached
-            close_time = timezone.localize(datetime(
+            close_time = timezone_ET.localize(datetime(
                 day.date.year,
                 day.date.month,
                 day.date.day,

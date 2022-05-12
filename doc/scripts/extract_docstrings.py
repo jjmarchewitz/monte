@@ -3,7 +3,5 @@ import os
 
 # os.chdir()
 
-with open("TEST.txt", "w") as f:
+with open("TEST.txt", "r+") as f:
     f.write("AAA\n")
-
-#

@@ -154,9 +154,9 @@ class Portfolio():
         Arguments:
             time_frame -- An alpaca_trade_api.TimeFrame value corresponding to the time
                 delta between price values.
-            start_time -- An ISO-8061-compliant date and time to start the new generators
+            start_time -- An ISO-8601-compliant date and time to start the new generators
                 at.
-            end_time -- An ISO-8061-compliant date and time to start the new generators
+            end_time -- An ISO-8601-compliant date and time to start the new generators
                 at.
         """
         for position in self.positions:

@@ -76,9 +76,9 @@ class Position():
 
         Arguments:
             time_frame -- The time delta between bars. Can be a minute, hour, or day.
-            start_time -- The ISO-8061 compliant date/time for the generator to start 
+            start_time -- The ISO-8601 compliant date/time for the generator to start 
                 generating bars.
-            end_time -- The ISO-8061 compliant date/time for the generator to stop 
+            end_time -- The ISO-8601 compliant date/time for the generator to stop 
                 generating bars.
         """
         if time_frame == TimeFrame.Day:

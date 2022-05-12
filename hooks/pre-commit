@@ -1,2 +1,2 @@
 #!/bin/sh
-python3 doc/scripts/extract_docstrings.py
+python3 doc/scripts/update_auto_generated_docs.py

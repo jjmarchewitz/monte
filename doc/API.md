@@ -1,1 +1,1 @@
-# TODO: fill this with the docstrings grabbed from the repo
+# API Documentation for algo-playground 

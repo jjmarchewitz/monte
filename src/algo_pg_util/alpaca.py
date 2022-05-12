@@ -1,7 +1,7 @@
-import alpaca_trade_api as tradeapi
-import os
-import re
+from alpaca_trade_api import REST
 from dataclasses import dataclass
+from os import environ, getcwd, sep
+from re import findall
 
 
 @dataclass
@@ -24,27 +24,27 @@ def alpaca_setup():
         An Alpaca trading REST API instance and an Alpaca market history REST API instance.
     """
     api_settings = APISettings()
-    repo_dir = re.findall("^.*algo-playground", os.getcwd())[0] + os.sep
+    repo_dir = findall("^.*algo-playground", getcwd())[0]
 
     # Grab all of the info contained in alpaca.config
-    with open(f"{repo_dir}alpaca.config", "r") as api_config_file:
+    with open(f"{repo_dir}{sep}alpaca.config", "r") as api_config_file:
         api_config_file_str = api_config_file.read()
 
         # Load the trading context
         api_settings.trading_context = (
-            re.findall('TRADING_CONTEXT=".*"', api_config_file_str)[0]
+            findall('TRADING_CONTEXT=".*"', api_config_file_str)[0]
             .lstrip("TRADING_CONTEXT=")
             .strip('"'))
 
         # Load the API key ID
         api_settings.api_key_ID = (
-            re.findall('APCA-API-KEY-ID=".*"', api_config_file_str)[0]
+            findall('APCA-API-KEY-ID=".*"', api_config_file_str)[0]
             .lstrip("APCA-API-KEY-ID=")
             .strip('"'))
 
         # Load the secret key
         api_settings.secret_key = (
-            re.findall('APCA-API-SECRET-KEY=".*"', api_config_file_str)[0]
+            findall('APCA-API-SECRET-KEY=".*"', api_config_file_str)[0]
             .lstrip("APCA-API-SECRET-KEY=")
             .strip('"'))
 
@@ -62,18 +62,18 @@ def alpaca_setup():
     market_data_website = "https://data.alpaca.markets"
 
     # Set the API key ID and secret key as an environment variables
-    os.environ["APCA-API-KEY-ID"] = api_settings.api_key_ID
-    os.environ["APCA-API-SECRET-KEY"] = api_settings.secret_key
+    environ["APCA-API-KEY-ID"] = api_settings.api_key_ID
+    environ["APCA-API-SECRET-KEY"] = api_settings.secret_key
 
     # Create the instance of the alpaca trading API with the given keys and website
-    trading_api = tradeapi.REST(
+    trading_api = REST(
         api_settings.api_key_ID,
         api_settings.secret_key,
         api_settings.trading_website
     )
 
     # Create the instance of the alpaca market data API
-    market_data_api = tradeapi.REST(
+    market_data_api = REST(
         api_settings.api_key_ID,
         api_settings.secret_key,
         market_data_website

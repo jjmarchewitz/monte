@@ -1,16 +1,21 @@
 .. Algo Playground documentation master file, created by
-   sphinx-quickstart on Fri May 13 13:26:15 2022.
+   sphinx-quickstart on Fri May 13 14:28:34 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
 Welcome to Algo Playground's documentation!
 ===========================================
 
-.. autosummary:: 
-   :toctree: _autosummary
-   :recursive:
+.. automodule:: algo_pg.containers.portfolio
+   :members:
 
-   algo_pg
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   modules
+
+
 
 Indices and tables
 ==================

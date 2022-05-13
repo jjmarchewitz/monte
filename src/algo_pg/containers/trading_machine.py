@@ -10,6 +10,8 @@ from datetime import date, datetime
 from pytz import timezone
 
 
+# TODO: Rewrite docstrings in google-no-type style
+
 @dataclass
 class MarketDay():
     date: str
@@ -24,6 +26,7 @@ class AlgoPortfolioPair():
 
 
 class TradingMachine():
+    # TODO: Write class docstring
     def __init__(
             self, trading_api, market_data_api, start_date, end_date,
             time_frame=TimeFrame.Minute):

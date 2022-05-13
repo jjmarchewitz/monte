@@ -7,7 +7,10 @@ from datetime import timedelta
 from dateutil.parser import isoparse
 
 
+# TODO: Rewrite docstrings in google-no-type style
+
 class Position():
+    # TODO: Write class docstring
     def __init__(self, market_data_api, symbol, initial_quantity):
         """
         Constructor for the Position class.

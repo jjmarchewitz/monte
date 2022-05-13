@@ -4,6 +4,8 @@ from os import environ, getcwd, sep
 from re import findall
 
 
+# TODO: Rewrite docstrings in google-no-type style
+
 @dataclass
 class APISettings():
     api_key_ID: str = ""

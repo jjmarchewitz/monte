@@ -1,2 +1,1 @@
 #!/bin/sh
-python3 doc/scripts/update_auto_generated_docs.py

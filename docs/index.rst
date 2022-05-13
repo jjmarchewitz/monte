@@ -6,14 +6,14 @@
 Welcome to Algo Playground's documentation!
 ===========================================
 
-.. automodule:: algo_pg.containers.portfolio
-   :members:
+.. .. automodule:: algo_pg.containers.portfolio
+..    :members:
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+   source/algo_pg
 
 
 

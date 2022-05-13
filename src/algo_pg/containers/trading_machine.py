@@ -14,6 +14,9 @@ from pytz import timezone
 
 @dataclass
 class MarketDay():
+    """
+    # TODO:
+    """
     date: str
     open_time_iso: str
     close_time_iso: str
@@ -21,12 +24,18 @@ class MarketDay():
 
 @dataclass
 class AlgoPortfolioPair():
+    """
+    # TODO:
+    """
     algo: TradingAlgorithm
     portfolio: Portfolio
 
 
 class TradingMachine():
+    """
     # TODO: Write class docstring
+    """
+
     def __init__(
             self, trading_api, market_data_api, start_date, end_date,
             time_frame=TimeFrame.Minute):

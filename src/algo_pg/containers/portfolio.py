@@ -11,7 +11,7 @@ class OrderType(Enum):
 
 class Portfolio():
     """
-    Whoa do I need a class docstring?
+    # TODO: Write this class docstring
     """
 
     def __init__(self, market_data_api, starting_cash=10000, name=None):

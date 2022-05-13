@@ -2,9 +2,9 @@
 # and trading algorithm are being run on. This encompasses backtesting (testing on
 # historical data) as well as running an algorithm live.
 
+from algo_pg.containers.trading_algorithm import TradingAlgorithm
+from algo_pg.containers.portfolio import Portfolio
 from alpaca_trade_api import TimeFrame
-from containers.trading_algorithm import TradingAlgorithm
-from containers.portfolio import Portfolio
 from dataclasses import dataclass
 from datetime import date, datetime
 from pytz import timezone

@@ -1,8 +1,8 @@
-from algo_pg_util.alpaca import alpaca_setup
+from algo_pg.containers.portfolio import Portfolio
+from algo_pg.containers.position import Position
+from algo_pg.containers.trading_machine import TradingMachine
+from algo_pg.util.alpaca import alpaca_setup
 from alpaca_trade_api import TimeFrame
-from containers.portfolio import Portfolio
-from containers.position import Position
-from containers.trading_machine import TradingMachine
 
 
 def main():

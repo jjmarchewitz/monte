@@ -1,6 +1,6 @@
 # DEFINITION: A portfolio is simply a collection of individual positions
 
-from containers.position import Position
+from algo_pg.containers.position import Position
 from enum import Enum
 
 

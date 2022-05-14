@@ -1,8 +1,9 @@
 alpaca
-===================
+======
 
 .. automodule:: util.alpaca
-   :members:
+	:members:
 
 .. toctree::
-   :maxdepth: 4
+	:maxdepth: 4
+

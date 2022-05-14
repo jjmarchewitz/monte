@@ -1,8 +1,9 @@
 trading_machine
-==================================
+===============
 
 .. automodule:: containers.trading_machine
-   :members:
+	:members:
 
 .. toctree::
-   :maxdepth: 4
+	:maxdepth: 4
+

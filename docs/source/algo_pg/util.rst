@@ -2,6 +2,7 @@ util
 ====
 
 .. toctree::
-   :maxdepth: 4
+	:maxdepth: 4
 
-   util/alpaca
+	util/alpaca
+

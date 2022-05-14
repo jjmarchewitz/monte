@@ -6,6 +6,9 @@ from re import findall
 
 @dataclass
 class APISettings():
+    """
+    A dataclass meant for storing the user's personal alpaca keys and configurations.
+    """
     api_key_ID: str = ""
     secret_key: str = ""
     trading_context: str = ""
@@ -18,11 +21,12 @@ def alpaca_setup():
     and an Alpaca market history REST API instance.
 
     Raises:
-        ValueError: Is raised when the trading context in alpaca.config is invalid.
+        ValueError: When the trading context in alpaca.config is invalid.
 
     Returns:
         An Alpaca trading REST API instance and an Alpaca market history REST API instance.
     """
+
     api_settings = APISettings()
     repo_dir = findall("^.*algo-playground", getcwd())[0]
 

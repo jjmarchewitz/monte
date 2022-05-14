@@ -9,7 +9,15 @@
 <br><br>
 
 ## Instructions ##
-* To install the project as a local package
+* Create a virtual environment in the repository folder
+    * Create a folder ".venv" in the repository, then cd into it
+    * Create the environment
+        * On Windows: "python -m venv (your environment name here)"
+        * On macOS: "python3 -m venv (your environment name here)"
+    * Activate the environment
+        * Run the command "source (environment name)/bin/activate"
+        * If inside the repository folder instead of .venv/ run "source .venv/(environment name)/bin/activate"
+* Install the project as a local package
     * Make sure your terminal/CMD's working directory is the algo-playground folder
     * Install the current project as a package with pip **(don't forget the period in the command at the end)**
         * On Windows: "python -m pip install -e ."
@@ -24,6 +32,14 @@
         * Note that "alpaca.config" is in the .gitignore so your file with your keys should not be committed with the rest of your work. The filename should be greyed out in VS Code
     * Open the new "alpaca.config" file and copy/paste your API key ID and secret key inside of the quotations that say "paste here"
     * Run the python script "scratchpad_example.py" inside of the tests folder, and it should print out your account information without any errors
+* Building the documentation:
+    * Happens automatically when a push occurs
+    * Can be triggered manually while inside of docs/
+        * On Windows, run
+                * python generate_source_rst.py
+                * make html
+        * On macOS: "python3 generate_source_rst.py"
+    * Open "docs/index.html" with your browser. Enjoy! You can even bookmark it
 <br><br>
 
 ## Notes and Reminders ##

@@ -67,7 +67,8 @@ class TradingMachine():
         """
         # Get a list of all market days between start_date and end_date, including their
         # open and close times
-        raw_market_days = self.trading_api.get_calendar(self.start_date, self.end_date)
+        raw_market_days = self.trading_api.get_calendar(
+            self.start_date, self.end_date)
 
         for day in raw_market_days:
 

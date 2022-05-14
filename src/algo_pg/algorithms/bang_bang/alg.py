@@ -1,4 +1,4 @@
-import yfinance
+import alpaca_trade_api
 
 
 class BangBang():

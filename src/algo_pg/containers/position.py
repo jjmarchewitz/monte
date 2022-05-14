@@ -1,22 +1,24 @@
-# DEFINITION: This is a container for an individual position, like ETH or IVV. An instance
-# is meant to be stored inside of a portfolio, so the position has a quantity currently held
-# and a current price associated with it.
-
 from alpaca_trade_api import TimeFrame
 from datetime import timedelta
 from dateutil.parser import isoparse
 
 
 class Position():
+    """
+    This is a container for an individual position, like ETH or IVV. An instance is meant\
+    to be stored inside of a portfolio, so the position has a quantity currently held and\
+    a current price associated with it.
+    """
+
     def __init__(self, market_data_api, symbol, initial_quantity):
         """
         Constructor for the Position class.
 
-        Arguments:
-            market_data_api -- An instance of the alpaca_trade_api package's own REST API
+        Args:
+            market_data_api: An instance of the alpaca_trade_api package's own REST API
                 set up to retrieve historical market data.
-            symbol -- A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
-            initial_quantity -- The quantity of this asset that should be held when this
+            symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+            initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
         """
         self.market_data_api = market_data_api
@@ -42,11 +44,12 @@ class Position():
         Determines an equivalent price for an asset during a bar from info about the
         bar itself.
 
-        Arguments:
-            bar -- One bar of stock information that takes up one TimeFrame's worth of time.
+        Args:
+            bar: One bar of stock information that takes up one TimeFrame's worth of time.
 
         Returns:
-            A price, determined from information about the bar.
+            An average price to represent the bar, determined from information about the
+            bar.
         """
         # TODO: Find a better way to approximate the average price during a bar
         price = (bar.h + bar.l) / 2
@@ -74,11 +77,11 @@ class Position():
         Create a new bar generator with a start time and end time that occur on the same
         day and correspond to the open and close times of the market for that day.
 
-        Arguments:
-            time_frame -- The time delta between bars. Can be a minute, hour, or day.
-            start_time -- The ISO-8601 compliant date/time for the generator to start 
+        Args:
+            time_frame: The time delta between bars. Can be a minute, hour, or day.
+            start_time: The ISO-8601 compliant date/time for the generator to start 
                 generating bars.
-            end_time -- The ISO-8601 compliant date/time for the generator to stop 
+            end_time: The ISO-8601 compliant date/time for the generator to stop 
                 generating bars.
         """
         if time_frame == TimeFrame.Day:

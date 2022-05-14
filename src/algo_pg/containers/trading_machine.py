@@ -1,10 +1,8 @@
-# DEFINITION: The "trading context" is meant to represent the timeline that a portfolio
-# and trading algorithm are being run on. This encompasses backtesting (testing on
-# historical data) as well as running an algorithm live.
+# DEFINITION:
 
+from algo_pg.containers.trading_algorithm import TradingAlgorithm
+from algo_pg.containers.portfolio import Portfolio
 from alpaca_trade_api import TimeFrame
-from containers.trading_algorithm import TradingAlgorithm
-from containers.portfolio import Portfolio
 from dataclasses import dataclass
 from datetime import date, datetime
 from pytz import timezone
@@ -12,6 +10,10 @@ from pytz import timezone
 
 @dataclass
 class MarketDay():
+    """
+    A dataclass holding information for a single day the market is open, like the date. \
+    This dataclass also stores the market open time and close time in the ISO-8601 format.
+    """
     date: str
     open_time_iso: str
     close_time_iso: str
@@ -19,30 +21,38 @@ class MarketDay():
 
 @dataclass
 class AlgoPortfolioPair():
+    """
+    A trading algorithm-portfolio pair is run together across a trading machine's timeline\
+    as one unit.
+    """
     algo: TradingAlgorithm
     portfolio: Portfolio
 
 
 class TradingMachine():
+    """
+    The "trading machine" is meant to represent a machine running an algorithm with data \
+    across the timeline that are provided as constructor arguments. This encompasses\
+    backtesting (testing on historical data) as well as running an algorithm live.
+    """
+
     def __init__(
             self, trading_api, market_data_api, start_date, end_date,
             time_frame=TimeFrame.Minute):
         """
         Constructor for the TradingMachine class.
 
-        Arguments:
-            trading_api -- An instance of the alpaca_trade_api package's own REST API
+        Args:
+            trading_api: An instance of the alpaca_trade_api package's own REST API
                 set up to retrieve live trading data. Here, it is used for calendar data.
-            market_data_api -- An instance of the alpaca_trade_api package's own REST API
+            market_data_api: An instance of the alpaca_trade_api package's own REST API
                 set up to retrieve historical market data.
-            start_date -- The YYYY-MM-DD formatted date for the trading machine to start its
+            start_date: The YYYY-MM-DD formatted date for the trading machine to start its
+                run at.
+            end_date: The YYYY-MM-DD formatted date for the trading machine to end its
                 run at. 
-            end_date -- The YYYY-MM-DD formatted date for the trading machine to end its
-                run at. 
-
-        Keyword Arguments:
-            time_frame -- An alpaca_trade_api.TimeFrame value corresponding to the time
-                delta between price values. (default: {TimeFrame.Minute})
+            time_frame: An alpaca_trade_api.TimeFrame value corresponding to the time
+                delta between price values. Defaults to TimeFrame.Minute.
         """
         self.trading_api = trading_api
         self.market_data_api = market_data_api
@@ -118,9 +128,9 @@ class TradingMachine():
         machine. This is useful because the run() function can iterate over these pairs and
         all of the provided algorithms against their corresponding portfolios.
 
-        Arguments:
-            algorithm -- A TradingAlgorithm instance or instance of a sub-class.
-            portfolio -- A Portfolio instance.
+        Args:
+            algorithm: A TradingAlgorithm instance or instance of a sub-class.
+            portfolio: A Portfolio instance.
         """
         # TODO: Add a check to make sure the algorithm and portfolio are set up correctly
         # before adding

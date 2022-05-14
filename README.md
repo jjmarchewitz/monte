@@ -12,7 +12,7 @@
 * Create a virtual environment in the repository folder
     * Create a folder ".venv" in the repository, then cd into it
     * Create the environment
-        * On Windows: "python -m venv (your environment name here)"
+        * On Windows (Git Bash): "python -m venv (your environment name here)"
         * On macOS: "python3 -m venv (your environment name here)"
     * Activate the environment
         * Run the command "source (environment name)/bin/activate"
@@ -34,11 +34,15 @@
     * Run the python script "scratchpad_example.py" inside of the tests folder, and it should print out your account information without any errors
 * Building the documentation:
     * Happens automatically when a push occurs
-    * Can be triggered manually while inside of docs/
-        * On Windows, run
+    * Can be triggered manually while current working directory in terminal is algo-playground/docs/
+        * On Windows (Git Bash), run
+                * sphinx-apidoc -o source/ ../src/algo_pg
                 * python generate_source_rst.py
+                * mingw32-make html
+        * On macOS, run
+                * sphinx-apidoc -o source/ ../src/algo_pg
+                * python3 generate_source_rst.py
                 * make html
-        * On macOS: "python3 generate_source_rst.py"
     * Open "docs/index.html" with your browser. Enjoy! You can even bookmark it
 <br><br>
 

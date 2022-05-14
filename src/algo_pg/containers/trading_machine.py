@@ -10,8 +10,6 @@ from datetime import date, datetime
 from pytz import timezone
 
 
-# TODO: Rewrite docstrings in google-no-type style
-
 @dataclass
 class MarketDay():
     """
@@ -42,19 +40,17 @@ class TradingMachine():
         """
         Constructor for the TradingMachine class.
 
-        Arguments:
-            trading_api -- An instance of the alpaca_trade_api package's own REST API
+        Args:
+            trading_api: An instance of the alpaca_trade_api package's own REST API
                 set up to retrieve live trading data. Here, it is used for calendar data.
-            market_data_api -- An instance of the alpaca_trade_api package's own REST API
+            market_data_api: An instance of the alpaca_trade_api package's own REST API
                 set up to retrieve historical market data.
-            start_date -- The YYYY-MM-DD formatted date for the trading machine to start its
+            start_date: The YYYY-MM-DD formatted date for the trading machine to start its
+                run at.
+            end_date: The YYYY-MM-DD formatted date for the trading machine to end its
                 run at. 
-            end_date -- The YYYY-MM-DD formatted date for the trading machine to end its
-                run at. 
-
-        Keyword Arguments:
-            time_frame -- An alpaca_trade_api.TimeFrame value corresponding to the time
-                delta between price values. (default: {TimeFrame.Minute})
+            time_frame: An alpaca_trade_api.TimeFrame value corresponding to the time
+                delta between price values. Defaults to TimeFrame.Minute.
         """
         self.trading_api = trading_api
         self.market_data_api = market_data_api
@@ -129,9 +125,9 @@ class TradingMachine():
         machine. This is useful because the run() function can iterate over these pairs and
         all of the provided algorithms against their corresponding portfolios.
 
-        Arguments:
-            algorithm -- A TradingAlgorithm instance or instance of a sub-class.
-            portfolio -- A Portfolio instance.
+        Args:
+            algorithm: A TradingAlgorithm instance or instance of a sub-class.
+            portfolio: A Portfolio instance.
         """
         # TODO: Add a check to make sure the algorithm and portfolio are set up correctly
         # before adding

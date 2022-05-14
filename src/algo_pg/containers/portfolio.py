@@ -5,6 +5,9 @@ from enum import Enum
 
 
 class OrderType(Enum):
+    """
+    # TODO:
+    """
     BUY = 1
     SELL = 2
 
@@ -54,9 +57,9 @@ class Portfolio():
                 to the Portfolio.
 
         Raises:
-            ValueError: Raises when there is a Position object for the same symbol as a
+            ValueError: When there is a Position object for the same symbol as a
                 Position already in the Portfolio.
-            TypeError: Raises when new_position is not of type containers.position.Position.
+            TypeError: When new_position is not of type containers.position.Position.
         """
         # Check that the new_position is a Position object
         if type(new_position) is Position:
@@ -130,7 +133,7 @@ class Portfolio():
                 buy or a sell order. Defaults to OrderType.BUY.
 
         Raises:
-            ValueError: Raises when the value passed into order_type is not in the enum
+            ValueError: When the value passed into order_type is not in the enum
                 OrderType.
         """
         # TODO: Finish implementing this

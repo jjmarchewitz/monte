@@ -6,15 +6,11 @@
 Welcome to Algo Playground's documentation!
 ===========================================
 
-.. .. automodule:: algo_pg.containers.portfolio
-..    :members:
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    source/algo_pg
-
 
 
 Indices and tables

@@ -11,7 +11,8 @@ from pytz import timezone
 @dataclass
 class MarketDay():
     """
-    # TODO:
+    A dataclass holding information for a single day the market is open, like the date. \
+    This dataclass also stores the market open time and close time in the ISO-8601 format.
     """
     date: str
     open_time_iso: str

@@ -37,13 +37,13 @@
   * Happens automatically when a push occurs
   * Can be triggered manually while current working directory in terminal is algo-playground/docs/
       * On Windows (Git Bash), run
-              * sphinx-apidoc -o source/ ../src/algo_pg
-              * python generate_source_rst.py
-              * mingw32-make html
+          * sphinx-apidoc -o source/ ../src/algo_pg
+          * python generate_source_rst.py
+          * mingw32-make html
       * On macOS, run
-              * sphinx-apidoc -o source/ ../src/algo_pg
-              * python3 generate_source_rst.py
-              * make html
+          * sphinx-apidoc -o source/ ../src/algo_pg
+          * python3 generate_source_rst.py
+          * make html
   * Open "docs/index.html" with your browser. Enjoy! You can even bookmark it
 <br><br>
 

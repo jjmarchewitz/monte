@@ -1,6 +1,4 @@
-# DEFINITION: The "trading context" is meant to represent the timeline that a portfolio
-# and trading algorithm are being run on. This encompasses backtesting (testing on
-# historical data) as well as running an algorithm live.
+# DEFINITION:
 
 from algo_pg.containers.trading_algorithm import TradingAlgorithm
 from algo_pg.containers.portfolio import Portfolio
@@ -23,7 +21,8 @@ class MarketDay():
 @dataclass
 class AlgoPortfolioPair():
     """
-    # TODO:
+    A trading algorithm-portfolio pair is run together across a trading machine's timeline\
+    as one unit.
     """
     algo: TradingAlgorithm
     portfolio: Portfolio
@@ -31,7 +30,9 @@ class AlgoPortfolioPair():
 
 class TradingMachine():
     """
-    # TODO: Write class docstring
+    The "trading machine" is meant to represent a machine running an algorithm with data \
+    across the timeline that are provided as constructor arguments. This encompasses\
+    backtesting (testing on historical data) as well as running an algorithm live.
     """
 
     def __init__(

@@ -1,7 +1,3 @@
-# DEFINITION: This is a container for an individual position, like ETH or IVV. An instance
-# is meant to be stored inside of a portfolio, so the position has a quantity currently held
-# and a current price associated with it.
-
 from alpaca_trade_api import TimeFrame
 from datetime import timedelta
 from dateutil.parser import isoparse
@@ -9,7 +5,9 @@ from dateutil.parser import isoparse
 
 class Position():
     """
-    # TODO: Write class docstring
+    This is a container for an individual position, like ETH or IVV. An instance is meant\
+    to be stored inside of a portfolio, so the position has a quantity currently held and\
+    a current price associated with it.
     """
 
     def __init__(self, market_data_api, symbol, initial_quantity):

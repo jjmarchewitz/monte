@@ -32,7 +32,14 @@
         * Note that "alpaca.config" is in the .gitignore so your file with your keys should not be committed with the rest of your work. The filename should be greyed out in VS Code
     * Open the new "alpaca.config" file and copy/paste your API key ID and secret key inside of the quotations that say "paste here"
     * Run the python script "scratchpad_example.py" inside of the tests folder, and it should print out your account information without any errors
-* To build the documentation: TBD TODO:
+* Building the documentation:
+    * Happens automatically when a push occurs
+    * Can be triggered manually while inside of docs/
+        * On Windows, run
+                * python generate_source_rst.py
+                * make html
+        * On macOS: "python3 generate_source_rst.py"
+    * Open "docs/index.html" with your browser. Enjoy! You can even bookmark it
 <br><br>
 
 ## Notes and Reminders ##

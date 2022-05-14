@@ -1,4 +1,4 @@
-# DEFINITION: A portfolio is simply a collection of individual positions
+# DEFINITION:
 
 from algo_pg.containers.position import Position
 from enum import Enum
@@ -6,7 +6,7 @@ from enum import Enum
 
 class OrderType(Enum):
     """
-    # TODO:
+    An Enum holding a value for an order either being a buy or a sell order.
     """
     BUY = 1
     SELL = 2
@@ -14,7 +14,7 @@ class OrderType(Enum):
 
 class Portfolio():
     """
-    # TODO: Write this class docstring
+    A portfolio is simply a collection of individual positions.
     """
 
     def __init__(self, market_data_api, starting_cash=10000, name=None):

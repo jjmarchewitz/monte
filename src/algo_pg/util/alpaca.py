@@ -8,6 +8,9 @@ from re import findall
 
 @dataclass
 class APISettings():
+    """
+    A dataclass meant for storing the user's personal alpaca keys and configurations.
+    """
     api_key_ID: str = ""
     secret_key: str = ""
     trading_context: str = ""

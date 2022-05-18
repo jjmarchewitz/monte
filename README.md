@@ -23,9 +23,9 @@
   * Install the current project as a package with pip **(don't forget the period in the command at the end)**
       * On Windows: "python -m pip install -e ."
       * On macOS: "python3 -m pip install -e ."
+  * To update dependencies later down the line, re-install the package locally as above
 ### Use the tracked git hooks folder instead of your local copy for necessary hooks ###
   * From the algo-playground directory, run "git config core.hooksPath hooks"
-  * To update dependencies later down the line, re-install the package locally as above
 ### [Create an Alpaca account](https://app.alpaca.markets/signup) ###
   * Once the account is created, switch your view (top left corner) to the paper trading dashboard instead of live.
   * On the right hand side, click "show" on "Your API keys"

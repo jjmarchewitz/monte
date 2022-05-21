@@ -1,6 +1,7 @@
 # DEFINITION:
 
 from algo_pg.containers.position import Position
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -10,6 +11,14 @@ class OrderType(Enum):
     """
     BUY = 1
     SELL = 2
+
+
+@dataclass
+class Order():
+    identifier: int
+    symbol: str
+    quantity: float
+    order_type: OrderType
 
 
 class Portfolio():
@@ -34,7 +43,8 @@ class Portfolio():
         self.positions = []
         self.cash = starting_cash
         self.time_of_last_price_gen_increment = None
-        self.most_recent_order_number = 0
+        self.current_order_id_number = 1
+        self.order_queue = []
 
     def create_new_position(self, symbol, initial_quantity):
         """
@@ -135,14 +145,25 @@ class Portfolio():
         Raises:
             ValueError: When the value passed into order_type is not in the enum
                 OrderType.
+
+        Returns:
+            The unique order ID number for the order being created.
         """
-        # TODO: Finish implementing this
-        if order_type == OrderType.BUY:
-            pass
-        elif order_type == OrderType.SELL:
-            pass
-        else:
+
+        # Check that the order type passed in is a valid order type from the enum OrderType
+        if order_type not in OrderType:
             raise ValueError("Invalid order type.")
+
+        # Set the order number and increment it for the next order
+        order_num = self.current_order_id_number
+        self.current_order_id_number += 1
+
+        # Create a new order object with the correct attributes and append it to the order
+        # queue
+        new_order = Order(order_num, symbol, quantity, order_type)
+        self.order_queue.append(new_order)
+
+        return order_num
 
     def cancel_order(self):
         pass

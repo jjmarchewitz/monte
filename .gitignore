@@ -4,6 +4,7 @@
 
 # VS Code
 *.code-workspace
+.vscode/
 
 # macOS
 *.DS_Store

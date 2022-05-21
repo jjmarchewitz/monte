@@ -1,2 +1,2 @@
 #!/bin/sh
-source ../scripts/build_docs.sh
+source scripts/build_docs.sh

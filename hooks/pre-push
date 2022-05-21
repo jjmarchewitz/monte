@@ -1,2 +1,3 @@
 #!/bin/sh
-source scripts/build_docs.sh
+cd hooks
+source ../scripts/build_docs.sh

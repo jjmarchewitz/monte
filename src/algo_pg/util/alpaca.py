@@ -26,7 +26,6 @@ def alpaca_setup():
     Returns:
         An Alpaca trading REST API instance and an Alpaca market history REST API instance.
     """
-
     api_settings = APISettings()
     repo_dir = findall("^.*algo-playground", getcwd())[0]
 

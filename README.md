@@ -23,9 +23,9 @@
   * Install the current project as a package with pip **(don't forget the period in the command at the end)**
       * On Windows: "python -m pip install -e ."
       * On macOS: "python3 -m pip install -e ."
+  * To update dependencies later down the line, re-install the package locally as above
 ### Use the tracked git hooks folder instead of your local copy for necessary hooks ###
   * From the algo-playground directory, run "git config core.hooksPath hooks"
-  * To update dependencies later down the line, re-install the package locally as above
 ### [Create an Alpaca account](https://app.alpaca.markets/signup) ###
   * Once the account is created, switch your view (top left corner) to the paper trading dashboard instead of live.
   * On the right hand side, click "show" on "Your API keys"
@@ -37,15 +37,14 @@
   * Happens automatically when a push occurs
   * Can be triggered manually while current working directory in terminal is algo-playground/docs/
       * On Windows (Git Bash), run
-          * sphinx-apidoc -o source/ ../src/algo_pg
           * python generate_source_rst.py
           * mingw32-make html
       * On macOS, run
-          * sphinx-apidoc -o source/ ../src/algo_pg
           * python3 generate_source_rst.py
           * make html
   * Open "docs/index.html" with your browser. Enjoy! You can even bookmark it
 <br><br>
+
 
 ## Notes and Reminders ##
 * There is no main.py anymore, create your scratchpads in tests/

@@ -1,4 +1,4 @@
-from util.alpaca import alpaca_setup
+from algo_pg.util.alpaca import alpaca_setup
 
 
 ##################################################################################

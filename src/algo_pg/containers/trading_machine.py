@@ -1,4 +1,6 @@
-# DEFINITION:
+"""
+TODO: Module docstring
+"""
 
 from algo_pg.containers.trading_algorithm import TradingAlgorithm
 from algo_pg.containers.portfolio import Portfolio

@@ -1,3 +1,7 @@
+"""
+TODO: Module docstring
+"""
+
 from alpaca_trade_api import TimeFrame
 from datetime import timedelta
 from dateutil.parser import isoparse

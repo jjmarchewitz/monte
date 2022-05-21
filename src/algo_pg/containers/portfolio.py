@@ -1,4 +1,6 @@
-# DEFINITION:
+"""
+TODO: Module docstring
+"""
 
 from algo_pg.containers.position import Position
 from dataclasses import dataclass
@@ -15,6 +17,10 @@ class OrderType(Enum):
 
 @dataclass
 class Order():
+    """
+    A dataclass that represents a market order
+    """
+    # TODO: Consider adding a creation date/time to this dataclass
     identifier: int
     symbol: str
     quantity: float

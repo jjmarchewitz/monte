@@ -1,5 +1,5 @@
 """
-TODO: Module docstring
+A Portfolio is meant to represent a collection of individual Positions.
 """
 
 from algo_pg.machine.position import Position
@@ -21,7 +21,7 @@ class Order():
     A dataclass that represents a market order
     """
     # TODO: Consider adding a creation date/time to this dataclass
-    identifier: int
+    unique_id_number: int
     symbol: str
     quantity: float
     order_type: OrderType
@@ -49,8 +49,8 @@ class Portfolio():
         self.positions = []
         self.cash = starting_cash
         self.time_of_last_price_gen_increment = None
-        self.current_order_id_number = 1
-        self.order_queue = []
+        self._current_order_id_number = 1
+        self._order_queue = []
 
     def create_new_position(self, symbol, initial_quantity):
         """
@@ -155,27 +155,50 @@ class Portfolio():
         Returns:
             The unique order ID number for the order being created.
         """
+        # TODO: Actually test this out
 
         # Check that the order type passed in is a valid order type from the enum OrderType
         if order_type not in OrderType:
             raise ValueError("Invalid order type.")
 
         # Set the order number and increment it for the next order
-        order_num = self.current_order_id_number
-        self.current_order_id_number += 1
+        order_num = self._current_order_id_number
+        self._current_order_id_number += 1
 
         # Create a new order object with the correct attributes and append it to the order
         # queue
         new_order = Order(order_num, symbol, quantity, order_type)
-        self.order_queue.append(new_order)
+        self._order_queue.append(new_order)
 
         return order_num
 
-    def cancel_order(self):
-        pass
+    def cancel_order(self, id_of_order_to_cancel):
+        """
+        Removes the order with the given ID from the order queue.
+
+        Args:
+            id_of_order_to_cancel: The ID of the order that needs to be cancelled.
+
+        Returns:
+            True if the order was successfully removed from the queue, False otherwise.
+        """
+        # TODO: Actually test this out
+        was_order_successfully_cancelled = False
+
+        # Check through all of the orders and remove the one that matches the provided ID
+        for index, order in enumerate(self._order_queue):
+            if order.unique_id_number == id_of_order_to_cancel:
+                self._order_queue.remove(index)
+                was_order_successfully_cancelled = True
+                break
+
+        return was_order_successfully_cancelled
 
     def process_pending_orders(self):
-        pass
+        list_of_completed_order_ids = []
+        # TODO: Implement this
+
+        return list_of_completed_order_ids
 
     def create_new_bar_generators(self, time_frame, start_time, end_time):
         """
@@ -217,6 +240,6 @@ class Portfolio():
         return need_new_generators
 
     def copy(self, name=None):
-        # TODO: Implement copy here and in Position
+        # TODO: Implement deep copy here and in Position
         new_name = name if name is not None else self.name
         copy_of_portfolio = Portfolio(self.market_data_api, name=new_name)

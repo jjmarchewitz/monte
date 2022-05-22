@@ -1,3 +1,7 @@
+"""
+A utility class to handle the setup and configuration of alpaca's APIs.
+"""
+
 from alpaca_trade_api import REST
 from dataclasses import dataclass
 from os import environ, getcwd, sep

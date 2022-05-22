@@ -1,5 +1,6 @@
 """
-TODO: Module docstring
+A trading machine is an object that encompasses the running of algorithms with portfolios
+attached. These algorithm-portfolio pairs can be either run on historical data or on live data.
 """
 
 from algo_pg.algorithms.trading_algorithm import TradingAlgorithm
@@ -84,7 +85,8 @@ class TradingMachine():
 
         for day in raw_market_days:
 
-            # Create a datetime object for the date of the market day
+            # Create a date object (from the datetime library) for the calendar date of the
+            # market day
             market_date = date(
                 day.date.year,
                 day.date.month,
@@ -173,7 +175,9 @@ class TradingMachine():
                 while not portfolio.market_day_needs_to_be_incremented():
                     print(
                         f"{portfolio.name} -- {portfolio.time_of_last_price_gen_increment} :"
-                        + f" ${portfolio.total_value()}")
+                        + f" ${round(portfolio.total_value(), 2):,}")
 
                     # This must be at the end of the loop
                     portfolio.increment_all_bar_generators()
+
+            print()

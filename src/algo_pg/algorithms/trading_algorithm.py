@@ -1,8 +1,7 @@
 """
-TODO: Module docstring
+The super-class for all trading algorithms to inherit from. Might become a python interface
+later on.
 """
-# DEFINITION: This is the sub-class for all algorithms and demonstrates an interface for
-# all of the trading algorithms to use.
 
 
 class TradingAlgorithm():

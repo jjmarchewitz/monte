@@ -1,5 +1,8 @@
 """
-TODO: Module docstring
+A Position is simply the name for an asset that a buyer actually has possession of. While
+Apple's stock exists in the world as an asset, it only becomes a person's position if they
+own Apple stock. A Position object as defined here has a symbol, quantity, and price
+associated with it.
 """
 
 from alpaca_trade_api import TimeFrame
@@ -30,7 +33,7 @@ class Position():
         self.quantity = initial_quantity
         self.price = 0
 
-        self.bar_generator = None
+        self._bar_generator = None
         self.time_when_price_last_updated = None
         self.needs_new_bar_generator = False
 
@@ -67,13 +70,13 @@ class Position():
         """
         try:
             # Grab the next bar from the generator and generate a price from it
-            current_bar = next(self.bar_generator)
+            current_bar = next(self._bar_generator)
             self.price = self._get_price_from_bar(current_bar)
 
-        # When a generator tries to generate past the end of its intended range it will
-        # throw this error, and I use it to indicate that a new bar generator for a
-        # new day needs to be generated.
         except StopIteration:
+            # When a generator tries to generate past the end of its intended range it will
+            # throw this error, and I use it to indicate that a new bar generator for a
+            # new day needs to be generated.
             self.needs_new_bar_generator = True
 
     def create_new_daily_bar_generator(self, time_frame, start_time, end_time):
@@ -100,12 +103,12 @@ class Position():
             iso_inc_start_time = incremented_start_time.isoformat()
 
             # Create the new generator
-            self.bar_generator = self.market_data_api.get_bars_iter(
+            self._bar_generator = self.market_data_api.get_bars_iter(
                 self.symbol, time_frame, iso_inc_start_time, end_time)
 
         else:
             # Create a generator object that will return prices for the day
-            self.bar_generator = self.market_data_api.get_bars_iter(
+            self._bar_generator = self.market_data_api.get_bars_iter(
                 self.symbol, time_frame, start_time, end_time)
 
         self.needs_new_bar_generator = False

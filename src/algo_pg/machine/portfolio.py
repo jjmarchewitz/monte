@@ -21,7 +21,7 @@ class Order():
     A dataclass that represents a market order
     """
     # TODO: Consider adding a creation date/time to this dataclass
-    unique_id_number: int
+    id_number: int
     symbol: str
     quantity: float
     order_type: OrderType
@@ -75,26 +75,24 @@ class Portfolio():
         Raises:
             ValueError: When there is a Position object for the same symbol as a
                 Position already in the Portfolio.
-            TypeError: When new_position is not of type containers.position.Position.
+            TypeError: When new_position is not of type machine.position.Position.
         """
         # Check that the new_position is a Position object
-        if type(new_position) is Position:
-
-            # Check that there is not already a position with this symbol in this portfolio
-            for position in self.positions:
-                if new_position.symbol == position.symbol:
-                    raise ValueError(
-                        f"There is already a position with symbol {position.symbol} in" +
-                        f"this Portfolio (name of portfolio: {self.name}).")
-
-            # If there was already a position with the incoming position's symbol in the
-            # portfolio, then the above error would be raised. If not, the program will
-            # keep running and add the position to the portfolio as below
-            self.positions.append(new_position)
-
-        else:
+        if type(new_position) is not Position:
             raise TypeError(
-                "The object passed is not of type containers.position.Position")
+                "The object passed is not of type machine.position.Position")
+
+        # Check that there is not already a position with this symbol in this portfolio
+        for position in self.positions:
+            if new_position.symbol == position.symbol:
+                raise ValueError(
+                    f"There is already a position with symbol {position.symbol} in" +
+                    f"this Portfolio (name of portfolio: {self.name}).")
+
+        # If there was already a position with the incoming position's symbol in the
+        # portfolio, then the above error would be raised. If not, the program will
+        # keep running and add the position to the portfolio as below
+        self.positions.append(new_position)
 
     def delete_empty_positions(self):
         """
@@ -155,8 +153,6 @@ class Portfolio():
         Returns:
             The unique order ID number for the order being created.
         """
-        # TODO: Actually test this out
-
         # Check that the order type passed in is a valid order type from the enum OrderType
         if order_type not in OrderType:
             raise ValueError("Invalid order type.")
@@ -182,13 +178,12 @@ class Portfolio():
         Returns:
             True if the order was successfully removed from the queue, False otherwise.
         """
-        # TODO: Actually test this out
         was_order_successfully_cancelled = False
 
         # Check through all of the orders and remove the one that matches the provided ID
         for index, order in enumerate(self._order_queue):
-            if order.unique_id_number == id_of_order_to_cancel:
-                self._order_queue.remove(index)
+            if order.id_number == id_of_order_to_cancel:
+                self._order_queue.pop(index)
                 was_order_successfully_cancelled = True
                 break
 

@@ -137,7 +137,7 @@ class TradingMachine():
             portfolio: A Portfolio instance.
         """
         # TODO: Add a check to make sure the algorithm and portfolio are set up correctly
-        # before adding
+        # before adding (type check)
         algo_portfolio_pair = AlgoPortfolioPair(algorithm, portfolio)
         self.algo_portfolio_pairs.append(algo_portfolio_pair)
 

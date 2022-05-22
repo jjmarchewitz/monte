@@ -109,7 +109,6 @@ def create_package_rst_files(base_dir):
 
 
 def main():
-    # TODO: Move this information to be global constants
     repo_dir = findall("^.*algo-playground", os.getcwd())[0]
     src_dir = f"{repo_dir}{os.sep}src"
     algo_pg_dir = f"{repo_dir}{os.sep}docs{os.sep}{SOURCE_DIR}{os.sep}{SUPER_PACKAGE_NAME}"

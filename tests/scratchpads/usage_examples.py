@@ -1,4 +1,4 @@
-from algo_pg.machine.portfolio import Portfolio
+from algo_pg.machine.portfolio import OrderType, Portfolio
 from algo_pg.machine.position import Position
 from algo_pg.machine.trading_machine import TradingMachine
 from algo_pg.util.alpaca import alpaca_setup
@@ -25,8 +25,9 @@ def main():
 
     # Create the second portfolio
     portfolio2 = Portfolio(market_data_api, starting_cash=10000, name="P2")
-    portfolio2.add_existing_position(Position(market_data_api, "IVV", 10.75))
-    portfolio2.add_existing_position(Position(market_data_api, "QQQ", 2.33))
+    order_num1 = portfolio2.place_order("GOOG", 5.0, OrderType.BUY)
+    order_num2 = portfolio2.place_order("IVV", 25.6, OrderType.BUY)
+    portfolio2.cancel_order(order_num2)
 
     # Add both portfolios along with fake algorithms to the trading machine. The algos
     # are dummy strings (for now) because they are keys in a dictionary, so if you add

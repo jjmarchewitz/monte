@@ -18,7 +18,7 @@ class OrderType(Enum):
 @dataclass
 class Order():
     """
-    A dataclass that represents a market order
+    A dataclass that represents a market order.
     """
     # TODO: Consider adding a creation date/time to this dataclass
     id_number: int

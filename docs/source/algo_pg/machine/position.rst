@@ -1,7 +1,7 @@
 position
 ========
 
-.. automodule:: containers.position
+.. automodule:: machine.position
 	:members:
 
 .. toctree::

@@ -2,8 +2,8 @@
 TODO: Module docstring
 """
 
-from algo_pg.containers.trading_algorithm import TradingAlgorithm
-from algo_pg.containers.portfolio import Portfolio
+from algo_pg.algorithms.trading_algorithm import TradingAlgorithm
+from algo_pg.machine.portfolio import Portfolio
 from alpaca_trade_api import TimeFrame
 from dataclasses import dataclass
 from datetime import date, datetime

@@ -1,9 +1,8 @@
 # TODO: Extract all of the TODO: markers in the reptory and put them into TODO.md,
-# sorted if pible
+# sorted if possible
 
-from importlib.resources import path
 import os
-from re import findall, sub
+from re import findall
 
 
 SUPER_PACKAGE_NAME = "algo_pg"
@@ -72,7 +71,6 @@ def create_rst_for_src_file(base_dir, relative_src_file_path):
 
 def create_package_rst_files(base_dir):
 
-    # TODO: Rename everything to dir instead of package
     for path_being_searched, subpackages, modules_in_package in os.walk(base_dir):
         # parent_package, current_package_name = os.path.split(package_being_searched)
 
@@ -80,7 +78,6 @@ def create_package_rst_files(base_dir):
 
         package_being_searched = os.path.basename(path_being_searched)
 
-        # TODO: Python formatting extension that formats strings into multiple shorter += calls
         with open(f"{path_being_searched}{os.sep}..{os.sep}{package_being_searched}.rst", "w") as f:
 
             file_text = f"{package_being_searched}\n"
@@ -96,8 +93,6 @@ def create_package_rst_files(base_dir):
                 file_text += f"\t{package_being_searched}{os.sep}{subpackage}\n"
 
             for module in modules_in_package:
-
-                # breakpoint()
 
                 module_matches_subpackage = False
 

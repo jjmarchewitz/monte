@@ -2,7 +2,7 @@
 TODO: Module docstring
 """
 
-from algo_pg.containers.position import Position
+from algo_pg.machine.position import Position
 from dataclasses import dataclass
 from enum import Enum
 

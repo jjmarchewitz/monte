@@ -1,7 +1,7 @@
 trading_algorithm
 =================
 
-.. automodule:: containers.trading_algorithm
+.. automodule:: algorithms.trading_algorithm
 	:members:
 
 .. toctree::

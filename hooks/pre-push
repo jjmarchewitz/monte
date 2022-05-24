@@ -3,3 +3,5 @@
 # python3 generate_source_rst.py
 # make html
 # make text
+cd hooks
+source ../scripts/build_docs.sh

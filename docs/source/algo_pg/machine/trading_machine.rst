@@ -1,7 +1,7 @@
 trading_machine
 ===============
 
-.. automodule:: containers.trading_machine
+.. automodule:: machine.trading_machine
 	:members:
 
 .. toctree::

@@ -5,6 +5,6 @@ algo_pg
 	:maxdepth: 4
 
 	algo_pg/algorithms
-	algo_pg/containers
+	algo_pg/machine
 	algo_pg/util
 

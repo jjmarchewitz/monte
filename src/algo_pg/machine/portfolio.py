@@ -1,6 +1,9 @@
-# DEFINITION:
+"""
+A Portfolio is meant to represent a collection of individual Positions.
+"""
 
-from algo_pg.containers.position import Position
+from algo_pg.machine.position import Position
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -10,6 +13,18 @@ class OrderType(Enum):
     """
     BUY = 1
     SELL = 2
+
+
+@dataclass
+class Order():
+    """
+    A dataclass that represents a market order.
+    """
+    # TODO: Consider adding a creation date/time to this dataclass
+    id_number: int
+    symbol: str
+    quantity: float
+    order_type: OrderType
 
 
 class Portfolio():
@@ -34,7 +49,8 @@ class Portfolio():
         self.positions = []
         self.cash = starting_cash
         self.time_of_last_price_gen_increment = None
-        self.most_recent_order_number = 0
+        self._current_order_id_number = 1
+        self._order_queue = []
 
     def create_new_position(self, symbol, initial_quantity):
         """
@@ -59,26 +75,24 @@ class Portfolio():
         Raises:
             ValueError: When there is a Position object for the same symbol as a
                 Position already in the Portfolio.
-            TypeError: When new_position is not of type containers.position.Position.
+            TypeError: When new_position is not of type machine.position.Position.
         """
         # Check that the new_position is a Position object
-        if type(new_position) is Position:
-
-            # Check that there is not already a position with this symbol in this portfolio
-            for position in self.positions:
-                if new_position.symbol == position.symbol:
-                    raise ValueError(
-                        f"There is already a position with symbol {position.symbol} in" +
-                        f"this Portfolio (name of portfolio: {self.name}).")
-
-            # If there was already a position with the incoming position's symbol in the
-            # portfolio, then the above error would be raised. If not, the program will
-            # keep running and add the position to the portfolio as below
-            self.positions.append(new_position)
-
-        else:
+        if type(new_position) is not Position:
             raise TypeError(
-                "The object passed is not of type containers.position.Position")
+                "The object passed is not of type machine.position.Position")
+
+        # Check that there is not already a position with this symbol in this portfolio
+        for position in self.positions:
+            if new_position.symbol == position.symbol:
+                raise ValueError(
+                    f"There is already a position with symbol {position.symbol} in" +
+                    f"this Portfolio (name of portfolio: {self.name}).")
+
+        # If there was already a position with the incoming position's symbol in the
+        # portfolio, then the above error would be raised. If not, the program will
+        # keep running and add the position to the portfolio as below
+        self.positions.append(new_position)
 
     def delete_empty_positions(self):
         """
@@ -135,20 +149,51 @@ class Portfolio():
         Raises:
             ValueError: When the value passed into order_type is not in the enum
                 OrderType.
+
+        Returns:
+            The unique order ID number for the order being created.
         """
-        # TODO: Finish implementing this
-        if order_type == OrderType.BUY:
-            pass
-        elif order_type == OrderType.SELL:
-            pass
-        else:
+        # Check that the order type passed in is a valid order type from the enum OrderType
+        if order_type not in OrderType:
             raise ValueError("Invalid order type.")
 
-    def cancel_order(self):
-        pass
+        # Set the order number and increment it for the next order
+        order_num = self._current_order_id_number
+        self._current_order_id_number += 1
+
+        # Create a new order object with the correct attributes and append it to the order
+        # queue
+        new_order = Order(order_num, symbol, quantity, order_type)
+        self._order_queue.append(new_order)
+
+        return order_num
+
+    def cancel_order(self, id_of_order_to_cancel):
+        """
+        Removes the order with the given ID from the order queue.
+
+        Args:
+            id_of_order_to_cancel: The ID of the order that needs to be cancelled.
+
+        Returns:
+            True if the order was successfully removed from the queue, False otherwise.
+        """
+        was_order_successfully_cancelled = False
+
+        # Check through all of the orders and remove the one that matches the provided ID
+        for index, order in enumerate(self._order_queue):
+            if order.id_number == id_of_order_to_cancel:
+                self._order_queue.pop(index)
+                was_order_successfully_cancelled = True
+                break
+
+        return was_order_successfully_cancelled
 
     def process_pending_orders(self):
-        pass
+        list_of_completed_order_ids = []
+        # TODO: Implement this
+
+        return list_of_completed_order_ids
 
     def create_new_bar_generators(self, time_frame, start_time, end_time):
         """
@@ -190,6 +235,6 @@ class Portfolio():
         return need_new_generators
 
     def copy(self, name=None):
-        # TODO: Implement copy here and in Position
+        # TODO: Implement deep copy here and in Position
         new_name = name if name is not None else self.name
         copy_of_portfolio = Portfolio(self.market_data_api, name=new_name)

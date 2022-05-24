@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>trading_machine &mdash; Algo Playground  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="util" href="../util.html" />
+    <link rel="prev" title="portfolio" href="portfolio.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Algo Playground
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../algo_pg.html">algo_pg</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../algorithms.html">algorithms</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../machine.html">machine</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="position.html">position</a></li>
+<li class="toctree-l3"><a class="reference internal" href="portfolio.html">portfolio</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">trading_machine</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../util.html">util</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Algo Playground</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../algo_pg.html">algo_pg</a> &raquo;</li>
+          <li><a href="../machine.html">machine</a> &raquo;</li>
+      <li>trading_machine</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/source/algo_pg/machine/trading_machine.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-machine.trading_machine">
+<span id="trading-machine"></span><h1>trading_machine<a class="headerlink" href="#module-machine.trading_machine" title="Permalink to this headline"></a></h1>
+<p>A trading machine is an object that encompasses the running of algorithms with portfolios
+attached. These algorithm-portfolio pairs can be either run on historical data or on live data.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="machine.trading_machine.AlgoPortfolioPair">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">machine.trading_machine.</span></span><span class="sig-name descname"><span class="pre">AlgoPortfolioPair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">algo_pg.algorithms.trading_algorithm.TradingAlgorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">portfolio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">algo_pg.machine.portfolio.Portfolio</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#machine.trading_machine.AlgoPortfolioPair" title="Permalink to this definition"></a></dt>
+<dd><p>A trading algorithm-portfolio pair is run together across a trading machine’s timeline    as one unit.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="machine.trading_machine.MarketDay">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">machine.trading_machine.</span></span><span class="sig-name descname"><span class="pre">MarketDay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_time_iso</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_time_iso</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#machine.trading_machine.MarketDay" title="Permalink to this definition"></a></dt>
+<dd><p>A dataclass holding information for a single day the market is open, like the date.     This dataclass also stores the market open time and close time in the ISO-8601 format.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="machine.trading_machine.TradingMachine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">machine.trading_machine.</span></span><span class="sig-name descname"><span class="pre">TradingMachine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trading_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">market_data_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_frame=&lt;alpaca_trade_api.rest.TimeFrame</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#machine.trading_machine.TradingMachine" title="Permalink to this definition"></a></dt>
+<dd><p>The “trading machine” is meant to represent a machine running an algorithm with data     across the timeline that are provided as constructor arguments. This encompasses    backtesting (testing on historical data) as well as running an algorithm live.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="machine.trading_machine.TradingMachine.add_algo_portfolio_pair">
+<span class="sig-name descname"><span class="pre">add_algo_portfolio_pair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">portfolio</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#machine.trading_machine.TradingMachine.add_algo_portfolio_pair" title="Permalink to this definition"></a></dt>
+<dd><p>Adds an algorithm-portfolio pair to the list of all such pairs for the trading
+machine. This is useful because the run() function can iterate over these pairs and
+all of the provided algorithms against their corresponding portfolios.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>algorithm</strong> – A TradingAlgorithm instance or instance of a sub-class.</p></li>
+<li><p><strong>portfolio</strong> – A Portfolio instance.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="machine.trading_machine.TradingMachine.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#machine.trading_machine.TradingMachine.run" title="Permalink to this definition"></a></dt>
+<dd><p>Run the trading machine and run all of the algorithm portfolio pairs from the start
+date to the end date.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="portfolio.html" class="btn btn-neutral float-left" title="portfolio" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../util.html" class="btn btn-neutral float-right" title="util" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jake Marchewitz, Surya Gupta, Viren Gadkari.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

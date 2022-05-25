@@ -17,7 +17,7 @@ class Position():
     a current price associated with it.
     """
 
-    def __init__(self,trading_api, market_data_api, symbol, initial_quantity):
+    def __init__(self, trading_api, market_data_api, symbol, initial_quantity):
         """
         Constructor for the Position class.
 
@@ -30,6 +30,7 @@ class Position():
         """
         # TODO: Check that input symbol is valid and corresponds to an actual asset
         self.market_data_api = market_data_api
+        self.trading_api = trading_api
         self.symbol = symbol
         self.quantity = initial_quantity
         self.price = 0
@@ -39,18 +40,15 @@ class Position():
         self.time_when_price_last_updated = None
         self.needs_new_bar_generator = False
 
-    def _get_asset_class(self, asset):
+    def get_asset_class(self):
         """
         Gets the Asset Class for any symbol
         Asset Class is a string identifying what class an asset belongs to
         (i.e. "us equity")
 
-        Args:
-            asset: An object holding attributes describing an asset (i.e. class, exchange)
-
         Returns: An an asset class string
         """
-        return self.asset.asset_class
+        return self.asset.__getattr__("class")
 
     def total_value(self):
         """

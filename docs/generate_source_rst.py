@@ -41,14 +41,10 @@ def create_rst_for_src_file(base_dir, relative_src_file_path):
 
     folder_path, filename = os.path.split(full_rst_file_path)
 
-    module_name = filename.split(".")[0]
-
-    # TODO: VS Code extension pasting into terminal, auto remove the extra line
+    module_name = filename.rstrip(".rst")
 
     import_name = relative_src_file_path.lstrip(SUPER_PACKAGE_NAME).lstrip(
-        os.sep).rstrip(".py").replace(os.sep, ".")
-
-    # breakpoint()
+        os.sep).rstrip("py").rstrip(".").replace(os.sep, ".")
 
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)

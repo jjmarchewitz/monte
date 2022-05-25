@@ -76,7 +76,7 @@ class TradingMachine():
     def _generate_market_day_list(self):
         """
         Generates a list of MarketDay instances in order from self.start_date to self.end_date
-        to represent all of the days the market is open, and *only* the days the market is open
+        to represent all of the days the market is open, and *only* the days the market is open.
         """
         # Get a list of all market days between start_date and end_date, including their
         # open and close times

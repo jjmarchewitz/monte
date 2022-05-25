@@ -89,7 +89,7 @@ own Apple stock. A Position object as defined here has a symbol, quantity, and p
 associated with it.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="machine.position.Position">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">machine.position.</span></span><span class="sig-name descname"><span class="pre">Position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">market_data_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_quantity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#machine.position.Position" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">machine.position.</span></span><span class="sig-name descname"><span class="pre">Position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trading_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">market_data_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_quantity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#machine.position.Position" title="Permalink to this definition"></a></dt>
 <dd><p>This is a container for an individual position, like ETH or IVV. An instance is meant    to be stored inside of a portfolio, so the position has a quantity currently held and    a current price associated with it.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="machine.position.Position.create_new_daily_bar_generator">
@@ -114,6 +114,15 @@ generating bars.</p></li>
 <span class="sig-name descname"><span class="pre">generate_next_price</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#machine.position.Position.generate_next_price" title="Permalink to this definition"></a></dt>
 <dd><p>Increment the bar generator to the next iteration and set the price based on the
 new bar.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="machine.position.Position.get_asset_class">
+<span class="sig-name descname"><span class="pre">get_asset_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#machine.position.Position.get_asset_class" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the Asset Class for any symbol
+Asset Class is a string identifying what class an asset belongs to
+(i.e. “us equity”)</p>
+<p>Returns: An an asset class string</p>
 </dd></dl>
 
 <dl class="py method">

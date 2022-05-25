@@ -46,7 +46,8 @@ class Position():
         Asset Class is a string identifying what class an asset belongs to
         (i.e. "us equity")
 
-        Returns: An an asset class string
+        Returns: 
+            An an asset class string
         """
         return self.asset.__getattr__("class")
 

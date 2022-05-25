@@ -191,7 +191,19 @@ class Portfolio():
 
     def process_pending_orders(self):
         list_of_completed_order_ids = []
-        # TODO: Implement this
+
+        # Check through every order in the order queue
+        for order in self._order_queue:
+
+            # Check that the order type passed in is a valid order type from the enum OrderType
+            if order.order_type not in OrderType:
+                raise ValueError("Invalid order type.")
+
+            # Process the order based on buy/sell
+            if order.order_type == OrderType.BUY:
+                pass
+            elif order.order_type == OrderType.SELL:
+                pass
 
         return list_of_completed_order_ids
 

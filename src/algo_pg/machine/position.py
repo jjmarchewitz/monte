@@ -17,11 +17,11 @@ class Position():
     a current price associated with it.
     """
 
-    def __init__(self, market_data_api, symbol, initial_quantity):
+    def __init__(self,trading_api, market_data_api, symbol, initial_quantity):
         """
         Constructor for the Position class.
 
-        Args:
+        Args: # TODO: (ADD TRADING_API documentation)
             market_data_api: An instance of the alpaca_trade_api package's own REST API
                 set up to retrieve historical market data.
             symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
@@ -33,10 +33,24 @@ class Position():
         self.symbol = symbol
         self.quantity = initial_quantity
         self.price = 0
+        self.asset = self.trading_api.get_asset(self.symbol)
 
         self._bar_generator = None
         self.time_when_price_last_updated = None
         self.needs_new_bar_generator = False
+
+    def _get_asset_class(self, asset):
+        """
+        Gets the Asset Class for any symbol
+        Asset Class is a string identifying what class an asset belongs to
+        (i.e. "us equity")
+
+        Args:
+            asset: An object holding attributes describing an asset (i.e. class, exchange)
+
+        Returns: An an asset class string
+        """
+        return self.asset.asset_class
 
     def total_value(self):
         """

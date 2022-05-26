@@ -42,12 +42,12 @@ class Position():
 
     def get_asset_class(self):
         """
-        Gets the Asset Class for any symbol
+        Gets the Asset Class for any symbol.
         Asset Class is a string identifying what class an asset belongs to
         (i.e. "us equity")
 
         Returns: 
-            An an asset class string
+            An asset class string
         """
         return self.asset.__getattr__("class")
 

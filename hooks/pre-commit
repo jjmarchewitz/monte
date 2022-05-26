@@ -1,5 +1,5 @@
 #!/bin/sh
 cd hooks
 source ../scripts/build_docs.sh > /dev/null
-echo "Re-built documentation."
+echo "> Re-built documentation."
 

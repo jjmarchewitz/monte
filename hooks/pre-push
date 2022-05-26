@@ -1,5 +1,4 @@
 #!/bin/sh
 cd hooks
 source ../scripts/build_docs.sh
-git commit -am "built doc"
 

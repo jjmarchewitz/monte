@@ -28,7 +28,7 @@ class Position():
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
         """
-        # TODO: Check that input symbol is valid and corresponds to an actual asset
+        # TODO: Check that input symbol is valid and corresponds to an actual asset.
         self.market_data_api = market_data_api
         self.trading_api = trading_api
         self.symbol = symbol

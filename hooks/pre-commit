@@ -1,0 +1,4 @@
+#!/bin/sh
+cd hooks
+(source ../scripts/build_docs.sh &)
+

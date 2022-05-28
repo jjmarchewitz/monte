@@ -20,11 +20,11 @@ class Order():
     """
     A dataclass that represents a market order.
     """
-    # TODO: Consider adding a creation date/time to this dataclass
     id_number: int
     symbol: str
     quantity: float
     order_type: OrderType
+    # TODO: creation_time: str
 
 
 class Portfolio():
@@ -32,19 +32,20 @@ class Portfolio():
     A portfolio is simply a collection of individual positions.
     """
 
-    def __init__(self, market_data_api, starting_cash=10000, name=None):
+    def __init__(self, alpaca_api, starting_cash=10000, name=None):
         """
         Constructor for the Portfolio class.
 
         Args:
-            market_data_api: An instance of the alpaca_trade_api package's own REST API
-                set up to retrieve historical market data.
+            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
+                in the repo's alpaca.config.
             starting_cash: The starting cash that the portfolio will have before any
                 orders are placed or any positions are held. Defaults to 10000.
             name: A string name to give the portfolio, purely for aesthetic/debugging
                 purposes. Defaults to None.
         """
-        self.market_data_api = market_data_api
+        self.alpaca_api = alpaca_api
+
         self.name = name if name is not None else "Unnamed"
         self.positions = []
         self.cash = starting_cash
@@ -61,7 +62,7 @@ class Portfolio():
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
         """
-        new_position = Position(self.market_data_api, symbol, initial_quantity)
+        new_position = Position(self.alpaca_api, symbol, initial_quantity)
         self.add_existing_position(new_position)
 
     def add_existing_position(self, new_position):
@@ -195,7 +196,8 @@ class Portfolio():
         # Check through every order in the order queue
         for order in self._order_queue:
 
-            # Check that the order type passed in is a valid order type from the enum OrderType
+            # Check that the order type passed in is a valid order type from the enum
+            # OrderType
             if order.order_type not in OrderType:
                 raise ValueError("Invalid order type.")
 
@@ -249,4 +251,4 @@ class Portfolio():
     def copy(self, name=None):
         # TODO: Implement deep copy here and in Position
         new_name = name if name is not None else self.name
-        copy_of_portfolio = Portfolio(self.market_data_api, name=new_name)
+        copy_of_portfolio = Portfolio(self.alpaca_api, name=new_name)

@@ -16,9 +16,9 @@ from alpaca_trade_api import TimeFrame
 
 
 def main():
-    trading_api, market_data_api = alpaca_setup()
+    alpaca_api = alpaca_setup()
 
-    portfolio1 = Portfolio(market_data_api, starting_cash=10000, name="P1")
+    portfolio1 = Portfolio(alpaca_api, starting_cash=10000, name="P1")
 
     breakpoint()
 

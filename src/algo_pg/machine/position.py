@@ -17,24 +17,24 @@ class Position():
     a current price associated with it.
     """
 
-    def __init__(self, trading_api, market_data_api, symbol, initial_quantity):
+    def __init__(self, alpaca_api, symbol, initial_quantity):
         """
         Constructor for the Position class.
 
-        Args: # TODO: (ADD TRADING_API documentation)
-            market_data_api: An instance of the alpaca_trade_api package's own REST API
-                set up to retrieve historical market data.
+        Args:
+            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
+                in the repo's alpaca.config.
             symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
         """
         # TODO: Check that input symbol is valid and corresponds to an actual asset.
-        self.market_data_api = market_data_api
-        self.trading_api = trading_api
+        self.alpaca_api = alpaca_api
         self.symbol = symbol
         self.quantity = initial_quantity
         self.price = 0
-        self.asset = self.trading_api.get_asset(self.symbol)
+        self.asset = self.alpaca_api.trading.get_asset(self.symbol)
+        self.current_bar = None
 
         self._bar_generator = None
         self.time_when_price_last_updated = None
@@ -49,7 +49,7 @@ class Position():
         Returns: 
             An asset class string
         """
-        return self.asset.__getattr__("class")
+        return getattr(self.asset, "class")
 
     def total_value(self):
         """
@@ -84,8 +84,8 @@ class Position():
         """
         try:
             # Grab the next bar from the generator and generate a price from it
-            current_bar = next(self._bar_generator)
-            self.price = self._get_price_from_bar(current_bar)
+            self.current_bar = next(self._bar_generator)
+            self.price = self._get_price_from_bar(self.current_bar)
 
         except StopIteration:
             # When a generator tries to generate past the end of its intended range it will
@@ -117,12 +117,12 @@ class Position():
             iso_inc_start_time = incremented_start_time.isoformat()
 
             # Create the new generator
-            self._bar_generator = self.market_data_api.get_bars_iter(
+            self._bar_generator = self.alpaca_api.market_data.get_bars_iter(
                 self.symbol, time_frame, iso_inc_start_time, end_time)
 
         else:
             # Create a generator object that will return prices for the day
-            self._bar_generator = self.market_data_api.get_bars_iter(
+            self._bar_generator = self.alpaca_api.market_data.get_bars_iter(
                 self.symbol, time_frame, start_time, end_time)
 
         self.needs_new_bar_generator = False

@@ -40,16 +40,14 @@ class TradingMachine():
     """
 
     def __init__(
-            self, trading_api, market_data_api, start_date, end_date,
+            self, alpaca_api, start_date, end_date,
             time_frame=TimeFrame.Minute):
         """
         Constructor for the TradingMachine class.
 
         Args:
-            trading_api: An instance of the alpaca_trade_api package's own REST API
-                set up to retrieve live trading data. Here, it is used for calendar data.
-            market_data_api: An instance of the alpaca_trade_api package's own REST API
-                set up to retrieve historical market data.
+            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
+                in the repo's alpaca.config.
             start_date: The YYYY-MM-DD formatted date for the trading machine to start its
                 run at.
             end_date: The YYYY-MM-DD formatted date for the trading machine to end its
@@ -57,8 +55,10 @@ class TradingMachine():
             time_frame: An alpaca_trade_api.TimeFrame value corresponding to the time
                 delta between price values. Defaults to TimeFrame.Minute.
         """
-        self.trading_api = trading_api
-        self.market_data_api = market_data_api
+
+        self.alpaca_api = alpaca_api
+
+        # Attributes to keep track of the time span of the trading_machine
         self.start_date = start_date
         self.end_date = end_date
 
@@ -80,7 +80,7 @@ class TradingMachine():
         """
         # Get a list of all market days between start_date and end_date, including their
         # open and close times
-        raw_market_days = self.trading_api.get_calendar(
+        raw_market_days = self.alpaca_api.trading.get_calendar(
             self.start_date, self.end_date)
 
         for day in raw_market_days:

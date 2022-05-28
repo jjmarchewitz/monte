@@ -18,7 +18,16 @@ from alpaca_trade_api import TimeFrame
 def main():
     alpaca_api = alpaca_setup()
 
+    machine = TradingMachine(
+        alpaca_api, "2022-03-08", "2022-03-20",
+        time_frame=TimeFrame.Day)
+
     portfolio1 = Portfolio(alpaca_api, starting_cash=10000, name="P1")
+
+    # Old call // New call
+    crypto_api = alpaca_api.crypto
+    market_data_api = alpaca_api.market_data
+    trading_api = alpaca_api.trading
 
     breakpoint()
 

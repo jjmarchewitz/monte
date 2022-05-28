@@ -42,15 +42,16 @@ from alpaca_trade_api import TimeFrame
 
 
 def main():
-    trading_api, market_data_api = alpaca_setup()
+    alpaca_api = alpaca_setup()
 
     # Only Days, Hours, and Minutes are supported as time frames
-    test_position = Position(trading_api, market_data_api, "QQQ", 1000.1)
+    test_position = Position(alpaca_api, "QQQ", 1000.1)
     breakpoint()
     print(test_position.get_asset_class())
     # machine_hours = TradingMachine(
     #      trading_api, market_data_api, "2022-03-08", "2022-03-20",
     #     time_frame=TimeFrame.Hours)
+
 
 if __name__ == "__main__":
     main()

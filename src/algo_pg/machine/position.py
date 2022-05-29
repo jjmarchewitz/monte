@@ -28,8 +28,9 @@ class Position():
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
         """
-        # TODO: Check that input symbol is valid and corresponds to an actual asset.
+        # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api
+        # TODO: Check that input symbol is valid and corresponds to an actual asset.
         self.symbol = symbol
         self.quantity = initial_quantity
         self.price = 0
@@ -74,6 +75,7 @@ class Position():
         """
         # TODO: Find a better way to approximate the average price during a bar
         price = (bar.h + bar.l) / 2
+        # price = (bar.o + bar.c) / 2
         self.time_when_price_last_updated = bar.t
         return price
 

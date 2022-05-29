@@ -44,6 +44,7 @@ class Portfolio():
             name: A string name to give the portfolio, purely for aesthetic/debugging
                 purposes. Defaults to None.
         """
+        # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api
 
         self.name = name if name is not None else "Unnamed"

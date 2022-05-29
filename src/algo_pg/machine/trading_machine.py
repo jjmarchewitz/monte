@@ -55,7 +55,7 @@ class TradingMachine():
             time_frame: An alpaca_trade_api.TimeFrame value corresponding to the time
                 delta between price values. Defaults to TimeFrame.Minute.
         """
-
+        # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api
 
         # Attributes to keep track of the time span of the trading_machine

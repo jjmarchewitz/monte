@@ -204,11 +204,17 @@ class Portfolio():
 
             # Process the order based on buy/sell
             if order.order_type == OrderType.BUY:
-                pass
+                self._process_buy_order(order)
             elif order.order_type == OrderType.SELL:
-                pass
+                self._process_sell_order(order)
 
         return list_of_completed_order_ids
+
+    def _process_buy_order(self, order):
+        pass
+
+    def _process_sell_order(self, order):
+        pass
 
     def create_new_bar_generators(self, time_frame, start_time, end_time):
         """

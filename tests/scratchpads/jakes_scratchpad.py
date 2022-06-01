@@ -2,7 +2,7 @@
 
 from algo_pg.machine.portfolio import OrderType, Portfolio
 from algo_pg.machine.position import Position
-from algo_pg.machine.trading_machine import TradingMachine
+from algo_pg.machine.machine import TradingMachine
 from algo_pg.util.alpaca import alpaca_setup
 from alpaca_trade_api import TimeFrame
 

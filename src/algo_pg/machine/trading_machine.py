@@ -51,7 +51,7 @@ class TradingMachine():
             start_date: The YYYY-MM-DD formatted date for the trading machine to start its
                 run at.
             end_date: The YYYY-MM-DD formatted date for the trading machine to end its
-                run at. 
+                run at.
             time_frame: An alpaca_trade_api.TimeFrame value corresponding to the time
                 delta between price values. Defaults to TimeFrame.Minute.
         """

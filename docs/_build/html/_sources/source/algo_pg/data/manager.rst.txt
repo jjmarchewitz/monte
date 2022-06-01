@@ -1,5 +1,5 @@
-manage
-======
+manager
+=======
 
 .. automodule:: data.manager
 	:members:

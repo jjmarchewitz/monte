@@ -3,6 +3,7 @@ A trading machine is an object that encompasses the running of algorithms with p
 attached. These algorithm-portfolio pairs can be either run on historical data or on live data.
 """
 
+from algo_pg.algorithms.base_algorithm import Algorithm
 from algo_pg.machine.portfolio import Portfolio
 from alpaca_trade_api import TimeFrame
 from dataclasses import dataclass
@@ -27,7 +28,7 @@ class AlgoPortfolioPair():
     A trading algorithm-portfolio pair is run together across a trading machine's timeline\
     as one unit.
     """
-    algo: TradingAlgorithm
+    algo: Algorithm
     portfolio: Portfolio
 
 

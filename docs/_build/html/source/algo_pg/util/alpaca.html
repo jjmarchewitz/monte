@@ -89,15 +89,14 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="util.alpaca.alpaca_setup">
 <span class="sig-prename descclassname"><span class="pre">util.alpaca.</span></span><span class="sig-name descname"><span class="pre">alpaca_setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#util.alpaca.alpaca_setup" title="Permalink to this definition"></a></dt>
-<dd><p>Grab the Alpaca API keys from alpaca.config and create an Alpaca trading REST API instance
-and an Alpaca market history REST API instance.
-# TODO: Update this documentation to be about the API bundle</p>
+<dd><p>Grab the Alpaca API keys from alpaca.config and create an AlpacaAPIBundle instance with each API
+authenticated with the same API keys.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><p><strong>ValueError</strong> – When the trading context in alpaca.config is invalid.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An Alpaca trading REST API instance and an Alpaca market history REST API instance.</p>
+<dd class="field-even"><p>An AlpacaAPIBundle instance.</p>
 </dd>
 </dl>
 </dd></dl>

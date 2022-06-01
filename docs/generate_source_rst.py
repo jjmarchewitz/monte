@@ -1,6 +1,3 @@
-# TODO: Extract all of the TODO: markers in the reptory and put them into TODO.md,
-# sorted if possible
-
 import os
 from re import findall
 

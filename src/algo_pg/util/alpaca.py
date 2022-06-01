@@ -17,15 +17,14 @@ class AlpacaAPIBundle():
 
 def alpaca_setup():
     """
-    Grab the Alpaca API keys from alpaca.config and create an Alpaca trading REST API instance
-    and an Alpaca market history REST API instance.
-    # TODO: Update this documentation to be about the API bundle
+    Grab the Alpaca API keys from alpaca.config and create an AlpacaAPIBundle instance with each API
+    authenticated with the same API keys.
 
     Raises:
         ValueError: When the trading context in alpaca.config is invalid.
 
     Returns:
-        An Alpaca trading REST API instance and an Alpaca market history REST API instance.
+        An AlpacaAPIBundle instance.
     """
     repo_dir = findall("^.*algo-playground", getcwd())[0]
 

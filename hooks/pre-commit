@@ -2,3 +2,4 @@
 cd hooks
 echo "> Building documentation..."
 source ../scripts/build_docs.sh > /dev/null
+git add .

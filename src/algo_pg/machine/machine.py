@@ -56,7 +56,7 @@ class TradingMachine():
                 delta between price values. Defaults to TimeFrame.Minute.
             time_frames_between_algo_runs: The number of TimeFrames that need to occur for
                 an algorithm's run function to be called once TODO: Move this into the
-                algo parent class
+                algo parent class.
         """
         # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api

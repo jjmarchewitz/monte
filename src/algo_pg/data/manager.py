@@ -4,5 +4,5 @@ asset data - either from downloaded CSVs in the top-level data/ folder or from A
 """
 
 
-class DataManager():
+def get_dataframe(alpaca_api, symbol, start_date, end_date):
     pass

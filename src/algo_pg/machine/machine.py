@@ -41,7 +41,7 @@ class TradingMachine():
 
     def __init__(
             self, alpaca_api, start_date, end_date,
-            time_frame=TimeFrame.Minute):
+            time_frame=TimeFrame.Minute, time_frames_between_algo_runs=1):
         """
         Constructor for the TradingMachine class.
 
@@ -54,6 +54,9 @@ class TradingMachine():
                 run at.
             time_frame: An alpaca_trade_api.TimeFrame value corresponding to the time
                 delta between price values. Defaults to TimeFrame.Minute.
+            time_frames_between_algo_runs: The number of TimeFrames that need to occur for
+                an algorithm's run function to be called once TODO: Move this into the
+                algo parent class
         """
         # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api

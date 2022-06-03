@@ -7,19 +7,7 @@ from algo_pg.algorithms.base_algorithm import Algorithm
 from algo_pg.machine.portfolio import Portfolio
 from alpaca_trade_api import TimeFrame
 from dataclasses import dataclass
-from datetime import date, datetime
-from pytz import timezone
-
-
-@dataclass
-class MarketDay():
-    """
-    A dataclass holding information for a single day the market is open, like the date. \
-    This dataclass also stores the market open time and close time in the ISO-8601 format.
-    """
-    date: str
-    open_time_iso: str
-    close_time_iso: str
+import algo_pg.util.dates as date_util
 
 
 @dataclass
@@ -41,7 +29,7 @@ class TradingMachine():
 
     def __init__(
             self, alpaca_api, start_date, end_date,
-            time_frame=TimeFrame.Minute, time_frames_between_algo_runs=1):
+            time_frame=TimeFrame.Hour):
         """
         Constructor for the TradingMachine class.
 
@@ -54,10 +42,12 @@ class TradingMachine():
                 run at.
             time_frame: An alpaca_trade_api.TimeFrame value corresponding to the time
                 delta between price values. Defaults to TimeFrame.Minute.
-            time_frames_between_algo_runs: The number of TimeFrames that need to occur for
-                an algorithm's run function to be called once TODO: Move this into the
-                algo parent class.
         """
+
+        # TODO: Move this into the algo parent class.
+        # time_frames_between_algo_runs: The number of TimeFrames that need to occur for
+        # an algorithm's run function to be called once
+
         # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api
 
@@ -68,66 +58,15 @@ class TradingMachine():
         # The only supported time frames for this class are minutes, hours, and days.
         self.time_frame = time_frame
 
-        # Create a list of all market days in range with start and end times
-        self.market_days = []
+        # Generates a list of MarketDay instances in order from self.start_date to
+        # self.end_date to represent all of the days the market is open, and *only*
+        # the days the market is open.
+        self.market_days = date_util.get_list_of_market_days_in_range(
+            self.alpaca_api, self.start_date, self.end_date)
         self.current_market_date = None
-        self._generate_market_day_list()
 
         # Pairs of algorithms and portfolios
         self.algo_portfolio_pairs = []
-
-    def _generate_market_day_list(self):
-        """
-        Generates a list of MarketDay instances in order from self.start_date to self.end_date
-        to represent all of the days the market is open, and *only* the days the market is open.
-        """
-        # Get a list of all market days between start_date and end_date, including their
-        # open and close times
-        raw_market_days = self.alpaca_api.trading.get_calendar(
-            self.start_date, self.end_date)
-
-        for day in raw_market_days:
-
-            # Create a date object (from the datetime library) for the calendar date of the
-            # market day
-            market_date = date(
-                day.date.year,
-                day.date.month,
-                day.date.day
-            )
-
-            # Grab the DST-aware timezone object for eastern time
-            timezone_ET = timezone("America/New_York")
-
-            # Create a datetime object for the opening time with the timezone info attached
-            open_time = timezone_ET.localize(datetime(
-                day.date.year,
-                day.date.month,
-                day.date.day,
-                day.open.hour,
-                day.open.minute
-            ))
-
-            # Create a datetime object for the closing time with the timezone info attached
-            close_time = timezone_ET.localize(datetime(
-                day.date.year,
-                day.date.month,
-                day.date.day,
-                day.close.hour,
-                day.close.minute
-            ))
-
-            # Convert the opening and closing times to ISO-8601
-            # Literally dont even fucking ask me how long it took to get the data in the
-            # right format for this to work.
-            open_time = open_time.isoformat()
-            close_time = close_time.isoformat()
-
-            # Create a MarketDay object with the right open/close times and append it to
-            # the list of all such MarketDay objects within the span between start_date and
-            # end_date
-            market_day = MarketDay(market_date, open_time, close_time)
-            self.market_days.append(market_day)
 
     def add_algo_portfolio_pair(self, algorithm, portfolio):
         """
@@ -176,6 +115,7 @@ class TradingMachine():
 
                 # While the trading machine has not yet hit the end of the day
                 while not portfolio.market_day_needs_to_be_incremented():
+                    # TODO: Use logging instead of printing
                     print(
                         f"{portfolio.name} -- {portfolio.time_of_last_price_gen_increment} :"
                         + f" ${round(portfolio.total_value(), 2):,}")

@@ -1,5 +1,4 @@
 #!/bin/sh
-cd hooks
 echo "> Building documentation..."
-source ../scripts/build_docs.sh > /dev/null
+source docs/build_docs.sh > /dev/null
 git add .

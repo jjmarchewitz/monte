@@ -34,15 +34,15 @@
 # How do I incorporate my own keys with Jake's Architecture.
 # I think I need to add it somehow to a configure file and then have the alpaca.py file in src choose between the keys on input arg
 # Right now, testing collecting bar data with Jake's keys
-from algo_pg.machine.portfolio import Portfolio
-from algo_pg.machine.position import Position
-from algo_pg.machine.machine import TradingMachine
-from algo_pg.util.alpaca import alpaca_setup
+from algo_pg.portfolio import Portfolio
+from algo_pg.position import Position
+from algo_pg.machine import TradingMachine
+from algo_pg.util import AlpacaAPIBundle
 from alpaca_trade_api import TimeFrame
 
 
 def main():
-    alpaca_api = alpaca_setup()
+    alpaca_api = AlpacaAPIBundle()
 
     # Only Days, Hours, and Minutes are supported as time frames
     test_position = Position(alpaca_api, "QQQ", 1000.1)

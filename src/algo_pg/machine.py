@@ -4,10 +4,10 @@ attached. These algorithm-portfolio pairs can be either run on historical data o
 """
 
 from algo_pg.algorithms.base_algorithm import Algorithm
-from algo_pg.machine.portfolio import Portfolio
+from algo_pg.portfolio import Portfolio
 from alpaca_trade_api import TimeFrame
 from dataclasses import dataclass
-import algo_pg.util.dates as date_util
+import algo_pg.util as apg_util
 
 
 @dataclass
@@ -61,7 +61,7 @@ class TradingMachine():
         # Generates a list of MarketDay instances in order from self.start_date to
         # self.end_date to represent all of the days the market is open, and *only*
         # the days the market is open.
-        self.market_days = date_util.get_list_of_market_days_in_range(
+        self.trading_days = apg_util.get_list_of_trading_days_in_range(
             self.alpaca_api, self.start_date, self.end_date)
         self.current_market_date = None
 
@@ -89,10 +89,10 @@ class TradingMachine():
         date to the end date.
         """
         # For every day that the market will be open
-        for market_day in self.market_days:
+        for trading_day in self.trading_days:
 
             # Update the current date variable in the machine
-            self.current_market_date = market_day.date
+            self.current_trading_date = trading_day.date
 
             # For every algo - portfolio pair, simulate an entire day no matter what the
             # time frame is.
@@ -104,8 +104,8 @@ class TradingMachine():
                 # Create the day's bar generator objects
                 portfolio.create_new_bar_generators(
                     self.time_frame,
-                    market_day.open_time_iso,
-                    market_day.close_time_iso
+                    trading_day.open_time_iso,
+                    trading_day.close_time_iso
                 )
 
                 # Increment all of the bar generators so that they are on the first value

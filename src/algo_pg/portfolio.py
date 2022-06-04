@@ -2,7 +2,7 @@
 A Portfolio is meant to represent a collection of individual Positions.
 """
 
-from algo_pg.machine.position import Position
+from algo_pg.position import Position
 from dataclasses import dataclass
 from enum import Enum
 

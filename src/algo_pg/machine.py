@@ -5,9 +5,9 @@ attached. These algorithm-portfolio pairs can be either run on historical data o
 
 from algo_pg.algorithms.base_algorithm import Algorithm
 from algo_pg.portfolio import Portfolio
+from algo_pg.util import get_list_of_trading_days_in_range
 from alpaca_trade_api import TimeFrame
 from dataclasses import dataclass
-import algo_pg.util as apg_util
 
 
 @dataclass
@@ -48,12 +48,15 @@ class TradingMachine():
         # time_frames_between_algo_runs: The number of TimeFrames that need to occur for
         # an algorithm's run function to be called once
 
+        # TODO: kwarg for a time_delta for how far the historical data needs to go back
+
         # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api
 
         # Attributes to keep track of the time span of the trading_machine
         self.start_date = start_date
         self.end_date = end_date
+        self.current_datetime = None
 
         # The only supported time frames for this class are minutes, hours, and days.
         self.time_frame = time_frame
@@ -61,9 +64,8 @@ class TradingMachine():
         # Generates a list of MarketDay instances in order from self.start_date to
         # self.end_date to represent all of the days the market is open, and *only*
         # the days the market is open.
-        self.trading_days = apg_util.get_list_of_trading_days_in_range(
+        self.trading_days = get_list_of_trading_days_in_range(
             self.alpaca_api, self.start_date, self.end_date)
-        self.current_market_date = None
 
         # Pairs of algorithms and portfolios
         self.algo_portfolio_pairs = []

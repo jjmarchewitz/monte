@@ -4,9 +4,9 @@ the project.
 
 """
 
-from alpaca_trade_api import REST
+from alpaca_trade_api import REST, TimeFrameUnit
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from os import environ, getcwd, sep
 from pytz import timezone
 from re import findall
@@ -194,8 +194,69 @@ def get_trading_day_obj_list_from_date_list(trading_date_list):
 
 
 def get_datetime_obj_from_date(date):
+    """
+    TODO:
+
+    Args:
+        date: _description_
+
+    Returns:
+        _description_
+    """
     format_str = '%Y-%m-%d'
 
     dt_obj = datetime.strptime(date, format_str)
 
     return dt_obj
+
+
+def get_time_delta_from_time_frame(time_frame):
+    """
+    TODO:
+
+    Args:
+        time_frame: _description_
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        _description_
+    """
+    delta = None
+
+    if time_frame.unit is TimeFrameUnit.Minute:
+        delta = timedelta(minutes=time_frame.amount)
+    elif time_frame.unit is TimeFrameUnit.Hour:
+        delta = timedelta(hours=time_frame.amount)
+    elif time_frame.unit is TimeFrameUnit.Day:
+        delta = timedelta(days=time_frame.amount)
+    else:
+        raise ValueError(
+            "Invalid time frame passed in. TimeFrameUnit must be Minutes, Hours, or Days.")
+
+    return delta
+
+
+###################
+# MONEY UTILITIES #
+###################
+
+
+def get_price_from_bar(bar):
+    """
+    Determines an equivalent price for an asset during a bar from info about the
+    bar itself.
+
+    Args:
+        bar: One bar of stock information that takes up one TimeFrame's worth of time.
+
+    Returns:
+        An average price to represent the bar, determined from information about the
+        bar.
+    """
+    # TODO: Find a better way to approximate the average price during a bar
+    price = (bar.h + bar.l) / 2
+    # price = (bar.o + bar.c) / 2
+
+    return price

@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="util" href="util.html" />
-    <link rel="prev" title="history" href="history.html" /> 
+    <link rel="prev" title="machine" href="machine.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,8 +43,8 @@
 <li class="toctree-l2"><a class="reference internal" href="algorithms.html">algorithms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_manager.html">data_manager</a></li>
 <li class="toctree-l2"><a class="reference internal" href="position.html">position</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stat_calculators.html">stat_calculators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="machine.html">machine</a></li>
-<li class="toctree-l2"><a class="reference internal" href="history.html">history</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">portfolio</a><ul class="simple">
 </ul>
 </li>
@@ -131,24 +131,6 @@ to the Portfolio.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="portfolio.Portfolio.create_new_bar_generators">
-<span class="sig-name descname"><span class="pre">create_new_bar_generators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#portfolio.Portfolio.create_new_bar_generators" title="Permalink to this definition"></a></dt>
-<dd><p>Replaces the bar generators in every Position with new ones for a new date/time.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>time_frame</strong> – An alpaca_trade_api.TimeFrame value corresponding to the time
-delta between price values.</p></li>
-<li><p><strong>start_time</strong> – An ISO-8601-compliant date and time to start the new generators
-at.</p></li>
-<li><p><strong>end_time</strong> – An ISO-8601-compliant date and time to start the new generators
-at.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="portfolio.Portfolio.create_new_position">
 <span class="sig-name descname"><span class="pre">create_new_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_quantity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#portfolio.Portfolio.create_new_position" title="Permalink to this definition"></a></dt>
 <dd><p>Create a new Position from the provided args and add it to the Portfolio.</p>
@@ -167,26 +149,6 @@ instance is finished being constructed.</p></li>
 <dt class="sig sig-object py" id="portfolio.Portfolio.delete_empty_positions">
 <span class="sig-name descname"><span class="pre">delete_empty_positions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#portfolio.Portfolio.delete_empty_positions" title="Permalink to this definition"></a></dt>
 <dd><p>Delete all positions in the portfolio that have 0 quantity currently held.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="portfolio.Portfolio.increment_all_bar_generators">
-<span class="sig-name descname"><span class="pre">increment_all_bar_generators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#portfolio.Portfolio.increment_all_bar_generators" title="Permalink to this definition"></a></dt>
-<dd><p>Steps every position’s bar generator forward by one time increment (TimeFrame).</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="portfolio.Portfolio.market_day_needs_to_be_incremented">
-<span class="sig-name descname"><span class="pre">market_day_needs_to_be_incremented</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#portfolio.Portfolio.market_day_needs_to_be_incremented" title="Permalink to this definition"></a></dt>
-<dd><p>Determines whether or not all of the bar generators have hit the end of the market
-day, meaning the simulated market day is over and needs to be replaced with the next
-market day.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Whether or not the market day has ended and needs to be replaced by the next
-market day.</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -234,7 +196,7 @@ buy or a sell order. Defaults to OrderType.BUY.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="history.html" class="btn btn-neutral float-left" title="history" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="machine.html" class="btn btn-neutral float-left" title="machine" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="util.html" class="btn btn-neutral float-right" title="util" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

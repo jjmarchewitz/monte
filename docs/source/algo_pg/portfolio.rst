@@ -1,7 +1,7 @@
 portfolio
 =========
 
-.. automodule:: machine.portfolio
+.. automodule:: portfolio
 	:members:
 
 .. toctree::

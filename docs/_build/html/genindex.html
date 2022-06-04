@@ -70,6 +70,7 @@
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#O"><strong>O</strong></a>
@@ -82,11 +83,11 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/machine.html#machine.machine.TradingMachine.add_algo_portfolio_pair">add_algo_portfolio_pair() (machine.machine.TradingMachine method)</a>
+      <li><a href="source/algo_pg/machine.html#machine.TradingMachine.add_algo_portfolio_pair">add_algo_portfolio_pair() (machine.TradingMachine method)</a>
 </li>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio.add_existing_position">add_existing_position() (machine.portfolio.Portfolio method)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio.add_existing_position">add_existing_position() (portfolio.Portfolio method)</a>
 </li>
-      <li><a href="source/algo_pg/machine/machine.html#machine.machine.AlgoPortfolioPair">AlgoPortfolioPair (class in machine.machine)</a>
+      <li><a href="source/algo_pg/machine.html#machine.AlgoPortfolioPair">AlgoPortfolioPair (class in machine)</a>
 </li>
       <li>
     algorithms.bang_bang.alg
@@ -104,9 +105,7 @@
         <li><a href="source/algo_pg/algorithms/base_algorithm.html#module-algorithms.base_algorithm">module</a>
 </li>
       </ul></li>
-      <li><a href="source/algo_pg/util/alpaca.html#util.alpaca.alpaca_setup">alpaca_setup() (in module util.alpaca)</a>
-</li>
-      <li><a href="source/algo_pg/util/alpaca.html#util.alpaca.AlpacaAPIBundle">AlpacaAPIBundle (class in util.alpaca)</a>
+      <li><a href="source/algo_pg/util.html#util.AlpacaAPIBundle">AlpacaAPIBundle (class in util)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -114,15 +113,15 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio.cancel_order">cancel_order() (machine.portfolio.Portfolio method)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio.cancel_order">cancel_order() (portfolio.Portfolio method)</a>
 </li>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio.create_new_bar_generators">create_new_bar_generators() (machine.portfolio.Portfolio method)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio.create_new_bar_generators">create_new_bar_generators() (portfolio.Portfolio method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/position.html#machine.position.Position.create_new_daily_bar_generator">create_new_daily_bar_generator() (machine.position.Position method)</a>
+      <li><a href="source/algo_pg/position.html#position.Position.create_new_daily_bar_generator">create_new_daily_bar_generator() (position.Position method)</a>
 </li>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio.create_new_position">create_new_position() (machine.portfolio.Portfolio method)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio.create_new_position">create_new_position() (portfolio.Portfolio method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -131,15 +130,15 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    data.manager
+    data_manager
 
       <ul>
-        <li><a href="source/algo_pg/data/manager.html#module-data.manager">module</a>
+        <li><a href="source/algo_pg/data_manager.html#module-data_manager">module</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio.delete_empty_positions">delete_empty_positions() (machine.portfolio.Portfolio method)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio.delete_empty_positions">delete_empty_positions() (portfolio.Portfolio method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -147,25 +146,38 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/position.html#machine.position.Position.generate_next_price">generate_next_price() (machine.position.Position method)</a>
+      <li><a href="source/algo_pg/position.html#position.Position.generate_next_price">generate_next_price() (position.Position method)</a>
 </li>
-      <li><a href="source/algo_pg/machine/position.html#machine.position.Position.get_asset_class">get_asset_class() (machine.position.Position method)</a>
+      <li><a href="source/algo_pg/position.html#position.Position.get_asset_class">get_asset_class() (position.Position method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/util/dates.html#util.dates.get_list_of_market_days_in_range">get_list_of_market_days_in_range() (in module util.dates)</a>
+      <li><a href="source/algo_pg/util.html#util.get_list_of_trading_days_in_range">get_list_of_trading_days_in_range() (in module util)</a>
 </li>
-      <li><a href="source/algo_pg/util/dates.html#util.dates.get_market_day_obj_list_from_date_list">get_market_day_obj_list_from_date_list() (in module util.dates)</a>
+      <li><a href="source/algo_pg/util.html#util.get_raw_trading_dates_in_range">get_raw_trading_dates_in_range() (in module util)</a>
 </li>
-      <li><a href="source/algo_pg/util/dates.html#util.dates.get_raw_market_dates_in_range">get_raw_market_dates_in_range() (in module util.dates)</a>
+      <li><a href="source/algo_pg/util.html#util.get_trading_day_obj_list_from_date_list">get_trading_day_obj_list_from_date_list() (in module util)</a>
 </li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    history
+
+      <ul>
+        <li><a href="source/algo_pg/history.html#module-history">module</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio.increment_all_bar_generators">increment_all_bar_generators() (machine.portfolio.Portfolio method)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio.increment_all_bar_generators">increment_all_bar_generators() (portfolio.Portfolio method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -174,39 +186,14 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    machine.history
+    machine
 
       <ul>
-        <li><a href="source/algo_pg/machine/history.html#module-machine.history">module</a>
+        <li><a href="source/algo_pg/machine.html#module-machine">module</a>
 </li>
       </ul></li>
-      <li>
-    machine.machine
-
-      <ul>
-        <li><a href="source/algo_pg/machine/machine.html#module-machine.machine">module</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio.market_day_needs_to_be_incremented">market_day_needs_to_be_incremented() (portfolio.Portfolio method)</a>
 </li>
-      </ul></li>
-      <li>
-    machine.portfolio
-
-      <ul>
-        <li><a href="source/algo_pg/machine/portfolio.html#module-machine.portfolio">module</a>
-</li>
-      </ul></li>
-      <li>
-    machine.position
-
-      <ul>
-        <li><a href="source/algo_pg/machine/position.html#module-machine.position">module</a>
-</li>
-      </ul></li>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio.market_day_needs_to_be_incremented">market_day_needs_to_be_incremented() (machine.portfolio.Portfolio method)</a>
-</li>
-      <li><a href="source/algo_pg/util/dates.html#util.dates.MarketDay">MarketDay (class in util.dates)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
@@ -215,19 +202,17 @@
 </li>
         <li><a href="source/algo_pg/algorithms/base_algorithm.html#module-algorithms.base_algorithm">algorithms.base_algorithm</a>
 </li>
-        <li><a href="source/algo_pg/data/manager.html#module-data.manager">data.manager</a>
+        <li><a href="source/algo_pg/data_manager.html#module-data_manager">data_manager</a>
 </li>
-        <li><a href="source/algo_pg/machine/history.html#module-machine.history">machine.history</a>
+        <li><a href="source/algo_pg/history.html#module-history">history</a>
 </li>
-        <li><a href="source/algo_pg/machine/machine.html#module-machine.machine">machine.machine</a>
+        <li><a href="source/algo_pg/machine.html#module-machine">machine</a>
 </li>
-        <li><a href="source/algo_pg/machine/portfolio.html#module-machine.portfolio">machine.portfolio</a>
+        <li><a href="source/algo_pg/portfolio.html#module-portfolio">portfolio</a>
 </li>
-        <li><a href="source/algo_pg/machine/position.html#module-machine.position">machine.position</a>
+        <li><a href="source/algo_pg/position.html#module-position">position</a>
 </li>
-        <li><a href="source/algo_pg/util/alpaca.html#module-util.alpaca">util.alpaca</a>
-</li>
-        <li><a href="source/algo_pg/util/dates.html#module-util.dates">util.dates</a>
+        <li><a href="source/algo_pg/util.html#module-util">util</a>
 </li>
       </ul></li>
   </ul></td>
@@ -236,11 +221,11 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Order">Order (class in machine.portfolio)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Order">Order (class in portfolio)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.OrderType">OrderType (class in machine.portfolio)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.OrderType">OrderType (class in portfolio)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -248,13 +233,27 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio.place_order">place_order() (machine.portfolio.Portfolio method)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio.place_order">place_order() (portfolio.Portfolio method)</a>
 </li>
+      <li>
+    portfolio
+
+      <ul>
+        <li><a href="source/algo_pg/portfolio.html#module-portfolio">module</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio">Portfolio (class in machine.portfolio)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio">Portfolio (class in portfolio)</a>
 </li>
-      <li><a href="source/algo_pg/machine/position.html#machine.position.Position">Position (class in machine.position)</a>
+      <li>
+    position
+
+      <ul>
+        <li><a href="source/algo_pg/position.html#module-position">module</a>
+</li>
+      </ul></li>
+      <li><a href="source/algo_pg/position.html#position.Position">Position (class in position)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -262,7 +261,7 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/machine.html#machine.machine.TradingMachine.run">run() (machine.machine.TradingMachine method)</a>
+      <li><a href="source/algo_pg/machine.html#machine.TradingMachine.run">run() (machine.TradingMachine method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -270,15 +269,17 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/portfolio.html#machine.portfolio.Portfolio.total_value">total_value() (machine.portfolio.Portfolio method)</a>
+      <li><a href="source/algo_pg/portfolio.html#portfolio.Portfolio.total_value">total_value() (portfolio.Portfolio method)</a>
 
       <ul>
-        <li><a href="source/algo_pg/machine/position.html#machine.position.Position.total_value">(machine.position.Position method)</a>
+        <li><a href="source/algo_pg/position.html#position.Position.total_value">(position.Position method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="source/algo_pg/machine/machine.html#machine.machine.TradingMachine">TradingMachine (class in machine.machine)</a>
+      <li><a href="source/algo_pg/util.html#util.TradingDay">TradingDay (class in util)</a>
+</li>
+      <li><a href="source/algo_pg/machine.html#machine.TradingMachine">TradingMachine (class in machine)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -287,19 +288,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    util.alpaca
+    util
 
       <ul>
-        <li><a href="source/algo_pg/util/alpaca.html#module-util.alpaca">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    util.dates
-
-      <ul>
-        <li><a href="source/algo_pg/util/dates.html#module-util.dates">module</a>
+        <li><a href="source/algo_pg/util.html#module-util">module</a>
 </li>
       </ul></li>
   </ul></td>

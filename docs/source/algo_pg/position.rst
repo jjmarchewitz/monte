@@ -1,7 +1,7 @@
 position
 ========
 
-.. automodule:: machine.position
+.. automodule:: position
 	:members:
 
 .. toctree::

@@ -1,7 +1,7 @@
-dates
-=====
+history
+=======
 
-.. automodule:: util.dates
+.. automodule:: history
 	:members:
 
 .. toctree::

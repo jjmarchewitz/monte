@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>position &mdash; Algo Playground  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="machine" href="machine.html" />
+    <link rel="prev" title="data_manager" href="data_manager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Algo Playground
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../algo_pg.html">algo_pg</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="algorithms.html">algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_manager.html">data_manager</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">position</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="machine.html">machine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="history.html">history</a></li>
+<li class="toctree-l2"><a class="reference internal" href="portfolio.html">portfolio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="util.html">util</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Algo Playground</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../algo_pg.html">algo_pg</a> &raquo;</li>
+      <li>position</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/source/algo_pg/position.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-position">
+<span id="position"></span><h1>position<a class="headerlink" href="#module-position" title="Permalink to this headline"></a></h1>
+<p>A Position is simply the name for an asset that a buyer actually has possession of. While
+Apple’s stock exists in the world as an asset, it only becomes a person’s position if they
+own Apple stock. A Position object as defined here has a symbol, quantity, and price
+associated with it.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="position.Position">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">position.</span></span><span class="sig-name descname"><span class="pre">Position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpaca_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_quantity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#position.Position" title="Permalink to this definition"></a></dt>
+<dd><p>This is a container for an individual position, like ETH or IVV. An instance is meant    to be stored inside of a portfolio, so the position has a quantity currently held and    a current price associated with it.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="position.Position.create_new_daily_bar_generator">
+<span class="sig-name descname"><span class="pre">create_new_daily_bar_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#position.Position.create_new_daily_bar_generator" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new bar generator with a start time and end time that occur on the same
+day and correspond to the open and close times of the market for that day.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_frame</strong> – The time delta between bars. Can be a minute, hour, or day.</p></li>
+<li><p><strong>start_time</strong> – The ISO-8601 compliant date/time for the generator to start
+generating bars.</p></li>
+<li><p><strong>end_time</strong> – The ISO-8601 compliant date/time for the generator to stop
+generating bars.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="position.Position.generate_next_price">
+<span class="sig-name descname"><span class="pre">generate_next_price</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#position.Position.generate_next_price" title="Permalink to this definition"></a></dt>
+<dd><p>Increment the bar generator to the next iteration and set the price based on the
+new bar.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="position.Position.get_asset_class">
+<span class="sig-name descname"><span class="pre">get_asset_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#position.Position.get_asset_class" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the Asset Class for any symbol.
+Asset Class is a string identifying what class an asset belongs to
+(i.e. “us equity”)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An asset class string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="position.Position.total_value">
+<span class="sig-name descname"><span class="pre">total_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#position.Position.total_value" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the total value of this position with the current market price.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The total value of this position with the current market price.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_manager.html" class="btn btn-neutral float-left" title="data_manager" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="machine.html" class="btn btn-neutral float-right" title="machine" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jake Marchewitz, Surya Gupta, Viren Gadkari.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

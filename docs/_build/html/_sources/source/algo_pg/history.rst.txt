@@ -1,7 +1,7 @@
-manager
+history
 =======
 
-.. automodule:: data.manager
+.. automodule:: history
 	:members:
 
 .. toctree::

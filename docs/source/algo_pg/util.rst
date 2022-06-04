@@ -1,9 +1,9 @@
 util
 ====
 
+.. automodule:: util
+	:members:
+
 .. toctree::
 	:maxdepth: 4
-
-	util/dates
-	util/alpaca
 

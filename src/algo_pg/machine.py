@@ -123,6 +123,8 @@ class TradingMachine():
                     # TEST CODE
                     if portfolio._increment_count == 100:
                         portfolio.place_order("IVV", 5, OrderType.BUY)
+                    elif portfolio._increment_count == 200:
+                        portfolio.place_order("AAPL", 2, OrderType.SELL)
 
                     if not portfolio._any_generator_reached_end_of_day():
                         # TODO: Change to Logging library

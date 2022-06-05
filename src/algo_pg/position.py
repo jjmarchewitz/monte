@@ -96,5 +96,7 @@ class Position():
             if current_timestamp == target_timestamp:
                 break
 
+        self.update_price_from_current_bar()
+
         # TODO: Use the increments arg to only generate the number of rows needed, not from the
         # start of the whole machine

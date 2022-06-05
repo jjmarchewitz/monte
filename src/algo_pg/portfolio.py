@@ -248,6 +248,8 @@ class Portfolio():
 
     def _process_buy_order(self, order):
         """TODO:"""
+
+        # TODO: Add Logging
         order_status = OrderStatus.PENDING
 
         # Calculate total price of the order on the current bar
@@ -291,12 +293,30 @@ class Portfolio():
         else:
             order_status = OrderStatus.FAILED
 
+        print(f"\n\n\nBUY: {order.symbol}\n\n\n")
+
         return order_status
 
     def _process_sell_order(self, order):
         """TODO:"""
-        # TODO:
-        pass
+        order_status = OrderStatus.PENDING
+
+        # TODO: Add Logging
+        if not self.contains_position(order.symbol):
+            order_status = OrderStatus.FAILED
+        else:
+            position_from_sell_order = self.get_position(order.symbol)
+
+            if position_from_sell_order.quantity < order.quantity:
+                order_status = OrderStatus.FAILED
+
+        # If there are enough units of the currently-held position that the sell order
+        # can succeed, perform the sell order
+        if not order_status is OrderStatus.FAILED:
+            self.cash += order.quantity * position_from_sell_order.price
+            position_from_sell_order.quantity -= order.quantity
+
+        return order_status
 
     def get_current_timestamp(self):
         """TODO:"""

@@ -38,7 +38,7 @@ def main():
 
     # portfolio1.create_new_position("AAPL", 5)
 
-    portfolio1.place_order("AAPL", 2, OrderType.BUY)
+    portfolio1.place_order("AAPL", 5, OrderType.BUY)
 
     machine.add_algo_portfolio_pair("DummyAlgo1", portfolio1)
 

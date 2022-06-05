@@ -228,9 +228,6 @@ class Portfolio():
             # Update the price attribute based on the current bar
             position.update_price_from_current_bar()
 
-            # Update the data manager's dataframe based on the new data
-            position.data_manager.update_df()
-
     def _any_generator_reached_end_of_day(self):
         """TODO:"""
         generator_at_end_of_day = False

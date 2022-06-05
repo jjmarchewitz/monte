@@ -11,6 +11,16 @@ from dataclasses import dataclass
 
 
 @dataclass
+class MachineSettings():
+    """
+    Used to store all of the trading machine settings so this object can be passed around
+    and settings can be synchronized.
+    """
+    # TODO:
+    pass
+
+
+@dataclass
 class AlgoPortfolioPair():
     """
     A trading algorithm-portfolio pair is run together across a trading machine's timeline\
@@ -96,7 +106,9 @@ class TradingMachine():
                 portfolio = algo_portfolio_pair.portfolio
 
                 for position in portfolio.positions:
+                    # TODO: Maybe remove this when MachineSettings is working
                     position.data_manager.add_stat_dict(self.stat_dict)
+                    position.data_manager.set_time_frame(self.stat_dict)
 
     def run(self):
         """
@@ -126,4 +138,7 @@ class TradingMachine():
                     portfolio._increment_all_positions()
                     # TODO: Call algorithm increment/run function here
 
-                    print(f"{portfolio.get_current_timestamp()}, {portfolio.total_value()}")
+                    # breakpoint()
+                    if not portfolio._any_generator_reached_end_of_day():
+                        print(
+                            f"{portfolio.get_current_timestamp()}, {round(portfolio.total_value(), 2):,}")

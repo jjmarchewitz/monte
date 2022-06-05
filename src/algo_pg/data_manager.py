@@ -2,8 +2,6 @@
 TODO:
 """
 
-from os import stat
-from time import time
 from algo_pg.util import get_list_of_trading_days_in_range
 from alpaca_trade_api import TimeFrame
 from datetime import timedelta
@@ -110,45 +108,9 @@ class DataManager():
         while not self.generator_at_end_of_day:
             self._generate_next_bar()
             self._add_current_bar_to_raw_df()
-            # TODO: Use stats dict to add/generate stats columns
+            self.update_df()
 
             yield self.generator_at_end_of_day
-
-    def update_df(self):
-        """TODO:"""
-
-        # Add a new row to the main dataframe
-        self.df.loc[len(self.df)] = ["ERROR_NOT_REPLACED" for _ in self._df_columns]
-
-        last_row_of_raw_df = self._raw_df.loc[len(self._raw_df) - 1]
-
-        for column, value in last_row_of_raw_df.items():
-            setattr(self.df.loc[len(self.df) - 1], column, value)
-
-        for column, func in self.stat_dict.items():
-            value = func(self._raw_df)
-            setattr(self.df.loc[len(self.df) - 1], column, value)
-
-        breakpoint()
-
-    def get_df_between_dates(self, start_date, end_date):
-        """TODO:"""
-
-        # Get a list of all valid trading days the market was open for in the date range
-        # provided with open and close times as attributes.
-        trading_days = get_list_of_trading_days_in_range(
-            self.alpaca_api, start_date, end_date)
-
-        for day in trading_days:
-
-            self._row_generator = self._row_generator(
-                day.open_time_iso, day.close_time_iso)
-
-            while True:
-                try:
-                    next(self._row_generator)
-                except StopIteration:
-                    break
 
     def _generate_next_bar(self):
         """
@@ -179,6 +141,44 @@ class DataManager():
             ]
 
             self._raw_df.loc[len(self._raw_df)] = row_data
+
+    def update_df(self):
+        """TODO:"""
+        if not self.generator_at_end_of_day:
+
+            # Add a new row to the main dataframe
+            self.df.loc[len(self.df)] = ["ERROR_NOT_REPLACED" for _ in self._df_columns]
+
+            last_row_of_raw_df = self._raw_df.loc[len(self._raw_df) - 1]
+
+            # Copy over columns from raw_df
+            for column, value in last_row_of_raw_df.items():
+                setattr(self.df.loc[len(self.df) - 1], column, value)
+
+            # Calculate any statistics from the stat dict and add them to the appropriate
+            # column in self.df
+            for column, func in self.stat_dict.items():
+                value = func(self._raw_df)
+                setattr(self.df.loc[len(self.df) - 1], column, value)
+
+    def get_df_between_dates(self, start_date, end_date):
+        """TODO:"""
+
+        # Get a list of all valid trading days the market was open for in the date range
+        # provided with open and close times as attributes.
+        trading_days = get_list_of_trading_days_in_range(
+            self.alpaca_api, start_date, end_date)
+
+        for day in trading_days:
+
+            self._row_generator = self._row_generator(
+                day.open_time_iso, day.close_time_iso)
+
+            while True:
+                try:
+                    next(self._row_generator)
+                except StopIteration:
+                    break
 
     def _create_new_daily_bar_generator(self, start_time, end_time):
         """

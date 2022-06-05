@@ -46,8 +46,17 @@ class DataManager():
         self.start_date = start_date
         self.end_date = end_date
 
-    def row_generator(self, start_date, end_date):
+    def row_generator(self, start_date=None, end_date=None):
         """TODO:"""
+
+        # Use the instance start date if a different one is not passed in
+        if start_date is None:
+            start_date = self.start_date
+
+        # Use the instance end date if a different one is not passed in
+        if end_date is None:
+            end_date = self.end_date
+
         # Get a list of all valid trading days the market was open for in the date range
         # provided with open and close times as attributes.
         trading_days = get_list_of_trading_days_in_range(
@@ -97,14 +106,14 @@ class DataManager():
         """TODO:"""
         if not self.needs_new_bar_generator:
             row_data = [
-                self.current_bar.t,
-                self.current_bar.o,
-                self.current_bar.h,
-                self.current_bar.l,
-                self.current_bar.c,
-                self.current_bar.v,
-                self.current_bar.n,
-                self.current_bar.vw
+                self.current_bar.t,  # Timestamp
+                self.current_bar.o,  # Open price
+                self.current_bar.h,  # High price
+                self.current_bar.l,  # Low price
+                self.current_bar.c,  # Close price
+                self.current_bar.v,  # Volume
+                self.current_bar.n,  # Number of Trades (trade count)
+                self.current_bar.vw  # Volume-weighted average price
             ]
 
             self._raw_df.loc[len(self._raw_df)] = row_data

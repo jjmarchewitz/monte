@@ -33,7 +33,7 @@ class Position():
         # TODO: Check that input symbol is valid and corresponds to an actual asset.
         self.symbol = symbol
         self.quantity = initial_quantity
-        self.price = 0
+        self.price = 0  # TODO: Set price based on VWAP
         self.asset = self.alpaca_api.trading.get_asset(self.symbol)
         self.current_bar = None
 

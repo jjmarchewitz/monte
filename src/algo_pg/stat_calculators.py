@@ -1,1 +1,1 @@
-"""Functions that will generate summary statistics for a DataManager"""
+"""Functions that will generate summary statistics for a DataManager instance."""

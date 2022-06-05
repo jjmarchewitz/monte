@@ -20,8 +20,9 @@ class DataManager():
     """
 
     def __init__(self, alpaca_api, data_settings, symbol):
-
-        # TODO: Machine Settings
+        """
+        TODO:
+        """
 
         self.alpaca_api = alpaca_api
         self.data_settings = data_settings
@@ -71,10 +72,6 @@ class DataManager():
 
         return stat_column_names
 
-    def set_time_frame(self, time_frame):
-        """TODO:"""
-        self.time_frame = time_frame
-
     def get_last_row(self):
         """TODO:"""
 
@@ -99,7 +96,7 @@ class DataManager():
         while not self.generator_at_end_of_day:
             self._generate_next_bar()
             self._add_current_bar_to_raw_df()
-            self.update_df()
+            self._update_df()
 
             yield self.generator_at_end_of_day
 
@@ -133,7 +130,7 @@ class DataManager():
 
             self._raw_df.loc[len(self._raw_df)] = row_data
 
-    def update_df(self):
+    def _update_df(self):
         """TODO:"""
         # Remove the first row if the total row count is above the limit
         if len(self.df.index) > self.max_rows:
@@ -159,14 +156,7 @@ class DataManager():
 
             self._next_df_index += 1
 
-        # # Remove the last row if it still has error messages in it
-        # last_row_of_df = self.df.loc[len(self.df) - 1]
-        # if any([value == "ERROR_NOT_REPLACED" for _, value in last_row_of_df.items()]):
-        #     self.df = self.df.drop(
-        #         index=self.df.index[len(self.df.index)],
-        #         axis=0, inplace=False)
-
-    def get_df_between_dates(self, start_date, end_date):
+    def set_df_from_dates(self, start_date, end_date):
         """TODO:"""
 
         # Get a list of all valid trading days the market was open for in the date range

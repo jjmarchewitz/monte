@@ -3,6 +3,7 @@ A Portfolio is meant to represent a collection of individual Positions.
 """
 
 from algo_pg.position import Position
+from algo_pg.util import get_price_from_bar
 from dataclasses import dataclass
 from enum import Enum
 
@@ -13,6 +14,14 @@ class OrderType(Enum):
     """
     BUY = 1
     SELL = 2
+
+
+class OrderStatus(Enum):
+    """
+    """
+    PENDING = 1
+    COMPLETED = 2
+    FAILED = 3
 
 
 @dataclass
@@ -58,6 +67,8 @@ class Portfolio():
         self.time_of_last_price_gen_increment = None
         self._current_order_id_number = 1
         self._order_queue = []
+
+        self.increment_count = 0
 
     def create_new_position(self, symbol, initial_quantity):
         """
@@ -113,6 +124,29 @@ class Portfolio():
                 non_empty_positions.append(position)
 
         self.positions = non_empty_positions
+
+    def contains_position(self, symbol):
+        """TODO:"""
+
+        has_position = False
+
+        # Check if any position has the symbol that was passed in
+        if any([position.symbol == symbol for position in self.positions]):
+            has_position = True
+
+        return has_position
+
+    def get_position(self, symbol):
+        """TODO:"""
+        retval = None
+
+        if self.contains_position(symbol):
+            for position in self.positions:
+                if position.symbol == symbol:
+                    retval = position
+                    break
+
+        return retval
 
     def total_value(self):
         """
@@ -182,8 +216,10 @@ class Portfolio():
 
         return was_order_successfully_cancelled
 
-    def process_pending_orders(self):
+    def _process_pending_orders(self):
+        """TODO:"""
         list_of_completed_order_ids = []
+        new_order_queue = []
 
         # Check through every order in the order queue
         for order in self._order_queue:
@@ -195,16 +231,60 @@ class Portfolio():
 
             # Process the order based on buy/sell
             if order.order_type == OrderType.BUY:
-                self._process_buy_order(order)
+                status = self._process_buy_order(order)
             elif order.order_type == OrderType.SELL:
-                self._process_sell_order(order)
+                status = self._process_sell_order(order)
 
         return list_of_completed_order_ids
 
     def _process_buy_order(self, order):
-        pass
+        # TODO:
+
+        order_status = OrderStatus.PENDING
+
+        # Calculate total price of the order on the current bar
+        current_timestamp = self.get_current_timestamp()
+        bar_for_current_order = self.alpaca_api.market_data.get_bars(
+            order.symbol,
+            self.data_settings.time_frame,
+            start=current_timestamp.isoformat(),
+            limit=1
+        )
+
+        # Determine what the unit price for the order's symbol currently is
+        unit_price = get_price_from_bar(bar_for_current_order)
+
+        # Determine the total cost of the order
+        total_order_cost = unit_price * order.quantity
+
+        # Check if the Portfolio has enough money in cash to make the purchase
+        if self.cash >= total_order_cost:
+
+            # Remove the total cost of the order from the Portfolio's liquid cash
+            self.cash -= total_order_cost
+
+            # Check if a Position already exists
+            if self.contains_position(order.symbol):
+                target_position = self.get_position(order.symbol)
+                target_position.quantity += order.quantity
+
+            # Create a new Position if one doesn't exist
+            else:
+                self.create_new_position(order.symbol, order.quantity)
+
+                # TODO: Generate the historical data for the asset going back either to the beginning
+                # of the simulation or for the max number of rows
+                new_position = self.get_position(order.symbol)
+
+            order_status = OrderStatus.COMPLETED
+        else:
+            order_status = OrderStatus.FAILED
+
+        return order_status
 
     def _process_sell_order(self, order):
+        """TODO:"""
+        # TODO:
         pass
 
     def get_current_timestamp(self):
@@ -232,6 +312,8 @@ class Portfolio():
 
             # Update the price attribute based on the current bar
             position.update_price_from_current_bar()
+
+        self.increment_count += 1
 
     def _any_generator_reached_end_of_day(self):
         """TODO:"""

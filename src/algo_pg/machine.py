@@ -23,7 +23,7 @@ class DataSettings():
     stat_dict: dict
     max_rows_in_history_df: int
     buffer_data_length: timedelta
-    pass
+    time_frames_between_algo_runs: int = 1
 
 
 @dataclass
@@ -52,12 +52,6 @@ class TradingMachine():
                 in the repo's alpaca.config.
             TODO: data_settings
         """
-
-        # TODO: Move this into the algo parent class.
-        # time_frames_between_algo_runs: The number of TimeFrames that need to occur for
-        # an algorithm's run function to be called once
-
-        # TODO: kwarg for a time_delta for how far the historical data needs to go back
 
         # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api
@@ -119,8 +113,10 @@ class TradingMachine():
 
                 while not portfolio._any_generator_reached_end_of_day():
                     portfolio._increment_all_positions()
+                    completed_order_ids = portfolio._process_pending_orders()
                     # TODO: Call algorithm increment/run function here
 
                     if not portfolio._any_generator_reached_end_of_day():
+                        # TODO: Change to Logging library
                         print(
                             f"{portfolio.get_current_timestamp()}, {round(portfolio.total_value(), 2):,}")

@@ -50,6 +50,7 @@ class Portfolio():
         self.name = name if name is not None else "Unnamed"
         self.positions = []
         self.cash = starting_cash
+
         self.time_of_last_price_gen_increment = None
         self._current_order_id_number = 1
         self._order_queue = []
@@ -219,18 +220,16 @@ class Portfolio():
 
     def _increment_all_positions(self):
         """TODO:"""
-        self._increment_data_manager_row_generator_for_all_positions()
-        self._update_position_prices_to_current_bar()
-
-    def _increment_data_manager_row_generator_for_all_positions(self):
-        """TODO:"""
         for position in self.positions:
+
+            # Increment the row generator to update the raw data to the next TimeFrame
             next(position.data_manager._row_generator)
 
-    def _update_position_prices_to_current_bar(self):
-        """TODO:"""
-        for position in self.positions:
-            position.update_price_for_current_bar()
+            # Update the price attribute based on the current bar
+            position.update_price_from_current_bar()
+
+            # Update the data manager's dataframe based on the new data
+            position.data_manager.update_df()
 
     def _any_generator_reached_end_of_day(self):
         """TODO:"""

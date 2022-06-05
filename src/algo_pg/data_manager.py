@@ -2,6 +2,7 @@
 TODO:
 """
 
+from os import stat
 from time import time
 from algo_pg.util import get_list_of_trading_days_in_range
 from alpaca_trade_api import TimeFrame
@@ -33,7 +34,6 @@ class DataManager():
         self.time_frame = time_frame
         # self.normal_market_hours_only = normal_market_hours_only
         # self.pre_start_buffer_period = pre_start_buffer_period
-        self.stat_dict = stat_dict
         self.current_bar = None
 
         # Start as True to force a new generator to be created
@@ -44,7 +44,37 @@ class DataManager():
         self._raw_df_columns = ['timestamp', 'open', 'high',
                                 'low', 'close', 'volume', 'trade_count', 'vwap']
         self._raw_df = pd.DataFrame(columns=self._raw_df_columns)
-        self.df = None
+
+        self._df_columns = self._raw_df_columns
+        self.df = pd.DataFrame(columns=self._df_columns)
+
+        # This must come after the dataframe initialization
+        self.stat_dict = None
+
+        # This is not the same as self.stat_dict, this is the constructor's argument
+        if stat_dict is not None:
+            self.add_stat_dict(stat_dict)
+
+    def add_stat_dict(self, stat_dict):
+        """TODO:"""
+        self.stat_dict = stat_dict
+
+        # Update the columns to include the statistics passed in
+        self._df_columns.extend(self._get_statistics_column_names())
+
+        # Recreate the dataframe with the new columns added in
+        self.df = pd.DataFrame(columns=self._df_columns)
+
+    def _get_statistics_column_names(self):
+        """TODO:"""
+
+        stat_column_names = []
+
+        if self.stat_dict is not None:
+            for key, _ in self.stat_dict.items():
+                stat_column_names.append(key)
+
+        return stat_column_names
 
     def set_start_and_end_dates(self, start_date, end_date):
         """TODO:"""
@@ -59,7 +89,7 @@ class DataManager():
         """TODO:"""
 
         # TODO: Change this back to regular df instead of _raw_df
-        return self._raw_df.loc[len(self._raw_df) - 1]
+        return self.df.loc[len(self.df) - 1]
 
     def create_new_daily_row_generator(self, start_time, end_time):
         """TODO:"""
@@ -83,6 +113,23 @@ class DataManager():
             # TODO: Use stats dict to add/generate stats columns
 
             yield self.generator_at_end_of_day
+
+    def update_df(self):
+        """TODO:"""
+
+        # Add a new row to the main dataframe
+        self.df.loc[len(self.df)] = ["ERROR_NOT_REPLACED" for _ in self._df_columns]
+
+        last_row_of_raw_df = self._raw_df.loc[len(self._raw_df) - 1]
+
+        for column, value in last_row_of_raw_df.items():
+            setattr(self.df.loc[len(self.df) - 1], column, value)
+
+        for column, func in self.stat_dict.items():
+            value = func(self._raw_df)
+            setattr(self.df.loc[len(self.df) - 1], column, value)
+
+        breakpoint()
 
     def get_df_between_dates(self, start_date, end_date):
         """TODO:"""

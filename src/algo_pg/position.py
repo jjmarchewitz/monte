@@ -38,7 +38,7 @@ class Position():
 
         # TODO: self.time_when_price_last_updated = None
 
-    def update_price_for_current_bar(self):
+    def update_price_from_current_bar(self):
         """TODO:"""
         self.price = get_price_from_bar(self.data_manager.current_bar)
 

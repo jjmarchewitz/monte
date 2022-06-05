@@ -29,7 +29,7 @@ class TradingMachine():
 
     def __init__(
             self, alpaca_api, start_date, end_date,
-            time_frame=TimeFrame.Hour):
+            time_frame=TimeFrame.Hour, stat_dict=None):
         """
         Constructor for the TradingMachine class.
 
@@ -42,6 +42,7 @@ class TradingMachine():
                 run at.
             time_frame: An alpaca_trade_api.TimeFrame value corresponding to the time
                 delta between price values. Defaults to TimeFrame.Minute.
+            TODO: stat_dict
         """
 
         # TODO: Move this into the algo parent class.
@@ -57,6 +58,7 @@ class TradingMachine():
         self.start_date = start_date
         self.end_date = end_date
         self.current_datetime = None
+        self.stat_dict = stat_dict
 
         # The only supported time frames for this class are minutes, hours, and days.
         self.time_frame = time_frame
@@ -85,11 +87,25 @@ class TradingMachine():
         algo_portfolio_pair = AlgoPortfolioPair(algorithm, portfolio)
         self.algo_portfolio_pairs.append(algo_portfolio_pair)
 
+    def _pre_run(self):
+        """TODO:"""
+
+        # If there is a stat dict, add it to every data manager in the whole machine
+        if self.stat_dict is not None:
+            for algo_portfolio_pair in self.algo_portfolio_pairs:
+                portfolio = algo_portfolio_pair.portfolio
+
+                for position in portfolio.positions:
+                    position.data_manager.add_stat_dict(self.stat_dict)
+
     def run(self):
         """
         Run the trading machine and run all of the algorithm portfolio pairs from the start
         date to the end date.
         """
+
+        self._pre_run()
+
         # For every day that the market will be open
         for trading_day in self.trading_days:
 

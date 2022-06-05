@@ -2,6 +2,7 @@
 TODO:
 """
 
+from time import time
 from algo_pg.util import get_list_of_trading_days_in_range
 from alpaca_trade_api import TimeFrame
 from datetime import timedelta
@@ -33,8 +34,12 @@ class DataManager():
         # self.normal_market_hours_only = normal_market_hours_only
         # self.pre_start_buffer_period = pre_start_buffer_period
         self.stat_dict = stat_dict
-        self.needs_new_bar_generator = True
         self.current_bar = None
+
+        # Start as True to force a new generator to be created
+        self._bar_generator = None
+        self._row_generator = None
+        self.generator_at_end_of_day = True
 
         self._raw_df_columns = ['timestamp', 'open', 'high',
                                 'low', 'close', 'volume', 'trade_count', 'vwap']
@@ -46,16 +51,41 @@ class DataManager():
         self.start_date = start_date
         self.end_date = end_date
 
-    def row_generator(self, start_date=None, end_date=None):
+    def set_time_frame(self, time_frame):
+        """TODO:"""
+        self.time_frame = time_frame
+
+    def get_last_row(self):
         """TODO:"""
 
-        # Use the instance start date if a different one is not passed in
-        if start_date is None:
-            start_date = self.start_date
+        # TODO: Change this back to regular df instead of _raw_df
+        return self._raw_df.loc[len(self._raw_df) - 1]
 
-        # Use the instance end date if a different one is not passed in
-        if end_date is None:
-            end_date = self.end_date
+    def create_new_daily_row_generator(self, start_time, end_time):
+        """TODO:"""
+        self._row_generator = self._daily_row_generator(start_time, end_time)
+        self.generator_at_end_of_day = False
+
+    def _daily_row_generator(self, start_time, end_time):
+        """TODO:"""
+
+        # Create a new bar generator each day, regardless of the TimeFrame. This is
+        # to synchronize the start and end times on each new day, as some assets have
+        # after-hours data that we are excluding
+        self._create_new_daily_bar_generator(
+            start_time, end_time)
+
+        # While the end of the day has not yet been reached, generate the next bar and
+        # add it to the raw dataframe
+        while not self.generator_at_end_of_day:
+            self._generate_next_bar()
+            self._add_current_bar_to_raw_df()
+            # TODO: Use stats dict to add/generate stats columns
+
+            yield self.generator_at_end_of_day
+
+    def get_df_between_dates(self, start_date, end_date):
+        """TODO:"""
 
         # Get a list of all valid trading days the market was open for in the date range
         # provided with open and close times as attributes.
@@ -63,30 +93,15 @@ class DataManager():
             self.alpaca_api, start_date, end_date)
 
         for day in trading_days:
-            # Create a new bar generator each day, regardless of the TimeFrame. This is
-            # to synchronize the start and end times on each new day, as some assets have
-            # after-hours data that we are excluding
-            self._create_new_daily_bar_generator(
-                day.open_time_iso, day.close_time_iso, self.time_frame)
 
-            # While the end of the day has not yet been reached, generate the next bar and
-            # add it to the raw dataframe
-            while not self.needs_new_bar_generator:
-                self._generate_next_bar()
-                self._add_current_bar_to_raw_df()
-                # TODO: Use stats dict to add/generate stats columns
-                yield
+            self._row_generator = self._row_generator(
+                day.open_time_iso, day.close_time_iso)
 
-    def get_df_between_dates(self, start_date, end_date):
-        """TODO:"""
-
-        row_generator = self.row_generator(start_date, end_date)
-
-        while True:
-            try:
-                next(row_generator)
-            except StopIteration:
-                break
+            while True:
+                try:
+                    next(self._row_generator)
+                except StopIteration:
+                    break
 
     def _generate_next_bar(self):
         """
@@ -100,11 +115,11 @@ class DataManager():
             # When a generator tries to generate past the end of its intended range it will
             # throw this error, and I use it to indicate that a new bar generator for a
             # new day needs to be generated.
-            self.needs_new_bar_generator = True
+            self.generator_at_end_of_day = True
 
     def _add_current_bar_to_raw_df(self):
         """TODO:"""
-        if not self.needs_new_bar_generator:
+        if not self.generator_at_end_of_day:
             row_data = [
                 self.current_bar.t,  # Timestamp
                 self.current_bar.o,  # Open price
@@ -118,7 +133,7 @@ class DataManager():
 
             self._raw_df.loc[len(self._raw_df)] = row_data
 
-    def _create_new_daily_bar_generator(self, start_time, end_time, time_frame):
+    def _create_new_daily_bar_generator(self, start_time, end_time):
         """
         Create a new bar generator with a start time and end time that occur on the same
         day and correspond to the open and close times of the market for that day.
@@ -128,9 +143,8 @@ class DataManager():
                 generating bars.
             end_time: The ISO-8601 compliant date/time for the generator to stop
                 generating bars.
-            time_frame: The time delta between bars. Can be a minute, hour, or day.
         """
-        if time_frame == TimeFrame.Day:
+        if self.time_frame == TimeFrame.Day:
             # If the time frame is a day, then creating a generator with the same start date
             # as its own end date will create an empty generator. What this all does is
             # it shifts the start of the generator back by one day so that when next() is
@@ -143,11 +157,11 @@ class DataManager():
 
             # Create the new generator
             self._bar_generator = self.alpaca_api.market_data.get_bars_iter(
-                self.symbol, time_frame, iso_inc_start_time, end_time)
+                self.symbol, self.time_frame, iso_inc_start_time, end_time)
 
         else:
             # Create a generator object that will return prices for the day
             self._bar_generator = self.alpaca_api.market_data.get_bars_iter(
-                self.symbol, time_frame, start_time, end_time)
+                self.symbol, self.time_frame, start_time, end_time)
 
-        self.needs_new_bar_generator = False
+        self.generator_at_end_of_day = False

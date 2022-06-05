@@ -255,8 +255,9 @@ def get_price_from_bar(bar):
         An average price to represent the bar, determined from information about the
         bar.
     """
-    # TODO: Find a better way to approximate the average price during a bar
-    price = (bar.h + bar.l) / 2
+    # price = (bar.h + bar.l) / 2
     # price = (bar.o + bar.c) / 2
+
+    price = bar.vw
 
     return price

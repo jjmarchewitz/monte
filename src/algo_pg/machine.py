@@ -103,26 +103,11 @@ class TradingMachine():
                 algo = algo_portfolio_pair.algo
                 portfolio = algo_portfolio_pair.portfolio
 
-                # Create the day's bar generator objects
-                portfolio.create_new_bar_generators(
-                    self.time_frame,
-                    trading_day.open_time_iso,
-                    trading_day.close_time_iso
-                )
+                portfolio._create_new_daily_row_generators(
+                    trading_day.open_time_iso, trading_day.close_time_iso)
 
-                # Increment all of the bar generators so that they are on the first value
-                # for the day. They begin as "None" and must be incremented to have an
-                # initial value.
-                portfolio.increment_all_bar_generators()
+                while not portfolio._any_generator_reached_end_of_day():
+                    portfolio._increment_all_positions()
+                    # TODO: Call algorithm increment/run function here
 
-                # While the trading machine has not yet hit the end of the day
-                while not portfolio.market_day_needs_to_be_incremented():
-                    # TODO: Use logging instead of printing
-                    print(
-                        f"{portfolio.name} -- {portfolio.time_of_last_price_gen_increment} :"
-                        + f" ${round(portfolio.total_value(), 2):,}")
-
-                    # This must be at the end of the loop
-                    portfolio.increment_all_bar_generators()
-
-            print()
+                    print(f"{portfolio.get_current_timestamp()}, {portfolio.total_value()}")

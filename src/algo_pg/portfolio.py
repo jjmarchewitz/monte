@@ -122,21 +122,6 @@ class Portfolio():
 
         return total
 
-    # def increment_all_bar_generators(self):
-    #     """
-    #     Steps every position's bar generator forward by one time increment (TimeFrame).
-    #     """
-    #     for position in self.positions:
-    #         position.generate_next_price()
-
-    #         # This is a bit of an odd piece of code but if a position has just been
-    #         # incremented and it doesn't need a new bar generator, then the increment
-    #         # succeeded and the time when last updated for the position was just updated.
-    #         # I am stealing that recently-updated time and making it the "most recent time
-    #         # of an update" for the portfolio itself.
-    #         if position.needs_new_bar_generator == False:
-    #             self.time_of_last_price_gen_increment = position.time_when_price_last_updated
-
     def place_order(self, symbol, quantity, order_type=OrderType.BUY):
         """
         Places an order to buy or sell some quantity of an asset. Adds the order to an order
@@ -216,44 +201,47 @@ class Portfolio():
     def _process_sell_order(self, order):
         pass
 
-    # def create_new_bar_generators(self, time_frame, start_time, end_time):
-    #     """
-    #     Replaces the bar generators in every Position with new ones for a new date/time.
+    def get_current_timestamp(self):
+        """TODO:"""
 
-    #     Args:
-    #         time_frame: An alpaca_trade_api.TimeFrame value corresponding to the time
-    #             delta between price values.
-    #         start_time: An ISO-8601-compliant date and time to start the new generators
-    #             at.
-    #         end_time: An ISO-8601-compliant date and time to start the new generators
-    #             at.
-    #     """
+        # Check if positions has items in it
+        if self.positions:
+            return self.positions[0].data_manager.get_last_row().timestamp
+        else:
+            raise LookupError(
+                "This portfolio has no positions, and this function is dependent on "
+                "searching a position for its last row of data to get its timestamp")
 
-    #     for position in self.positions:
-    #         position.create_new_daily_bar_generator(time_frame, start_time, end_time)
+    def _create_new_daily_row_generators(self, start_time, end_time):
+        """TODO:"""
+        for position in self.positions:
+            position.data_manager.create_new_daily_row_generator(start_time, end_time)
 
-    # def market_day_needs_to_be_incremented(self):
-    #     """
-    #     Determines whether or not all of the bar generators have hit the end of the market
-    #     day, meaning the simulated market day is over and needs to be replaced with the next
-    #     market day.
+    def _increment_all_positions(self):
+        """TODO:"""
+        self._increment_data_manager_row_generator_for_all_positions()
+        self._update_position_prices_to_current_bar()
 
-    #     Returns:
-    #         Whether or not the market day has ended and needs to be replaced by the next
-    #         market day.
-    #     """
+    def _increment_data_manager_row_generator_for_all_positions(self):
+        """TODO:"""
+        for position in self.positions:
+            next(position.data_manager._row_generator)
 
-    #     # If all of the positions need new generators, that means the end of the day has
-    #     # been reached
-    #     need_new_generators = True
+    def _update_position_prices_to_current_bar(self):
+        """TODO:"""
+        for position in self.positions:
+            position.update_price_for_current_bar()
 
-    #     # Check if any of the positions don't need a new generator (i.e. they haven't
-    #     # reached the end of their generation yet/haven't hit the end of the day)
-    #     for position in self.positions:
-    #         if position.needs_new_bar_generator == False:
-    #             need_new_generators = False
+    def _any_generator_reached_end_of_day(self):
+        """TODO:"""
+        generator_at_end_of_day = False
 
-    #     return need_new_generators
+        for position in self.positions:
+            if position.data_manager.generator_at_end_of_day == True:
+                generator_at_end_of_day = True
+                break
+
+        return generator_at_end_of_day
 
     def copy(self, name=None):
         # TODO: Implement deep copy here and in Position

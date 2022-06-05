@@ -68,7 +68,11 @@ class Portfolio():
         self._current_order_id_number = 1
         self._order_queue = []
 
-        self.increment_count = 0
+        self._increment_count = 0
+        # This exists for timing and synchronization purposes, this is a reference position
+        # that does count towards the value of the portfolio
+        self._reference_position = Position(
+            self.alpaca_api, self.data_settings, "SPY", 1.0)
 
     def create_new_position(self, symbol, initial_quantity):
         """
@@ -165,12 +169,12 @@ class Portfolio():
     def place_order(self, symbol, quantity, order_type=OrderType.BUY):
         """
         Places an order to buy or sell some quantity of an asset. Adds the order to an order
-        queue and does not directly execute the order. That is done by process_pending_orders(). 
+        queue and does not directly execute the order. That is done by process_pending_orders().
 
         Args:
             symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
             quantity: The quantity of the asset to be bought or sold.
-            order_type: A value from the enum OrderType that represents if the order is a 
+            order_type: A value from the enum OrderType that represents if the order is a
                 buy or a sell order. Defaults to OrderType.BUY.
 
         Raises:
@@ -235,11 +239,15 @@ class Portfolio():
             elif order.order_type == OrderType.SELL:
                 status = self._process_sell_order(order)
 
+            if status == OrderStatus.PENDING:
+                new_order_queue.append(order)
+
+        self._order_queue = new_order_queue
+
         return list_of_completed_order_ids
 
     def _process_buy_order(self, order):
-        # TODO:
-
+        """TODO:"""
         order_status = OrderStatus.PENDING
 
         # Calculate total price of the order on the current bar
@@ -249,7 +257,7 @@ class Portfolio():
             self.data_settings.time_frame,
             start=current_timestamp.isoformat(),
             limit=1
-        )
+        )[0]
 
         # Determine what the unit price for the order's symbol currently is
         unit_price = get_price_from_bar(bar_for_current_order)
@@ -271,10 +279,13 @@ class Portfolio():
             # Create a new Position if one doesn't exist
             else:
                 self.create_new_position(order.symbol, order.quantity)
-
-                # TODO: Generate the historical data for the asset going back either to the beginning
-                # of the simulation or for the max number of rows
                 new_position = self.get_position(order.symbol)
+
+                # Get the new position to the same state as the reference position by
+                # generating the historical data for the asset going back either to the
+                # beginning of the simulation or for the max number of rows
+                new_position._catch_up_to_reference_position(
+                    self._reference_position, self._increment_count)
 
             order_status = OrderStatus.COMPLETED
         else:
@@ -291,20 +302,22 @@ class Portfolio():
         """TODO:"""
 
         # Check if positions has items in it
-        if self.positions:
-            return self.positions[0].data_manager.get_last_row().timestamp
-        else:
-            raise LookupError(
-                "This portfolio has no positions, and this function is dependent on "
-                "searching a position for its last row of data to get its timestamp")
+        return self._reference_position.data_manager.get_last_row().timestamp
 
     def _create_new_daily_row_generators(self, start_time, end_time):
         """TODO:"""
+
+        self._reference_position.data_manager.create_new_daily_row_generator(
+            start_time, end_time)
+
         for position in self.positions:
             position.data_manager.create_new_daily_row_generator(start_time, end_time)
 
     def _increment_all_positions(self):
         """TODO:"""
+
+        next(self._reference_position.data_manager._row_generator)
+
         for position in self.positions:
 
             # Increment the row generator to update the raw data to the next TimeFrame
@@ -313,14 +326,15 @@ class Portfolio():
             # Update the price attribute based on the current bar
             position.update_price_from_current_bar()
 
-        self.increment_count += 1
+        self._increment_count += 1
 
     def _any_generator_reached_end_of_day(self):
         """TODO:"""
         generator_at_end_of_day = False
 
         for position in self.positions:
-            if position.data_manager.generator_at_end_of_day == True:
+            if (self._reference_position.data_manager.generator_at_end_of_day == True or
+                    position.data_manager.generator_at_end_of_day == True):
                 generator_at_end_of_day = True
                 break
 

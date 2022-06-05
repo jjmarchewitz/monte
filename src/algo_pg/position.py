@@ -6,7 +6,7 @@ associated with it.
 """
 
 from algo_pg.data_manager import DataManager
-from algo_pg.util import get_price_from_bar
+from algo_pg.util import get_list_of_trading_days_in_range, get_price_from_bar
 
 
 class Position():
@@ -67,3 +67,34 @@ class Position():
             The total value of this position with the current market price.
         """
         return self.quantity * self.price
+
+    def _catch_up_to_reference_position(self, reference_position, increments):
+        """TODO:"""
+
+        target_timestamp = reference_position.data_manager.get_last_row().timestamp
+
+        # Get a list of all valid trading days the market was open for in the date range
+        # provided with open and close times as attributes.
+        trading_days = get_list_of_trading_days_in_range(
+            self.alpaca_api, self.data_settings.start_date, self.data_settings.end_date)
+
+        for day in trading_days:
+
+            self.data_manager.create_new_daily_row_generator(
+                day.open_time_iso, day.close_time_iso)
+
+            while True:
+                try:
+                    next(self.data_manager._row_generator)
+                except StopIteration:
+                    break
+
+                current_timestamp = self.data_manager.get_last_row().timestamp
+                if current_timestamp == target_timestamp:
+                    break
+
+            if current_timestamp == target_timestamp:
+                break
+
+        # TODO: Use the increments arg to only generate the number of rows needed, not from the
+        # start of the whole machine

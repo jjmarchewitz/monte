@@ -36,7 +36,7 @@ def main():
 
     portfolio1 = Portfolio(alpaca_api, data_settings, starting_cash=5_000, name="P1")
 
-    portfolio1.create_new_position("AAPL", 5)
+    # portfolio1.create_new_position("AAPL", 5)
 
     portfolio1.place_order("AAPL", 2, OrderType.BUY)
 

@@ -11,6 +11,10 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 
+# TODO: Remove, testware
+from algo_pg.portfolio import OrderType
+
+
 @dataclass
 class DataSettings():
     """
@@ -115,6 +119,10 @@ class TradingMachine():
                     portfolio._increment_all_positions()
                     completed_order_ids = portfolio._process_pending_orders()
                     # TODO: Call algorithm increment/run function here
+
+                    # TEST CODE
+                    if portfolio._increment_count == 100:
+                        portfolio.place_order("IVV", 5, OrderType.BUY)
 
                     if not portfolio._any_generator_reached_end_of_day():
                         # TODO: Change to Logging library

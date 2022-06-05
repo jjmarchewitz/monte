@@ -156,6 +156,14 @@ class DataManager():
 
             self._next_df_index += 1
 
+    # def back_fill_df(self, current_time, increments):
+
+    #     if increments < self.data_settings.max_rows_in_history_df:
+    #         breakpoint()
+    #     else:
+    #         # Only generate some rows, don't start at the beginning
+    #         pass
+
     def set_df_from_dates(self, start_date, end_date):
         """TODO:"""
 
@@ -166,7 +174,7 @@ class DataManager():
 
         for day in trading_days:
 
-            self._row_generator = self._row_generator(
+            self._row_generator = self._daily_row_generator(
                 day.open_time_iso, day.close_time_iso)
 
             while True:

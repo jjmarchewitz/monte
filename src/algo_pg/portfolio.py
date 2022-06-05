@@ -18,6 +18,7 @@ class OrderType(Enum):
 
 class OrderStatus(Enum):
     """
+    An Enum holding a value for the status of an order (pending, completed, failed).
     """
     PENDING = 1
     COMPLETED = 2
@@ -48,7 +49,7 @@ class Portfolio():
         Args:
             alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
                 in the repo's alpaca.config.
-            TODO: data_settings
+            data_settings: An instance of the DataSettings dataclass.
             starting_cash: The starting cash that the portfolio will have before any
                 orders are placed or any positions are held. Defaults to 10000.
             name: A string name to give the portfolio, purely for aesthetic/debugging
@@ -130,8 +131,15 @@ class Portfolio():
         self.positions = non_empty_positions
 
     def contains_position(self, symbol):
-        """TODO:"""
+        """
+        Determines if any Position in the Portfolio uses the given symbol.
 
+        Args:
+            symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+
+        Returns:
+            A bool for if the given symbol was found in any Position in the Portfolio.
+        """
         has_position = False
 
         # Check if any position has the symbol that was passed in
@@ -141,7 +149,16 @@ class Portfolio():
         return has_position
 
     def get_position(self, symbol):
-        """TODO:"""
+        """
+        Gets the Position object from the Portfolio with the given symbol
+
+        Args:
+            symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+
+        Returns:
+            The Position object with the given symbol from within this Portfolio, returns None
+            if no such Position exists.
+        """
         retval = None
 
         if self.contains_position(symbol):
@@ -221,7 +238,15 @@ class Portfolio():
         return was_order_successfully_cancelled
 
     def _process_pending_orders(self):
-        """TODO:"""
+        """
+        Processes any pending orders and executes any that are ready to be executed.
+
+        Raises:
+            ValueError: When an order is passed in with an invalid order type.
+
+        Returns:
+            A list of the order IDs that were executed/completed.
+        """
         list_of_completed_order_ids = []
         new_order_queue = []
 
@@ -235,9 +260,9 @@ class Portfolio():
 
             # Process the order based on buy/sell
             if order.order_type == OrderType.BUY:
-                status = self._process_buy_order(order)
+                status = self._execute_buy_order(order)
             elif order.order_type == OrderType.SELL:
-                status = self._process_sell_order(order)
+                status = self._execute_sell_order(order)
 
             if status == OrderStatus.PENDING:
                 new_order_queue.append(order)
@@ -246,8 +271,17 @@ class Portfolio():
 
         return list_of_completed_order_ids
 
-    def _process_buy_order(self, order):
-        """TODO:"""
+    def _execute_buy_order(self, order):
+        """
+        Executes a buy order if it is ready to be executed (does not have any delay 
+        associated with it).
+
+        Args:
+            order: An Order dataclass instance.
+
+        Returns:
+            A value from the OrderStatus Enum to indicate the order's status.
+        """
 
         # TODO: Add Logging
         order_status = OrderStatus.PENDING
@@ -293,12 +327,21 @@ class Portfolio():
         else:
             order_status = OrderStatus.FAILED
 
-        print(f"\n\n\nBUY: {order.symbol}\n\n\n")
+        # TODO: Logging
 
         return order_status
 
-    def _process_sell_order(self, order):
-        """TODO:"""
+    def _execute_sell_order(self, order):
+        """
+        Executes a sell order if it is ready to be executed (does not have any delay 
+        associated with it).
+
+        Args:
+            order: An Order dataclass instance.
+
+        Returns:
+            A value from the OrderStatus Enum to indicate the order's status.
+        """
         order_status = OrderStatus.PENDING
 
         # TODO: Add Logging
@@ -316,16 +359,31 @@ class Portfolio():
             self.cash += order.quantity * position_from_sell_order.price
             position_from_sell_order.quantity -= order.quantity
 
+        # TODO: Logging
+
         return order_status
 
     def get_current_timestamp(self):
-        """TODO:"""
+        """
+        Gets the most recent timestamp that the DataManagers are on.
+
+        Returns:
+            The most recent timestamp from the reference position's dataframe
+        """
 
         # Check if positions has items in it
         return self._reference_position.data_manager.get_last_row().timestamp
 
     def _create_new_daily_row_generators(self, start_time, end_time):
-        """TODO:"""
+        """
+        Creates new daily row generators for each Position associated with this Portfolio.
+
+        Args:
+            start_time: The ISO-8601 compliant date/time for the generators to start
+                generating bars.
+            end_time: The ISO-8601 compliant date/time for the generators to stop
+                generating bars.
+        """
 
         self._reference_position.data_manager.create_new_daily_row_generator(
             start_time, end_time)
@@ -334,9 +392,13 @@ class Portfolio():
             position.data_manager.create_new_daily_row_generator(start_time, end_time)
 
     def _increment_all_positions(self):
-        """TODO:"""
+        """
+        Increment the generator for every Position associated with this Portfolio and
+        update the price attribute for each Position to use the new price data.
+        """
 
         next(self._reference_position.data_manager._row_generator)
+        self._reference_position.update_price_from_current_bar()
 
         for position in self.positions:
 
@@ -349,7 +411,15 @@ class Portfolio():
         self._increment_count += 1
 
     def _any_generator_reached_end_of_day(self):
-        """TODO:"""
+        """
+        Determines if any generator inside any Position has hit the end of its generation.
+        That indicates it has reached the end of the day and a new daily generator needs to
+        be created.
+
+        Returns:
+            A bool that shows if any generator inside any Position has reached the end of the
+            day.
+        """
         generator_at_end_of_day = False
 
         for position in self.positions:

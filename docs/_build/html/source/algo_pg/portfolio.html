@@ -90,7 +90,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="portfolio.OrderStatus">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">portfolio.</span></span><span class="sig-name descname"><span class="pre">OrderStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#portfolio.OrderStatus" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>An Enum holding a value for the status of an order (pending, completed, failed).</p>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="portfolio.OrderType">
@@ -138,7 +139,15 @@ to the Portfolio.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="portfolio.Portfolio.contains_position">
 <span class="sig-name descname"><span class="pre">contains_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#portfolio.Portfolio.contains_position" title="Permalink to this definition"></a></dt>
-<dd><p>TODO:</p>
+<dd><p>Determines if any Position in the Portfolio uses the given symbol.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>symbol</strong> – A string for the market symbol of this position (i.e. “AAPL” or “GOOG”).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A bool for if the given symbol was found in any Position in the Portfolio.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -165,13 +174,27 @@ instance is finished being constructed.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="portfolio.Portfolio.get_current_timestamp">
 <span class="sig-name descname"><span class="pre">get_current_timestamp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#portfolio.Portfolio.get_current_timestamp" title="Permalink to this definition"></a></dt>
-<dd><p>TODO:</p>
+<dd><p>Gets the most recent timestamp that the DataManagers are on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The most recent timestamp from the reference position’s dataframe</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="portfolio.Portfolio.get_position">
 <span class="sig-name descname"><span class="pre">get_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#portfolio.Portfolio.get_position" title="Permalink to this definition"></a></dt>
-<dd><p>TODO:</p>
+<dd><p>Gets the Position object from the Portfolio with the given symbol</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>symbol</strong> – A string for the market symbol of this position (i.e. “AAPL” or “GOOG”).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The Position object with the given symbol from within this Portfolio, returns None
+if no such Position exists.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

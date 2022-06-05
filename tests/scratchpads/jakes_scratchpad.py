@@ -1,10 +1,9 @@
 from algo_pg.data_manager import DataManager
 from algo_pg.machine import TradingMachine, DataSettings
 from algo_pg.portfolio import Portfolio, OrderType
-from algo_pg.position import Position
-from algo_pg.stat_calculators import dummy_420_69
+from algo_pg.stat_calculators import dummy_420_69, avg_last_5
 from algo_pg.util import AlpacaAPIBundle
-from alpaca_trade_api import TimeFrame, TimeFrameUnit
+from alpaca_trade_api import TimeFrame
 from datetime import timedelta
 
 
@@ -15,8 +14,7 @@ def main():
     # called on every row of every Position's DataManager
     stat_dict = {
         "TEST": dummy_420_69,
-        "TEST2": dummy_420_69,
-        "TEST3": dummy_420_69
+        "Avg. L5": avg_last_5,
     }
 
     # A dataclass that stores general information about data settings and how the data
@@ -27,7 +25,7 @@ def main():
         time_frame=TimeFrame.Minute,
         stat_dict=stat_dict,
         max_rows_in_history_df=10_000,
-        buffer_data_length=timedelta(days=0),
+        buffer_data_length=timedelta(days=1),
         time_frames_between_algo_runs=1
     )
 
@@ -35,8 +33,6 @@ def main():
     machine = TradingMachine(alpaca_api, data_settings)
 
     portfolio1 = Portfolio(alpaca_api, data_settings, starting_cash=5_000, name="P1")
-
-    # portfolio1.create_new_position("AAPL", 5)
 
     portfolio1.place_order("AAPL", 5, OrderType.BUY)
 
@@ -46,30 +42,11 @@ def main():
 
     #########
 
-    # bar_iter = alpaca_api.market_data.get_bars_iter(
-    #     "AAPL", timeframe=TimeFrame.Day, start="2020-06-28", end="2020-08-08")
+    # dm = DataManager(alpaca_api, data_settings, "GOOG")
 
-    # bar_df = alpaca_api.market_data.get_bars(
-    #     "AAPL", timeframe=TimeFrame(45, TimeFrameUnit.Minute),
-    #     start="2020-06-29", end="2020-06-29").df
+    # dm.set_df_with_dates("2022-03-08", "2022-03-20")
 
     #########
-
-    # dm = DataManager(alpaca_api, "GOOG", "2022-03-08", "2022-03-20")
-
-    # dm.get_df_between_dates("2022-03-08", "2022-03-20")
-
-    #########
-
-    # pos = Position(alpaca_api, "GOOG", 5.0)
-    # pos.data_manager.set_start_and_end_dates("2022-03-08", "2022-03-20")
-    # pos.data_manager.set_time_frame(TimeFrame.Day)
-
-    # rg = pos.data_manager._row_generator()
-
-    # next(rg)
-
-    # pos.update_price()
 
     breakpoint()
 

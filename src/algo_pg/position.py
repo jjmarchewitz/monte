@@ -23,7 +23,7 @@ class Position():
         Args:
             alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
                 in the repo's alpaca.config.
-            TODO: data_settings
+            data_settings: An instance of the DataSettings dataclass.
             symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
@@ -45,7 +45,9 @@ class Position():
         # TODO: self.time_when_price_last_updated = None
 
     def update_price_from_current_bar(self):
-        """TODO:"""
+        """
+        Updates the current price based on the most recent bar of information.
+        """
         self.price = get_price_from_bar(self.data_manager.current_bar)
 
     def get_asset_class(self):
@@ -69,7 +71,18 @@ class Position():
         return self.quantity * self.price
 
     def _catch_up_to_reference_position(self, reference_position, increments):
-        """TODO:"""
+        """
+        If this Position was created mid-simulation then it needs to generate all of the
+        equivalent data from earlier TimeFrames that it is missing (since it was just
+        created). This function allows the current position to "catch up" to the reference
+        Position in terms of historical data stored in the dataframe and in terms of current
+        price.
+
+        Args:
+            reference_position: The reference Position from the parent Portfolio object.
+            increments: The number of data increments (i.e. total rows generated, or 
+            total number of times each generator has been incremented).
+        """
 
         target_timestamp = reference_position.data_manager.get_last_row().timestamp
 

@@ -84,35 +84,63 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="data_manager.DataManager">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_manager.</span></span><span class="sig-name descname"><span class="pre">DataManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpaca_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_settings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager" title="Permalink to this definition"></a></dt>
-<dd><p>TODO:</p>
-<ul class="simple">
-<li><p>can handle switching between allowing and disallowing after-hours data</p></li>
-<li><p>can calculate summary statistics on the fly and add them to the main df</p></li>
-<li><p>can add “buffer data” to the beginning of the raw df to allow for stats to be
-calculated correctly from data point 0</p></li>
-</ul>
+<dd><p>The DataManager is meant to handle acquiring and synchronizing data from Alpaca, as well
+as building and formatting an output dataframe</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_manager.DataManager.add_stat_dict">
 <span class="sig-name descname"><span class="pre">add_stat_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stat_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager.add_stat_dict" title="Permalink to this definition"></a></dt>
-<dd><p>TODO:</p>
+<dd><p>Add a new statistics calculating dictionary and update the main dataframe with
+a column for each statistic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stat_dict</strong> – A dictionary where the keys are strings that represent the name of
+a statistic, and where the values are function objects that calculate
+the given statistic.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_manager.DataManager.create_new_daily_row_generator">
 <span class="sig-name descname"><span class="pre">create_new_daily_row_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager.create_new_daily_row_generator" title="Permalink to this definition"></a></dt>
-<dd><p>TODO:</p>
+<dd><p>Creates a new generator object that will generate rows from the start_time to the
+end_time, with the TimeFrame being given by self.data_settings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_time</strong> – The ISO-8601 compliant date/time for the generator to start
+generating bars.</p></li>
+<li><p><strong>end_time</strong> – The ISO-8601 compliant date/time for the generator to stop
+generating bars.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_manager.DataManager.get_last_row">
 <span class="sig-name descname"><span class="pre">get_last_row</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager.get_last_row" title="Permalink to this definition"></a></dt>
-<dd><p>TODO:</p>
+<dd><p>Get the last row of the main dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The last row of the main dataframe.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_manager.DataManager.set_df_from_dates">
-<span class="sig-name descname"><span class="pre">set_df_from_dates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager.set_df_from_dates" title="Permalink to this definition"></a></dt>
-<dd><p>TODO:</p>
+<dt class="sig sig-object py" id="data_manager.DataManager.set_df_with_dates">
+<span class="sig-name descname"><span class="pre">set_df_with_dates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager.set_df_with_dates" title="Permalink to this definition"></a></dt>
+<dd><p>Updates self.df to contain a dataframe for self.symbol in the date range between
+start_date and end_date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_date</strong> – A string for the start date of the dataframe in the form YYYY-MM-DD.</p></li>
+<li><p><strong>end_date</strong> – A string for the end date of the dataframe in the form YYYY-MM-DD.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

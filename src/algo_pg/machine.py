@@ -11,15 +11,11 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 
-# TODO: Remove, testware
-from algo_pg.portfolio import OrderType
-
-
 @dataclass
 class DataSettings():
     """
-    Used to store all of the trading machine settings so this object can be passed around
-    and settings can be synchronized.
+    Used to store all of the trading machine/data manager settings so this object can be
+    passed around and settings can be synchronized.
     """
     start_date: str
     end_date: str
@@ -33,7 +29,7 @@ class DataSettings():
 @dataclass
 class AlgoPortfolioPair():
     """
-    A trading algorithm-portfolio pair is run together across a trading machine's timeline\
+    A trading algorithm-portfolio pair is run together across a trading machine's timeline
     as one unit.
     """
     algo: Algorithm
@@ -42,8 +38,8 @@ class AlgoPortfolioPair():
 
 class TradingMachine():
     """
-    The "trading machine" is meant to represent a machine running an algorithm with data \
-    across the timeline that are provided as constructor arguments. This encompasses\
+    The "trading machine" is meant to represent a machine running an algorithm with data 
+    across the timeline that are provided as constructor arguments. This encompasses
     backtesting (testing on historical data) as well as running an algorithm live.
     """
 
@@ -54,7 +50,7 @@ class TradingMachine():
         Args:
             alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
                 in the repo's alpaca.config.
-            TODO: data_settings
+            data_settings: An instance of the DataSettings dataclass.
         """
 
         # Bundled alpaca API dataclass
@@ -119,12 +115,6 @@ class TradingMachine():
                     portfolio._increment_all_positions()
                     completed_order_ids = portfolio._process_pending_orders()
                     # TODO: Call algorithm increment/run function here
-
-                    # TEST CODE
-                    if portfolio._increment_count == 100:
-                        portfolio.place_order("IVV", 5, OrderType.BUY)
-                    elif portfolio._increment_count == 200:
-                        portfolio.place_order("AAPL", 2, OrderType.SELL)
 
                     if not portfolio._any_generator_reached_end_of_day():
                         # TODO: Change to Logging library

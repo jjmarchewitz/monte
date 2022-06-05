@@ -19,19 +19,16 @@ class DataManager():
 
     """
 
-    def __init__(
-            self, alpaca_api, symbol, start_date=None, end_date=None,
-            time_frame=TimeFrame.Hour, normal_market_hours_only=True,
-            pre_start_buffer_period=timedelta(seconds=0),
-            stat_dict=None):
+    def __init__(self, alpaca_api, data_settings, symbol):
+
+        # TODO: Machine Settings
 
         self.alpaca_api = alpaca_api
+        self.data_settings = data_settings
         self.symbol = symbol
-        self.start_date = start_date
-        self.end_date = end_date
-        self.time_frame = time_frame
-        # self.normal_market_hours_only = normal_market_hours_only
-        # self.pre_start_buffer_period = pre_start_buffer_period
+
+        self.time_frame = data_settings.time_frame
+
         self.current_bar = None
 
         # Start as True to force a new generator to be created
@@ -46,12 +43,12 @@ class DataManager():
         self._df_columns = self._raw_df_columns
         self.df = pd.DataFrame(columns=self._df_columns)
 
-        # This must come after the dataframe initialization
-        self.stat_dict = None
+        self.max_rows = self.data_settings.max_rows_in_history_df
+        self._next_df_index = 0
 
         # This is not the same as self.stat_dict, this is the constructor's argument
-        if stat_dict is not None:
-            self.add_stat_dict(stat_dict)
+        if data_settings.stat_dict is not None:
+            self.add_stat_dict(data_settings.stat_dict)
 
     def add_stat_dict(self, stat_dict):
         """TODO:"""
@@ -74,11 +71,6 @@ class DataManager():
 
         return stat_column_names
 
-    def set_start_and_end_dates(self, start_date, end_date):
-        """TODO:"""
-        self.start_date = start_date
-        self.end_date = end_date
-
     def set_time_frame(self, time_frame):
         """TODO:"""
         self.time_frame = time_frame
@@ -86,8 +78,7 @@ class DataManager():
     def get_last_row(self):
         """TODO:"""
 
-        # TODO: Change this back to regular df instead of _raw_df
-        return self.df.loc[len(self.df) - 1]
+        return self.df.loc[self._next_df_index - 1]
 
     def create_new_daily_row_generator(self, start_time, end_time):
         """TODO:"""
@@ -144,22 +135,36 @@ class DataManager():
 
     def update_df(self):
         """TODO:"""
+        # Remove the first row if the total row count is above the limit
+        if len(self.df.index) > self.max_rows:
+            self.df = self.df.iloc[1:]
+
         if not self.generator_at_end_of_day:
 
             # Add a new row to the main dataframe
-            self.df.loc[len(self.df)] = ["ERROR_NOT_REPLACED" for _ in self._df_columns]
+            self.df.loc[self._next_df_index] = ["ERROR_NOT_REPLACED"
+                                                for _ in self._df_columns]
 
-            last_row_of_raw_df = self._raw_df.loc[len(self._raw_df) - 1]
+            last_row_of_raw_df = self._raw_df.loc[self._next_df_index]
 
             # Copy over columns from raw_df
             for column, value in last_row_of_raw_df.items():
-                setattr(self.df.loc[len(self.df) - 1], column, value)
+                setattr(self.df.loc[self._next_df_index], column, value)
 
             # Calculate any statistics from the stat dict and add them to the appropriate
             # column in self.df
             for column, func in self.stat_dict.items():
                 value = func(self._raw_df)
-                setattr(self.df.loc[len(self.df) - 1], column, value)
+                setattr(self.df.loc[self._next_df_index], column, value)
+
+            self._next_df_index += 1
+
+        # # Remove the last row if it still has error messages in it
+        # last_row_of_df = self.df.loc[len(self.df) - 1]
+        # if any([value == "ERROR_NOT_REPLACED" for _, value in last_row_of_df.items()]):
+        #     self.df = self.df.drop(
+        #         index=self.df.index[len(self.df.index)],
+        #         axis=0, inplace=False)
 
     def get_df_between_dates(self, start_date, end_date):
         """TODO:"""

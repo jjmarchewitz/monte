@@ -1,10 +1,11 @@
 from algo_pg.data_manager import DataManager
-from algo_pg.machine import TradingMachine
+from algo_pg.machine import TradingMachine, DataSettings
 from algo_pg.portfolio import Portfolio
 from algo_pg.position import Position
 from algo_pg.stat_calculators import dummy_420_69
 from algo_pg.util import AlpacaAPIBundle
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
+from datetime import timedelta
 
 
 def main():
@@ -16,13 +17,19 @@ def main():
         "TEST3": dummy_420_69
     }
 
-    # Only Days, Hours, and Minutes are supported as time frames
-    machine = TradingMachine(
-        alpaca_api, "2022-03-08", "2022-03-20",
-        time_frame=TimeFrame.Day,
-        stat_dict=stat_dict)
+    data_settings = DataSettings(
+        start_date="2021-09-09",
+        end_date="2021-11-09",
+        time_frame=TimeFrame.Minute,
+        stat_dict=stat_dict,
+        max_rows_in_history_df=10_000,
+        buffer_data_length=timedelta(days=0)
+    )
 
-    portfolio1 = Portfolio(alpaca_api, starting_cash=0, name="P1")
+    # Only Days, Hours, and Minutes are supported as time frames
+    machine = TradingMachine(alpaca_api, data_settings)
+
+    portfolio1 = Portfolio(alpaca_api, data_settings, starting_cash=0, name="P1")
 
     portfolio1.create_new_position("AAPL", 5)
 

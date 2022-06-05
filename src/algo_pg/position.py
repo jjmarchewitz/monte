@@ -16,25 +16,31 @@ class Position():
     a current price associated with it.
     """
 
-    def __init__(self, alpaca_api, symbol, initial_quantity):
+    def __init__(self, alpaca_api, data_settings, symbol, initial_quantity):
         """
         Constructor for the Position class.
 
         Args:
             alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
                 in the repo's alpaca.config.
+            TODO: data_settings
             symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
         """
         # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api
+
+        # Trading Machine settings dataclass
+        self.data_settings = data_settings
+
         # TODO: Check that input symbol is valid and corresponds to an actual asset.
         self.symbol = symbol
         self.quantity = initial_quantity
         self.price = 0
         self.asset = self.alpaca_api.trading.get_asset(self.symbol)
-        self.data_manager = DataManager(self.alpaca_api, self.symbol)
+        self.data_manager = DataManager(
+            self.alpaca_api, self.data_settings, self.symbol)
 
         # TODO: self.time_when_price_last_updated = None
 

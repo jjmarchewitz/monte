@@ -32,13 +32,14 @@ class Portfolio():
     A portfolio is simply a collection of individual positions.
     """
 
-    def __init__(self, alpaca_api, starting_cash=10000, name=None):
+    def __init__(self, alpaca_api, data_settings, starting_cash=10000, name=None):
         """
         Constructor for the Portfolio class.
 
         Args:
             alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
                 in the repo's alpaca.config.
+            TODO: data_settings
             starting_cash: The starting cash that the portfolio will have before any
                 orders are placed or any positions are held. Defaults to 10000.
             name: A string name to give the portfolio, purely for aesthetic/debugging
@@ -46,6 +47,9 @@ class Portfolio():
         """
         # Bundled alpaca API dataclass
         self.alpaca_api = alpaca_api
+
+        # Trading Machine settings dataclass
+        self.data_settings = data_settings
 
         self.name = name if name is not None else "Unnamed"
         self.positions = []
@@ -64,7 +68,8 @@ class Portfolio():
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
         """
-        new_position = Position(self.alpaca_api, symbol, initial_quantity)
+        new_position = Position(self.alpaca_api, self.data_settings,
+                                symbol, initial_quantity)
         self.add_existing_position(new_position)
 
     def add_existing_position(self, new_position):

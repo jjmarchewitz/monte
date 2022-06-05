@@ -408,7 +408,8 @@ class Portfolio():
             # Update the price attribute based on the current bar
             position.update_price_from_current_bar()
 
-        self._increment_count += 1
+        if not self._any_generator_reached_end_of_day():
+            self._increment_count += 1
 
     def _any_generator_reached_end_of_day(self):
         """
@@ -422,9 +423,11 @@ class Portfolio():
         """
         generator_at_end_of_day = False
 
+        if self._reference_position.data_manager.generator_at_end_of_day == True:
+            generator_at_end_of_day = True
+
         for position in self.positions:
-            if (self._reference_position.data_manager.generator_at_end_of_day == True or
-                    position.data_manager.generator_at_end_of_day == True):
+            if (position.data_manager.generator_at_end_of_day == True):
                 generator_at_end_of_day = True
                 break
 

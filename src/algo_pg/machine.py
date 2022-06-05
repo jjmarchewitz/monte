@@ -119,4 +119,6 @@ class TradingMachine():
                     if not portfolio._any_generator_reached_end_of_day():
                         # TODO: Change to Logging library
                         print(
-                            f"{portfolio.get_current_timestamp()}, {round(portfolio.total_value(), 2):,}")
+                            f"{portfolio.get_current_timestamp()} - "
+                            f"${round(portfolio.total_value(), 2):,.2f} - "
+                            f"#{portfolio._increment_count}")

@@ -21,7 +21,7 @@ def main():
     # should be collected
     data_settings = DataSettings(
         start_date="2021-09-09",
-        end_date="2021-11-09",
+        end_date="2021-09-30",
         time_frame=TimeFrame.Minute,
         stat_dict=stat_dict,
         max_rows_in_history_df=10_000,

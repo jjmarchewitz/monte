@@ -16,6 +16,7 @@ class DataManager():
     """
 
     # TODO: can handle switching between allowing and disallowing after-hours data
+
     # TODO: can add "buffer data" to the beginning of the raw df to allow for stats to be
     # calculated correctly from data point 0
 

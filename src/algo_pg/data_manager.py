@@ -1,6 +1,5 @@
 """
-The data manager will handle interactions between the trading machine/related objects and any
-asset data - either from downloaded CSVs in the top-level data/ folder or from Alpaca itself.
+TODO:
 """
 
 from algo_pg.util import get_list_of_trading_days_in_range
@@ -21,9 +20,9 @@ class DataManager():
     """
 
     def __init__(
-            self, alpaca_api, symbol, start_date, end_date, time_frame=TimeFrame.Hour,
-            normal_market_hours_only=True, pre_start_buffer_period=timedelta(
-                seconds=0),
+            self, alpaca_api, symbol, start_date=None, end_date=None,
+            time_frame=TimeFrame.Hour, normal_market_hours_only=True,
+            pre_start_buffer_period=timedelta(seconds=0),
             stat_dict=None):
 
         self.alpaca_api = alpaca_api
@@ -42,25 +41,47 @@ class DataManager():
         self._raw_df = pd.DataFrame(columns=self._raw_df_columns)
         self.df = None
 
-    def increment(self):
-        pass
-
-    def get_df_between_dates(self, start_date, end_date):
+    def set_start_and_end_dates(self, start_date, end_date):
         """TODO:"""
+        self.start_date = start_date
+        self.end_date = end_date
+
+    def row_generator(self, start_date, end_date):
+        """TODO:"""
+        # Get a list of all valid trading days the market was open for in the date range
+        # provided with open and close times as attributes.
         trading_days = get_list_of_trading_days_in_range(
             self.alpaca_api, start_date, end_date)
 
         for day in trading_days:
+            # Create a new bar generator each day, regardless of the TimeFrame. This is
+            # to synchronize the start and end times on each new day, as some assets have
+            # after-hours data that we are excluding
             self._create_new_daily_bar_generator(
                 day.open_time_iso, day.close_time_iso, self.time_frame)
 
+            # While the end of the day has not yet been reached, generate the next bar and
+            # add it to the raw dataframe
             while not self.needs_new_bar_generator:
                 self._generate_next_bar()
                 self._add_current_bar_to_raw_df()
+                # TODO: Use stats dict to add/generate stats columns
+                yield
+
+    def get_df_between_dates(self, start_date, end_date):
+        """TODO:"""
+
+        row_generator = self.row_generator(start_date, end_date)
+
+        while True:
+            try:
+                next(row_generator)
+            except StopIteration:
+                break
 
     def _generate_next_bar(self):
         """
-        Increment the bar generator to the next iteration.
+        Set the current bar to the bar generator's next iteration.
         """
         try:
             # Grab the next bar from the generator and generate a price from it

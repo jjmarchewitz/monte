@@ -18,7 +18,7 @@ class BangBang(Algorithm):
 
         for position in self.portfolio.positions:
             data_manager = position.data_manager
-            df = data_manager.df
+            df = position.get_df()
 
             # Grab the last (most recent) row of data from the position's dataframe
             last_row = data_manager.get_last_row()
@@ -29,12 +29,12 @@ class BangBang(Algorithm):
             percent_change_l5_over_current_vwap = (
                 last_row.net_l5_vwap / last_row.vwap) * 100
 
-            # If this percentage growth number is more than 0.7%, buy 1 share
-            if percent_change_l5_over_current_vwap > 0.7:
+            # If this percentage growth number is more than 1%, buy 1 share
+            if percent_change_l5_over_current_vwap > 1:
                 self.portfolio.place_order(position.symbol, 1, OrderType.BUY)
 
-            # If this percentage growth number is less than -0.7%, sell 1 share
-            elif percent_change_l5_over_current_vwap < -0.7:
+            # If this percentage growth number is less than -1%, sell 1 share
+            elif percent_change_l5_over_current_vwap < -1:
                 self.portfolio.place_order(position.symbol, 1, OrderType.SELL)
 
             # breakpoint()

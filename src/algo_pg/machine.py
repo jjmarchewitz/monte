@@ -22,7 +22,7 @@ class DataSettings():
     time_frame: TimeFrame
     stat_dict: dict
     max_rows_in_history_df: int
-    buffer_data_length: timedelta
+    start_buffer_time_delta: timedelta
     time_frames_between_algo_runs: int = 1
 
 

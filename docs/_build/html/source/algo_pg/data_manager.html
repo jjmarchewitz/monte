@@ -108,7 +108,7 @@ the given statistic.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_manager.DataManager.create_new_daily_row_generator">
-<span class="sig-name descname"><span class="pre">create_new_daily_row_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager.create_new_daily_row_generator" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_new_daily_row_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_df_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager.create_new_daily_row_generator" title="Permalink to this definition"></a></dt>
 <dd><p>Creates a new generator object that will generate rows from the start_time to the
 end_time, with the TimeFrame being given by self.data_settings</p>
 <dl class="field-list simple">
@@ -136,7 +136,7 @@ generating bars.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_manager.DataManager.update_df_with_dates">
-<span class="sig-name descname"><span class="pre">update_df_with_dates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager.update_df_with_dates" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_df_with_dates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_df_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_manager.DataManager.update_df_with_dates" title="Permalink to this definition"></a></dt>
 <dd><p>Updates self.df to contain a dataframe for self.symbol in the date range between
 start_date and end_date.</p>
 <dl class="field-list simple">

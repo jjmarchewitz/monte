@@ -13,8 +13,8 @@ def main():
     # Keys will become column names and the function object that is the value will be
     # called on every row of every Position's DataManager
     stat_dict = {
-        "TEST": dummy_420_69,
-        "Avg. L5": avg_last_5,
+        "WS": dummy_420_69,
+        "Avg L5 VWAP": avg_last_5,
     }
 
     # A dataclass that stores general information about data settings and how the data
@@ -25,7 +25,7 @@ def main():
         time_frame=TimeFrame.Minute,
         stat_dict=stat_dict,
         max_rows_in_history_df=10_000,
-        buffer_data_length=timedelta(days=1),
+        start_buffer_time_delta=timedelta(days=5),
         time_frames_between_algo_runs=1
     )
 

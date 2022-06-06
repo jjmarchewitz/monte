@@ -53,12 +53,14 @@ class DataManager():
 
         self.max_rows = self.data_settings.max_rows_in_history_df
         self._next_df_index = 0
+        self._next_raw_df_index = 0
 
         # This is not the same as self.stat_dict, this is the constructor's argument
-        if data_settings.stat_dict is not None:
+        if self.data_settings.stat_dict is not None:
             self.add_stat_dict(data_settings.stat_dict)
 
-        breakpoint()
+        if self.data_settings.start_buffer_time_delta is not None:
+            self._add_start_buffer_data_to_raw_df()
 
     def add_stat_dict(self, stat_dict):
         """
@@ -109,7 +111,18 @@ class DataManager():
         self._raw_df = pd.DataFrame(columns=self._raw_df_columns)
         self.df = pd.DataFrame(columns=self._df_columns)
 
-    def update_df_with_dates(self, start_date, end_date):
+    def _add_start_buffer_data_to_raw_df(self):
+        """TODO:"""
+
+        # Shift the start date back by one day
+        original_start_dt_obj = isoparse(self.data_settings.start_date)
+        new_start_dt_obj = original_start_dt_obj - self.data_settings.start_buffer_time_delta
+        buffer_start_date = new_start_dt_obj.isoformat() + "Z"
+        buffer_end_date = original_start_dt_obj.isoformat() + "Z"
+
+        self.update_df_with_dates(buffer_start_date, buffer_end_date, raw_df_only=True)
+
+    def update_df_with_dates(self, start_date, end_date, raw_df_only=False):
         """
         Updates self.df to contain a dataframe for self.symbol in the date range between
         start_date and end_date.
@@ -126,7 +139,8 @@ class DataManager():
 
         for day in trading_days:
 
-            self.create_new_daily_row_generator(day.open_time_iso, day.close_time_iso)
+            self.create_new_daily_row_generator(
+                day.open_time_iso, day.close_time_iso, raw_df_only)
 
             while True:
                 try:
@@ -134,7 +148,7 @@ class DataManager():
                 except StopIteration:
                     break
 
-    def create_new_daily_row_generator(self, start_time, end_time):
+    def create_new_daily_row_generator(self, start_time, end_time, raw_df_only=False):
         """
         Creates a new generator object that will generate rows from the start_time to the
         end_time, with the TimeFrame being given by self.data_settings
@@ -145,10 +159,10 @@ class DataManager():
             end_time: The ISO-8601 compliant date/time for the generator to stop
                 generating bars.
         """
-        self._row_generator = self._daily_row_generator(start_time, end_time)
+        self._row_generator = self._daily_row_generator(start_time, end_time, raw_df_only)
         self.generator_at_end_of_day = False
 
-    def _daily_row_generator(self, start_time, end_time):
+    def _daily_row_generator(self, start_time, end_time, raw_df_only=False):
         """
         A generator object that updates the main dataframe with information from the next
         TimeFrame.
@@ -174,7 +188,10 @@ class DataManager():
         while not self.generator_at_end_of_day:
             self._generate_next_bar()
             self._add_current_bar_to_raw_df()
-            self._update_df()
+            self._update_raw_df()
+
+            if not raw_df_only:
+                self._update_df()
 
             yield self.generator_at_end_of_day
 
@@ -208,14 +225,21 @@ class DataManager():
                 self.current_bar.vw  # Volume-weighted average price
             ]
 
-            self._raw_df.loc[len(self._raw_df)] = row_data
+            self._raw_df.loc[self._next_raw_df_index] = row_data
+            self._next_raw_df_index += 1
+
+    def _update_raw_df(self):
+        """TODO:"""
+        # Remove the first row from the raw df if the total row count is above the limit
+        if len(self._raw_df.index) > self.max_rows:
+            self._raw_df = self._raw_df.iloc[1:]
 
     def _update_df(self):
         """
         Updates self.df with the newest input data from self._raw_df and then calculates
         summary statistics from those new entries and adds them to the appropriate column.
         """
-        # Remove the first row if the total row count is above the limit
+        # Remove the first row from the main df if the total row count is above the limit
         if len(self.df.index) > self.max_rows:
             self.df = self.df.iloc[1:]
 
@@ -225,7 +249,7 @@ class DataManager():
             self.df.loc[self._next_df_index] = ["ERROR_NOT_REPLACED"
                                                 for _ in self._df_columns]
 
-            last_row_of_raw_df = self._raw_df.loc[self._next_df_index]
+            last_row_of_raw_df = self._raw_df.loc[self._next_raw_df_index - 1]
 
             # Copy over columns from raw_df
             for column, value in last_row_of_raw_df.items():
@@ -234,7 +258,8 @@ class DataManager():
             # Calculate any statistics from the stat dict and add them to the appropriate
             # column in self.df
             for column, func in self.stat_dict.items():
-                value = func(self._raw_df)
+                last_raw_df_row_index = self._next_raw_df_index - 1
+                value = func(self._raw_df, last_raw_df_row_index)
                 setattr(self.df.loc[self._next_df_index], column, value)
 
             self._next_df_index += 1

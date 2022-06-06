@@ -17,9 +17,6 @@ class DataManager():
 
     # TODO: can handle switching between allowing and disallowing after-hours data
 
-    # TODO: can add "buffer data" to the beginning of the raw df to allow for stats to be
-    # calculated correctly from data point 0
-
     def __init__(self, alpaca_api, data_settings, symbol):
         """
         Constructor for the DataManager object.
@@ -51,7 +48,7 @@ class DataManager():
         self._df_columns = self._raw_df_columns
         self.df = pd.DataFrame(columns=self._df_columns)
 
-        self.max_rows = self.data_settings.max_rows_in_history_df
+        self.max_rows = self.data_settings.max_rows_in_df
         self._next_df_index = 0
         self._next_raw_df_index = 0
 

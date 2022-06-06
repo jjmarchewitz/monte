@@ -22,10 +22,10 @@ def main():
     # should be collected
     data_settings = DataSettings(
         start_date="2021-09-09",
-        end_date="2021-12-30",
+        end_date="2021-10-20",
         time_frame=TimeFrame.Hour,
         stat_dict=stat_dict,
-        max_rows_in_history_df=10_000,
+        max_rows_in_df=10_000,
         start_buffer_time_delta=timedelta(days=5),
         time_frames_between_algo_runs=1
     )

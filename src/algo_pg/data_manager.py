@@ -58,6 +58,8 @@ class DataManager():
         if data_settings.stat_dict is not None:
             self.add_stat_dict(data_settings.stat_dict)
 
+        breakpoint()
+
     def add_stat_dict(self, stat_dict):
         """
         Add a new statistics calculating dictionary and update the main dataframe with
@@ -102,7 +104,12 @@ class DataManager():
 
         return self.df.loc[self._next_df_index - 1]
 
-    def set_df_with_dates(self, start_date, end_date):
+    def clear_df(self):
+        """Clears the main dataframe and the raw (backend) dataframe."""
+        self._raw_df = pd.DataFrame(columns=self._raw_df_columns)
+        self.df = pd.DataFrame(columns=self._df_columns)
+
+    def update_df_with_dates(self, start_date, end_date):
         """
         Updates self.df to contain a dataframe for self.symbol in the date range between
         start_date and end_date.
@@ -118,9 +125,6 @@ class DataManager():
             self.alpaca_api, start_date, end_date)
 
         for day in trading_days:
-            # TODO:
-            # self._row_generator = self._daily_row_generator(
-            #     day.open_time_iso, day.close_time_iso)
 
             self.create_new_daily_row_generator(day.open_time_iso, day.close_time_iso)
 

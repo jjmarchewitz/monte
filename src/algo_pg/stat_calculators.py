@@ -18,6 +18,7 @@ def dummy_420_69(df, last_row_index):
 
     Returns:
         -420.69
+
     """
     return -420.69
 
@@ -32,6 +33,7 @@ def avg_last_5(df, last_row_index):
 
     Returns:
         The average volume-weighted average price over the last 5 TimeFrames.
+
     """
 
     total = 0
@@ -42,3 +44,21 @@ def avg_last_5(df, last_row_index):
     avg = total / 5
 
     return avg
+
+
+def net_last_5(df, last_row_index):
+    """
+    Computes the net value over the last 5 TimeFrames.
+
+    Args:
+        df: A dataframe of raw input data, almost straight from Alpaca.
+        last_row_index: The index of the last valid row in the provided dataframe.
+
+    Returns:
+        The net value over the last 5 TimeFrames.
+
+    """
+
+    net = df.loc[last_row_index].vwap - df.loc[last_row_index - 4].vwap
+
+    return net

@@ -61,6 +61,10 @@ class Position():
         """
         return getattr(self.asset, "class")
 
+    def get_df(self):
+        """TODO:"""
+        return self.data_manager.df
+
     def total_value(self):
         """
         Gets the total value of this position with the current market price.

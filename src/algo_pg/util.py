@@ -107,14 +107,6 @@ class TradingDay():
 def get_list_of_trading_days_in_range(alpaca_api, start_date, end_date):
     """
     TODO:
-
-    Args:
-        alpaca_api: _description_
-        start_date: _description_
-        end_date: _description_
-
-    Returns:
-        _description_
     """
     raw_market_days = get_raw_trading_dates_in_range(alpaca_api, start_date, end_date)
     return get_trading_day_obj_list_from_date_list(raw_market_days)
@@ -123,14 +115,6 @@ def get_list_of_trading_days_in_range(alpaca_api, start_date, end_date):
 def get_raw_trading_dates_in_range(alpaca_api, start_date, end_date):
     """
     TODO:
-
-    Args:
-        alpaca_api: _description_
-        start_date: _description_
-        end_date: _description_
-
-    Returns:
-        _description_
     """
     return alpaca_api.trading.get_calendar(start_date, end_date)
 
@@ -138,12 +122,6 @@ def get_raw_trading_dates_in_range(alpaca_api, start_date, end_date):
 def get_trading_day_obj_list_from_date_list(trading_date_list):
     """
     TODO:
-
-    Args:
-        market_date_list: _description_
-
-    Returns:
-        _description_
     """
     trading_days = []
 
@@ -196,12 +174,6 @@ def get_trading_day_obj_list_from_date_list(trading_date_list):
 def get_datetime_obj_from_date(date):
     """
     TODO:
-
-    Args:
-        date: _description_
-
-    Returns:
-        _description_
     """
     format_str = '%Y-%m-%d'
 
@@ -213,15 +185,6 @@ def get_datetime_obj_from_date(date):
 def get_time_delta_from_time_frame(time_frame):
     """
     TODO:
-
-    Args:
-        time_frame: _description_
-
-    Raises:
-        ValueError: _description_
-
-    Returns:
-        _description_
     """
     delta = None
 

@@ -4,7 +4,6 @@ attached. These algorithm-portfolio pairs can be either run on historical data o
 """
 
 from algo_pg.algorithms.base_algorithm import Algorithm
-from algo_pg.portfolio import Portfolio
 from algo_pg.util import get_list_of_trading_days_in_range
 from alpaca_trade_api import TimeFrame
 from dataclasses import dataclass
@@ -24,16 +23,6 @@ class DataSettings():
     max_rows_in_history_df: int
     start_buffer_time_delta: timedelta
     time_frames_between_algo_runs: int = 1
-
-
-@dataclass
-class AlgoPortfolioPair():
-    """
-    A trading algorithm-portfolio pair is run together across a trading machine's timeline
-    as one unit.
-    """
-    algo: Algorithm
-    portfolio: Portfolio
 
 
 class TradingMachine():
@@ -72,9 +61,9 @@ class TradingMachine():
             self.alpaca_api, self.start_date, self.end_date)
 
         # Pairs of algorithms and portfolios
-        self.algo_portfolio_pairs = []
+        self.algo_instances = []
 
-    def add_algo_portfolio_pair(self, algorithm, portfolio):
+    def add_algo_instance(self, algorithm_with_portfolio):
         """
         Adds an algorithm-portfolio pair to the list of all such pairs for the trading
         machine. This is useful because the run() function can iterate over these pairs and
@@ -86,14 +75,15 @@ class TradingMachine():
         """
         # TODO: Add a check to make sure the algorithm and portfolio are set up correctly
         # before adding (type check)
-        algo_portfolio_pair = AlgoPortfolioPair(algorithm, portfolio)
-        self.algo_portfolio_pairs.append(algo_portfolio_pair)
+        self.algo_instances.append(algorithm_with_portfolio)
 
     def run(self):
         """
         Run the trading machine and run all of the algorithm portfolio pairs from the start
         date to the end date.
         """
+
+        print("Starting machine...")
 
         # For every day that the market will be open
         for trading_day in self.trading_days:
@@ -103,10 +93,9 @@ class TradingMachine():
 
             # For every algo - portfolio pair, simulate an entire day no matter what the
             # time frame is.
-            for algo_portfolio_pair in self.algo_portfolio_pairs:
+            for algo in self.algo_instances:
 
-                algo = algo_portfolio_pair.algo
-                portfolio = algo_portfolio_pair.portfolio
+                portfolio = algo.portfolio
 
                 portfolio._create_new_daily_row_generators(
                     trading_day.open_time_iso, trading_day.close_time_iso)
@@ -114,7 +103,7 @@ class TradingMachine():
                 while not portfolio._any_generator_reached_end_of_day():
                     portfolio._increment_all_positions()
                     completed_order_ids = portfolio._process_pending_orders()
-                    # TODO: Call algorithm increment/run function here
+                    algo.run_for_one_time_frame()
 
                     if not portfolio._any_generator_reached_end_of_day():
                         # TODO: Change to Logging library

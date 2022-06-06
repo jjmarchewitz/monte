@@ -70,6 +70,7 @@ class Portfolio():
         self._order_queue = []
 
         self._increment_count = 0
+
         # This exists for timing and synchronization purposes, this is a reference position
         # that does count towards the value of the portfolio
         self._reference_position = Position(
@@ -324,6 +325,10 @@ class Portfolio():
                     self._reference_position, self._increment_count)
 
             order_status = OrderStatus.COMPLETED
+
+            print(
+                f"{self.get_current_timestamp()} - BOUGHT: {order.quantity} shares of {order.symbol}")
+
         else:
             order_status = OrderStatus.FAILED
 
@@ -358,6 +363,10 @@ class Portfolio():
         if not order_status is OrderStatus.FAILED:
             self.cash += order.quantity * position_from_sell_order.price
             position_from_sell_order.quantity -= order.quantity
+            order_status = OrderStatus.COMPLETED
+
+            print(
+                f"{self.get_current_timestamp()} - SOLD: {order.quantity} shares of {order.symbol}")
 
         # TODO: Logging
 

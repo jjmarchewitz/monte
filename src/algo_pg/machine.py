@@ -108,6 +108,13 @@ class TradingMachine():
                     if not portfolio._any_generator_reached_end_of_day():
                         # TODO: Change to Logging library
                         print(
-                            f"{portfolio.get_current_timestamp()} - "
+                            f"{portfolio.name} | {portfolio.get_current_timestamp()} - "
                             f"${round(portfolio.total_value(), 2):,.2f} - "
                             f"#{portfolio._increment_count}")
+
+        # Print out the final values of each portfolio
+        print("\n\n--Results--")
+        for algo in self.algo_instances:
+            print(f"Final value of Portfolio \"{algo.portfolio.name}\" - "
+                  f"${round(portfolio.total_value(), 2):,.2f}")
+        print("\n")

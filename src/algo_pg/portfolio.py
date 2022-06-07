@@ -327,7 +327,8 @@ class Portfolio():
             order_status = OrderStatus.COMPLETED
 
             print(
-                f"{self.get_current_timestamp()} - BOUGHT: {order.quantity} shares of {order.symbol}")
+                f"{self.name} | {self.get_current_timestamp()} - BOUGHT: {order.quantity} "
+                f"shares of {order.symbol}")
 
         else:
             order_status = OrderStatus.FAILED
@@ -366,7 +367,8 @@ class Portfolio():
             order_status = OrderStatus.COMPLETED
 
             print(
-                f"{self.get_current_timestamp()} - SOLD: {order.quantity} shares of {order.symbol}")
+                f"{self.name} | {self.get_current_timestamp()} - SOLD: {order.quantity} "
+                f"shares of {order.symbol}")
 
         # TODO: Logging
 

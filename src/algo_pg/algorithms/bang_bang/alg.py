@@ -18,7 +18,8 @@ class BangBang(Algorithm):
 
         for position in self.portfolio.positions:
             data_manager = position.data_manager
-            df = position.get_df()
+
+            df = data_manager.df
 
             # Grab the last (most recent) row of data from the position's dataframe
             last_row = data_manager.get_last_row()

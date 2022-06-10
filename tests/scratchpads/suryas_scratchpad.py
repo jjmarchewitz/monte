@@ -48,9 +48,11 @@ def main():
     test_position = Position(alpaca_api, "QQQ", 1000.1)
     breakpoint()
     print(test_position.get_asset_class())
+    print("I MISS GITBASHHHHH")
     # machine_hours = TradingMachine(
     #      trading_api, market_data_api, "2022-03-08", "2022-03-20",
     #     time_frame=TimeFrame.Hours)
+    # Test Comit
 
 
 if __name__ == "__main__":

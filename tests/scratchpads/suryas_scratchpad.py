@@ -32,7 +32,8 @@
 
 
 # How do I incorporate my own keys with Jake's Architecture.
-# I think I need to add it somehow to a configure file and then have the alpaca.py file in src choose between the keys on input arg
+# I think I need to add it somehow to a configure file and then have the alpaca.py file
+# in src choose between the keys on input arg
 # Right now, testing collecting bar data with Jake's keys
 from algo_pg.portfolio import Portfolio
 from algo_pg.position import Position

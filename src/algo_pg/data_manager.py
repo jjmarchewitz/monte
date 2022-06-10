@@ -11,8 +11,8 @@ import pandas as pd
 
 class DataManager():
     """
-    The DataManager is meant to handle acquiring and synchronizing data from Alpaca, as well
-    as building and formatting an output dataframe
+    The DataManager is meant to handle acquiring and synchronizing data from Alpaca, as
+    well as building and formatting an output dataframe.
     """
 
     # TODO: can handle switching between allowing and disallowing after-hours data
@@ -22,10 +22,11 @@ class DataManager():
         Constructor for the DataManager object.
 
         Args:
-            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
-                in the repo's alpaca.config.
+            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the
+                keys in the repo's alpaca.config.
             data_settings: An instance of the DataSettings dataclass.
-            symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+            symbol: A string for the market symbol of this position (i.e. "AAPL" or
+                "GOOG").
         """
 
         self.alpaca_api = alpaca_api
@@ -112,10 +113,10 @@ class DataManager():
         """TODO:"""
 
         # Shift the start date back by one day
-        original_start_dt_obj = isoparse(self.data_settings.start_date)
-        new_start_dt_obj = original_start_dt_obj - self.data_settings.start_buffer_time_delta
+        original_start_dt = isoparse(self.data_settings.start_date)
+        new_start_dt_obj = original_start_dt - self.data_settings.start_buffer_time_delta
         buffer_start_date = new_start_dt_obj.isoformat() + "Z"
-        buffer_end_date = original_start_dt_obj.isoformat() + "Z"
+        buffer_end_date = original_start_dt.isoformat() + "Z"
 
         self.update_df_with_dates(buffer_start_date, buffer_end_date, raw_df_only=True)
 
@@ -125,7 +126,8 @@ class DataManager():
         start_date and end_date.
 
         Args:
-            start_date: A string for the start date of the dataframe in the form YYYY-MM-DD.
+            start_date: A string for the start date of the dataframe in the form
+                YYYY-MM-DD.
             end_date: A string for the end date of the dataframe in the form YYYY-MM-DD.
         """
 
@@ -156,7 +158,8 @@ class DataManager():
             end_time: The ISO-8601 compliant date/time for the generator to stop
                 generating bars.
         """
-        self._row_generator = self._daily_row_generator(start_time, end_time, raw_df_only)
+        self._row_generator = self._daily_row_generator(
+            start_time, end_time, raw_df_only)
         self.generator_at_end_of_day = False
 
     def _daily_row_generator(self, start_time, end_time, raw_df_only=False):
@@ -201,9 +204,9 @@ class DataManager():
             self.current_bar = next(self._bar_generator)
 
         except StopIteration:
-            # When a generator tries to generate past the end of its intended range it will
-            # throw this error, and I use it to indicate that a new bar generator for a
-            # new day needs to be generated.
+            # When a generator tries to generate past the end of its intended range it
+            # will throw this error, and I use it to indicate that a new bar generator
+            # for a new day needs to be generated.
             self.generator_at_end_of_day = True
 
     def _add_current_bar_to_raw_df(self):
@@ -234,7 +237,8 @@ class DataManager():
     def _update_df(self):
         """
         Updates self.df with the newest input data from self._raw_df and then calculates
-        summary statistics from those new entries and adds them to the appropriate column.
+        summary statistics from those new entries and adds them to the appropriate
+        column.
         """
         # Remove the first row from the main df if the total row count is above the limit
         if len(self.df.index) > self.max_rows:
@@ -273,10 +277,10 @@ class DataManager():
                 generating bars.
         """
         if self.time_frame == TimeFrame.Day:
-            # If the time frame is a day, then creating a generator with the same start date
-            # as its own end date will create an empty generator. What this all does is
-            # it shifts the start of the generator back by one day so that when next() is
-            # called on the generator, it will return the intended day's price.
+            # If the time frame is a day, then creating a generator with the same start
+            # date as its own end date will create an empty generator. What this all
+            # does is it shifts the start of the generator back by one day so that when
+            # next() is called on the generator, it will return the intended day's price.
 
             # Shift the start date back by one day
             start_time_dt_obj = isoparse(start_time)

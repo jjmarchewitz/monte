@@ -81,7 +81,8 @@
   <section id="module-machine">
 <span id="machine"></span><h1>machine<a class="headerlink" href="#module-machine" title="Permalink to this headline"></a></h1>
 <p>A trading machine is an object that encompasses the running of algorithms with portfolios
-attached. These algorithm-portfolio pairs can be either run on historical data or on live data.</p>
+attached. These algorithm-portfolio pairs can be either run on historical data or on live
+data.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="machine.DataSettings">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">machine.</span></span><span class="sig-name descname"><span class="pre">DataSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">alpaca_trade_api.rest.TimeFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rows_in_df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_buffer_time_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime.timedelta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_frames_between_algo_runs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#machine.DataSettings" title="Permalink to this definition"></a></dt>
@@ -99,8 +100,8 @@ backtesting (testing on historical data) as well as running an algorithm live.</
 <dt class="sig sig-object py" id="machine.TradingMachine.add_algo_instance">
 <span class="sig-name descname"><span class="pre">add_algo_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algorithm_with_portfolio</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#machine.TradingMachine.add_algo_instance" title="Permalink to this definition"></a></dt>
 <dd><p>Adds an algorithm-portfolio pair to the list of all such pairs for the trading
-machine. This is useful because the run() function can iterate over these pairs and
-all of the provided algorithms against their corresponding portfolios.</p>
+machine. This is useful because the run() function can iterate over these pairs
+and all of the provided algorithms against their corresponding portfolios.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -114,8 +115,8 @@ all of the provided algorithms against their corresponding portfolios.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="machine.TradingMachine.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#machine.TradingMachine.run" title="Permalink to this definition"></a></dt>
-<dd><p>Run the trading machine and run all of the algorithm portfolio pairs from the start
-date to the end date.</p>
+<dd><p>Run the trading machine and run all of the algorithm portfolio pairs from the
+start date to the end date.</p>
 </dd></dl>
 
 </dd></dl>

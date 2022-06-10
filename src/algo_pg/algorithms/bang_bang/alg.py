@@ -24,8 +24,8 @@ class BangBang(Algorithm):
             # Grab the last (most recent) row of data from the position's dataframe
             last_row = data_manager.get_last_row()
 
-            # This is a statistic I made up. I took the net change in vwap over the last 5
-            # TimeFrames and divided it by the current vwap to get a rough indicator of
+            # This is a statistic I made up. I took the net change in vwap over the last
+            # 5 TimeFrames and divided it by the current vwap to get a rough indicator of
             # growth
             percent_change_l5_over_current_vwap = (
                 last_row.net_l5_vwap / last_row.vwap) * 100

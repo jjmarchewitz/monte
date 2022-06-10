@@ -1,7 +1,7 @@
 """
 A Position is simply the name for an asset that a buyer actually has possession of. While
-Apple's stock exists in the world as an asset, it only becomes a person's position if they
-own Apple stock. A Position object as defined here has a symbol, quantity, and price
+Apple's stock exists in the world as an asset, it only becomes a person's position if 
+they own Apple stock. A Position object as defined here has a symbol, quantity, and price
 associated with it.
 """
 
@@ -11,8 +11,8 @@ from algo_pg.util import get_list_of_trading_days_in_range, get_price_from_bar
 
 class Position():
     """
-    This is a container for an individual position, like ETH or IVV. An instance is meant\
-    to be stored inside of a portfolio, so the position has a quantity currently held and\
+    This is a container for an individual position, like ETH or IVV. An instance is meant
+    to be stored inside of a portfolio, so the position has a quantity currently held and
     a current price associated with it.
     """
 
@@ -21,10 +21,11 @@ class Position():
         Constructor for the Position class.
 
         Args:
-            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
-                in the repo's alpaca.config.
+            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the 
+                keys in the repo's alpaca.config.
             data_settings: An instance of the DataSettings dataclass.
-            symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+            symbol: A string for the market symbol of this position (i.e. "AAPL" or 
+                "GOOG").
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
         """
@@ -79,8 +80,8 @@ class Position():
         If this Position was created mid-simulation then it needs to generate all of the
         equivalent data from earlier TimeFrames that it is missing (since it was just
         created). This function allows the current position to "catch up" to the reference
-        Position in terms of historical data stored in the dataframe and in terms of current
-        price.
+        Position in terms of historical data stored in the dataframe and in terms of
+        current price.
 
         Args:
             reference_position: The reference Position from the parent Portfolio object.
@@ -115,5 +116,5 @@ class Position():
 
         self.update_price_from_current_bar()
 
-        # TODO: Use the increments arg to only generate the number of rows needed, not from the
-        # start of the whole machine
+        # TODO: Use the increments arg to only generate the number of rows needed, not
+        # from the start of the whole machine

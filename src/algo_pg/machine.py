@@ -1,6 +1,7 @@
 """
 A trading machine is an object that encompasses the running of algorithms with portfolios
-attached. These algorithm-portfolio pairs can be either run on historical data or on live data.
+attached. These algorithm-portfolio pairs can be either run on historical data or on live
+data.
 """
 
 from algo_pg.algorithms.base_algorithm import Algorithm
@@ -27,7 +28,7 @@ class DataSettings():
 
 class TradingMachine():
     """
-    The "trading machine" is meant to represent a machine running an algorithm with data 
+    The "trading machine" is meant to represent a machine running an algorithm with data
     across the timeline that are provided as constructor arguments. This encompasses
     backtesting (testing on historical data) as well as running an algorithm live.
     """
@@ -37,8 +38,8 @@ class TradingMachine():
         Constructor for the TradingMachine class.
 
         Args:
-            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
-                in the repo's alpaca.config.
+            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the
+                keys in the repo's alpaca.config.
             data_settings: An instance of the DataSettings dataclass.
         """
 
@@ -66,8 +67,8 @@ class TradingMachine():
     def add_algo_instance(self, algorithm_with_portfolio):
         """
         Adds an algorithm-portfolio pair to the list of all such pairs for the trading
-        machine. This is useful because the run() function can iterate over these pairs and
-        all of the provided algorithms against their corresponding portfolios.
+        machine. This is useful because the run() function can iterate over these pairs
+        and all of the provided algorithms against their corresponding portfolios.
 
         Args:
             algorithm: A TradingAlgorithm instance or instance of a sub-class.
@@ -79,11 +80,11 @@ class TradingMachine():
 
     def run(self):
         """
-        Run the trading machine and run all of the algorithm portfolio pairs from the start
-        date to the end date.
+        Run the trading machine and run all of the algorithm portfolio pairs from the
+        start date to the end date.
         """
 
-        print("Starting machine...")
+        print("\n> Starting machine...\n")
 
         # For every day that the market will be open
         for trading_day in self.trading_days:

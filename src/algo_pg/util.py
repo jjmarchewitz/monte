@@ -96,8 +96,9 @@ class AlpacaAPIBundle():
 @dataclass
 class TradingDay():
     """
-    A dataclass holding information for a single day the market is open, like the date. \
-    This dataclass also stores the market open time and close time in the ISO-8601 format.
+    A dataclass holding information for a single day the market is open, like the date.
+    This dataclass also stores the market open time and close time in the ISO-8601
+    format.
     """
     date: str
     open_time_iso: str
@@ -195,8 +196,8 @@ def get_time_delta_from_time_frame(time_frame):
     elif time_frame.unit is TimeFrameUnit.Day:
         delta = timedelta(days=time_frame.amount)
     else:
-        raise ValueError(
-            "Invalid time frame passed in. TimeFrameUnit must be Minutes, Hours, or Days.")
+        raise ValueError("Invalid time frame passed in. TimeFrameUnit must be Minutes, "
+                         "Hours, or Days.")
 
     return delta
 

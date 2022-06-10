@@ -47,8 +47,8 @@ class Portfolio():
         Constructor for the Portfolio class.
 
         Args:
-            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the keys
-                in the repo's alpaca.config.
+            alpaca_api: A bundle of Alpaca APIs all created and authenticated with the
+                keys in the repo's alpaca.config.
             data_settings: An instance of the DataSettings dataclass.
             starting_cash: The starting cash that the portfolio will have before any
                 orders are placed or any positions are held. Defaults to 10000.
@@ -71,8 +71,8 @@ class Portfolio():
 
         self._increment_count = 0
 
-        # This exists for timing and synchronization purposes, this is a reference position
-        # that does count towards the value of the portfolio
+        # This exists for timing and synchronization purposes, this is a reference
+        # position that does count towards the value of the portfolio
         self._reference_position = Position(
             self.alpaca_api, self.data_settings, "SPY", 1.0)
 
@@ -81,7 +81,8 @@ class Portfolio():
         Create a new Position from the provided args and add it to the Portfolio.
 
         Args:
-            symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+            symbol: A string for the market symbol of this position (i.e. "AAPL" or
+                "GOOG").
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
         """
@@ -94,8 +95,8 @@ class Portfolio():
         Adds an initialized Position object to the Portfolio.
 
         Args:
-            new_position: The incoming and already initialized Position object to be added
-                to the Portfolio.
+            new_position: The incoming and already initialized Position object to be
+                added to the Portfolio.
 
         Raises:
             ValueError: When there is a Position object for the same symbol as a
@@ -136,7 +137,8 @@ class Portfolio():
         Determines if any Position in the Portfolio uses the given symbol.
 
         Args:
-            symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+            symbol: A string for the market symbol of this position (i.e. "AAPL" or
+                "GOOG").
 
         Returns:
             A bool for if the given symbol was found in any Position in the Portfolio.
@@ -154,11 +156,12 @@ class Portfolio():
         Gets the Position object from the Portfolio with the given symbol
 
         Args:
-            symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+            symbol: A string for the market symbol of this position (i.e. "AAPL" or
+                "GOOG").
 
         Returns:
-            The Position object with the given symbol from within this Portfolio, returns None
-            if no such Position exists.
+            The Position object with the given symbol from within this Portfolio, returns
+            None if no such Position exists.
         """
         retval = None
 
@@ -186,11 +189,13 @@ class Portfolio():
 
     def place_order(self, symbol, quantity, order_type=OrderType.BUY):
         """
-        Places an order to buy or sell some quantity of an asset. Adds the order to an order
-        queue and does not directly execute the order. That is done by process_pending_orders().
+        Places an order to buy or sell some quantity of an asset. Adds the order to an
+        order queue and does not directly execute the order. That is done by
+        process_pending_orders().
 
         Args:
-            symbol: A string for the market symbol of this position (i.e. "AAPL" or "GOOG").
+            symbol: A string for the market symbol of this position (i.e. "AAPL" or
+                "GOOG").
             quantity: The quantity of the asset to be bought or sold.
             order_type: A value from the enum OrderType that represents if the order is a
                 buy or a sell order. Defaults to OrderType.BUY.
@@ -202,7 +207,8 @@ class Portfolio():
         Returns:
             The unique order ID number for the order being created.
         """
-        # Check that the order type passed in is a valid order type from the enum OrderType
+        # Check that the order type passed in is a valid order type from the enum
+        # OrderType
         if order_type not in OrderType:
             raise ValueError("Invalid order type.")
 
@@ -210,8 +216,8 @@ class Portfolio():
         order_num = self._current_order_id_number
         self._current_order_id_number += 1
 
-        # Create a new order object with the correct attributes and append it to the order
-        # queue
+        # Create a new order object with the correct attributes and append it to the
+        # order queue
         new_order = Order(order_num, symbol, quantity, order_type)
         self._order_queue.append(new_order)
 
@@ -274,7 +280,7 @@ class Portfolio():
 
     def _execute_buy_order(self, order):
         """
-        Executes a buy order if it is ready to be executed (does not have any delay 
+        Executes a buy order if it is ready to be executed (does not have any delay
         associated with it).
 
         Args:
@@ -327,8 +333,8 @@ class Portfolio():
             order_status = OrderStatus.COMPLETED
 
             print(
-                f"{self.name} | {self.get_current_timestamp()} - BOUGHT: {order.quantity} "
-                f"shares of {order.symbol}")
+                f"{self.name} | {self.get_current_timestamp()} - BOUGHT: "
+                f"{order.quantity} shares of {order.symbol}")
 
         else:
             order_status = OrderStatus.FAILED
@@ -339,7 +345,7 @@ class Portfolio():
 
     def _execute_sell_order(self, order):
         """
-        Executes a sell order if it is ready to be executed (does not have any delay 
+        Executes a sell order if it is ready to be executed (does not have any delay
         associated with it).
 
         Args:
@@ -367,8 +373,8 @@ class Portfolio():
             order_status = OrderStatus.COMPLETED
 
             print(
-                f"{self.name} | {self.get_current_timestamp()} - SOLD: {order.quantity} "
-                f"shares of {order.symbol}")
+                f"{self.name} | {self.get_current_timestamp()} - SOLD: "
+                f"{order.quantity} shares of {order.symbol}")
 
         # TODO: Logging
 
@@ -387,7 +393,8 @@ class Portfolio():
 
     def _create_new_daily_row_generators(self, start_time, end_time):
         """
-        Creates new daily row generators for each Position associated with this Portfolio.
+        Creates new daily row generators for each Position associated with this
+        Portfolio.
 
         Args:
             start_time: The ISO-8601 compliant date/time for the generators to start
@@ -424,13 +431,13 @@ class Portfolio():
 
     def _any_generator_reached_end_of_day(self):
         """
-        Determines if any generator inside any Position has hit the end of its generation.
-        That indicates it has reached the end of the day and a new daily generator needs to
-        be created.
+        Determines if any generator inside any Position has hit the end of its
+        generation. That indicates it has reached the end of the day and a new daily
+        generator needs to be created.
 
         Returns:
-            A bool that shows if any generator inside any Position has reached the end of the
-            day.
+            A bool that shows if any generator inside any Position has reached the end of
+            the day.
         """
         generator_at_end_of_day = False
 

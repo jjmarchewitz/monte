@@ -52,7 +52,7 @@ def main():
     # machine_hours = TradingMachine(
     #      trading_api, market_data_api, "2022-03-08", "2022-03-20",
     #     time_frame=TimeFrame.Hours)
-    # Test Comit
+    # Test Comittt
 
 
 if __name__ == "__main__":

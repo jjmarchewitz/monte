@@ -41,13 +41,13 @@ def main():
 
     machine.run()
 
-    #########
+    ############
 
     # dm = DataManager(alpaca_api, data_settings, "GOOG")
 
     # dm.set_df_with_dates("2022-03-08", "2022-03-20")
 
-    #########
+    ############
 
     breakpoint()
 

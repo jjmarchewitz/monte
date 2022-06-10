@@ -1,6 +1,6 @@
 from algo_pg.algorithms.bang_bang.alg import BangBang
 from algo_pg.machine import TradingMachine, DataSettings
-from algo_pg.portfolio import Portfolio, OrderType
+from algo_pg.portfolio import Portfolio
 from algo_pg.stat_calculators import dummy_420_69, avg_last_5, net_last_5
 from algo_pg.util import AlpacaAPIBundle
 from alpaca_trade_api import TimeFrame

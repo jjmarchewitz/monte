@@ -53,6 +53,7 @@ def main():
     #      trading_api, market_data_api, "2022-03-08", "2022-03-20",
     #     time_frame=TimeFrame.Hours)
     # Test Comittt
+    print("Make your message more visible")
 
 
 if __name__ == "__main__":

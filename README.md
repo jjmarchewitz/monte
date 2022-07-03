@@ -8,6 +8,13 @@
 * V. Gadkari
 <br><br>
 
+## Notes and Reminders ##
+* Create your scratchpads in scripts/scratchpads/
+* Don't forget to pull before working
+* Download the autoDocstring extension for VS Code, and use (CMD/CTRL) + SHIFT + 2 to generate a docstring for a function automatically
+* Run the hook folder config command in the instructions
+<br><br>
+
 ## Instructions ##
 
 ### Create a virtual environment in the repository folder ###
@@ -43,14 +50,6 @@
           * python3 generate_source_rst.py
           * make html
   * Open "docs/index.html" with your browser. Enjoy! You can even bookmark it
-<br><br>
-
-
-## Notes and Reminders ##
-* There is no main.py anymore, create your scratchpads in tests/
-* Don't forget to pull before working
-* Download the autoDocstring extension for VS Code, and use (CMD/CTRL) + SHIFT + 2 to generate a docstring for a function automatically
-* Run the hook folder config command in the instructions
 <br><br>
 
 ## Experiments ##

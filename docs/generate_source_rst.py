@@ -1,6 +1,3 @@
-# TODO: Extract all of the TODO: markers in the reptory and put them into TODO.md,
-# sorted if possible
-
 import os
 from re import findall
 
@@ -41,7 +38,7 @@ def create_rst_for_src_file(base_dir, relative_src_file_path):
 
     folder_path, filename = os.path.split(full_rst_file_path)
 
-    module_name = filename.rstrip(".rst")
+    module_name = filename.rstrip("rst").rstrip(".")
 
     import_name = relative_src_file_path.lstrip(SUPER_PACKAGE_NAME).lstrip(
         os.sep).rstrip("py").rstrip(".").replace(os.sep, ".")
@@ -67,14 +64,12 @@ def create_rst_for_src_file(base_dir, relative_src_file_path):
 
 def create_package_rst_files(base_dir):
 
-    for path_being_searched, subpackages, modules_in_package in os.walk(base_dir):
-        # parent_package, current_package_name = os.path.split(package_being_searched)
+    for parent_folder_path_for_rst_creation, subpackages, modules_in_package in os.walk(
+            base_dir):
 
-        # breakpoint()
+        package_being_searched = os.path.basename(parent_folder_path_for_rst_creation)
 
-        package_being_searched = os.path.basename(path_being_searched)
-
-        with open(f"{path_being_searched}{os.sep}..{os.sep}{package_being_searched}.rst", "w") as f:
+        with open(f"{parent_folder_path_for_rst_creation}{os.sep}..{os.sep}{package_being_searched}.rst", "w") as f:
 
             file_text = f"{package_being_searched}\n"
 
@@ -97,7 +92,7 @@ def create_package_rst_files(base_dir):
                         module_matches_subpackage = True
 
                 if not module_matches_subpackage:
-                    file_text += f'\t{package_being_searched}{os.sep}{module.rstrip(".rst")}\n'
+                    file_text += f'\t{package_being_searched}{os.sep}{module.rstrip("rst").rstrip(".")}\n'
 
             file_text += "\n"
 
@@ -115,7 +110,6 @@ def main():
     relative_src_file_path_list = [
         src_file_path.split("src/")[1] for src_file_path in py_src_files_list]
 
-    # breakpoint()
     for relative_src_file_path in relative_src_file_path_list:
         create_rst_for_src_file(doc_source_dir, relative_src_file_path)
 

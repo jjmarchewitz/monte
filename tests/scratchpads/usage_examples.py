@@ -1,12 +1,12 @@
-from algo_pg.machine.portfolio import OrderType, Portfolio
-from algo_pg.machine.position import Position
-from algo_pg.machine.trading_machine import TradingMachine
-from algo_pg.util.alpaca import alpaca_setup
+from algo_pg.portfolio import OrderType, Portfolio
+from algo_pg.position import Position
+from algo_pg.machine import TradingMachine
+from algo_pg.util import AlpacaAPIBundle
 from alpaca_trade_api import TimeFrame
 
 
 def main():
-    alpaca_api = alpaca_setup()
+    alpaca_api = AlpacaAPIBundle()
 
     # Only Days, Hours, and Minutes are supported as time frames
     machine = TradingMachine(

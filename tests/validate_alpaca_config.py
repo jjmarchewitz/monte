@@ -1,8 +1,8 @@
-from algo_pg.util.alpaca import alpaca_setup
+from algo_pg.util import AlpacaAPIBundle
 
 
 def main():
-    alpaca_api = alpaca_setup()
+    alpaca_api = AlpacaAPIBundle()
     print(alpaca_api.trading.get_account())
 
 

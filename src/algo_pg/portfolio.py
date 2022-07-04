@@ -62,7 +62,7 @@ class Portfolio():
         self.data_settings = data_settings
 
         self.name = name if name is not None else "Unnamed"
-        self.positions = []
+        self.positions = {}
         self.cash = starting_cash
 
         self.time_of_last_price_gen_increment = None
@@ -85,10 +85,15 @@ class Portfolio():
                 "GOOG").
             initial_quantity: The quantity of this asset that should be held when this
                 instance is finished being constructed.
+
+        Returns:
+            A newly created Position object that has been added to self.positions
         """
         new_position = Position(self.alpaca_api, self.data_settings,
                                 symbol, initial_quantity)
         self.add_existing_position(new_position)
+
+        return new_position
 
     def add_existing_position(self, new_position):
         """
@@ -109,28 +114,23 @@ class Portfolio():
                 "The object passed is not of type machine.position.Position")
 
         # Check that there is not already a position with this symbol in this portfolio
-        for position in self.positions:
-            if new_position.symbol == position.symbol:
-                raise ValueError(
-                    f"There is already a position with symbol {position.symbol} in" +
-                    f"this Portfolio (name of portfolio: {self.name}).")
+        if new_position.symbol in self.positions.keys():
+            raise ValueError(
+                f"There is already a position with symbol {new_position.symbol} in" +
+                f"this Portfolio (name of portfolio: {self.name}).")
 
         # If there was already a position with the incoming position's symbol in the
         # portfolio, then the above error would be raised. If not, the program will
         # keep running and add the position to the portfolio as below
-        self.positions.append(new_position)
+        self.positions[new_position.symbol] = new_position
 
     def delete_empty_positions(self):
         """
         Delete all positions in the portfolio that have 0 quantity currently held.
         """
-        non_empty_positions = []
-
-        for position in self.positions:
-            if position.quantity != 0:
-                non_empty_positions.append(position)
-
-        self.positions = non_empty_positions
+        for symbol, position in self.positions.items():
+            if position.quantity == 0:
+                del self.positions[symbol]
 
     def contains_position(self, symbol):
         """
@@ -143,13 +143,7 @@ class Portfolio():
         Returns:
             A bool for if the given symbol was found in any Position in the Portfolio.
         """
-        has_position = False
-
-        # Check if any position has the symbol that was passed in
-        if any([position.symbol == symbol for position in self.positions]):
-            has_position = True
-
-        return has_position
+        return symbol in self.positions.keys()
 
     def get_position(self, symbol):
         """
@@ -166,10 +160,7 @@ class Portfolio():
         retval = None
 
         if self.contains_position(symbol):
-            for position in self.positions:
-                if position.symbol == symbol:
-                    retval = position
-                    break
+            retval = self.positions[symbol]
 
         return retval
 
@@ -182,7 +173,7 @@ class Portfolio():
         """
         total = self.cash
 
-        for position in self.positions:
+        for position in self.positions.values():
             total += position.total_value()
 
         return total
@@ -321,8 +312,7 @@ class Portfolio():
 
             # Create a new Position if one doesn't exist
             else:
-                self.create_new_position(order.symbol, order.quantity)
-                new_position = self.get_position(order.symbol)
+                new_position = self.create_new_position(order.symbol, order.quantity)
 
                 # Get the new position to the same state as the reference position by
                 # generating the historical data for the asset going back either to the
@@ -360,16 +350,16 @@ class Portfolio():
         if not self.contains_position(order.symbol):
             order_status = OrderStatus.FAILED
         else:
-            position_from_sell_order = self.get_position(order.symbol)
+            position_from_the_sell_order = self.get_position(order.symbol)
 
-            if position_from_sell_order.quantity < order.quantity:
+            if position_from_the_sell_order.quantity < order.quantity:
                 order_status = OrderStatus.FAILED
 
         # If there are enough units of the currently-held position that the sell order
         # can succeed, perform the sell order
         if not order_status is OrderStatus.FAILED:
-            self.cash += order.quantity * position_from_sell_order.price
-            position_from_sell_order.quantity -= order.quantity
+            self.cash += order.quantity * position_from_the_sell_order.price
+            position_from_the_sell_order.quantity -= order.quantity
             order_status = OrderStatus.COMPLETED
 
             print(
@@ -406,7 +396,7 @@ class Portfolio():
         self._reference_position.data_manager.create_new_daily_row_generator(
             start_time, end_time)
 
-        for position in self.positions:
+        for position in self.positions.values():
             position.data_manager.create_new_daily_row_generator(start_time, end_time)
 
     def _increment_all_positions(self):
@@ -418,7 +408,7 @@ class Portfolio():
         next(self._reference_position.data_manager._row_generator)
         self._reference_position.update_price_from_current_bar()
 
-        for position in self.positions:
+        for position in self.positions.values():
 
             # Increment the row generator to update the raw data to the next TimeFrame
             next(position.data_manager._row_generator)
@@ -444,7 +434,7 @@ class Portfolio():
         if self._reference_position.data_manager.generator_at_end_of_day == True:
             generator_at_end_of_day = True
 
-        for position in self.positions:
+        for position in self.positions.values():
             if (position.data_manager.generator_at_end_of_day == True):
                 generator_at_end_of_day = True
                 break

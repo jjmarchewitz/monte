@@ -12,6 +12,7 @@
 # Project specific
 /alpaca.config
 docs/generated
+docs/source/
 
 
 ######################################

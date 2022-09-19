@@ -2,7 +2,7 @@ from algo_pg.algorithms.base_algorithm import Algorithm
 from algo_pg.portfolio import OrderType
 
 
-class BangBang(Algorithm):
+class MonthlySP(Algorithm):
     def __init__(self, alpaca_api, data_settings, portfolio):
         super().__init__(alpaca_api, data_settings, portfolio)
         self.alpaca_api = alpaca_api

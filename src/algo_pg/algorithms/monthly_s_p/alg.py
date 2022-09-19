@@ -2,16 +2,26 @@ from algo_pg.algorithms.base_algorithm import Algorithm
 from algo_pg.portfolio import OrderType
 
 
-class Monthly_S_P(Algorithm):
+class MonthlySP(Algorithm):
     def __init__(self, alpaca_api, data_settings, portfolio):
         super().__init__(alpaca_api, data_settings, portfolio)
         self.alpaca_api = alpaca_api
         self.data_settings = data_settings
         self.portfolio = portfolio
 
+        self.target_stocks = [
+            "AAPL",
+            "MSFT",
+            "AMZN",
+            "TSLA",
+            "GOOGL",
+        ]
+
+        # Some initial stock purchases, optional
+
     def run_for_one_time_frame(self):
 
-        for position in self.portfolio.positions:
+        for symbol, position in self.portfolio.positions.items():
             data_manager = position.data_manager
 
             df = data_manager.df
@@ -27,10 +37,10 @@ class Monthly_S_P(Algorithm):
 
             # If this percentage growth number is more than 1%, buy 1 share
             if percent_change_l5_over_current_vwap > 1:
-                self.portfolio.place_order(position.symbol, 1, OrderType.BUY)
+                self.portfolio.place_order(symbol, 1, OrderType.BUY)
 
             # If this percentage growth number is less than -1%, sell 1 share
             elif percent_change_l5_over_current_vwap < -1:
-                self.portfolio.place_order(position.symbol, 1, OrderType.SELL)
+                self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
             # breakpoint()

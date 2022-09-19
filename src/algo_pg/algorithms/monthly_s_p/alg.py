@@ -17,11 +17,19 @@ class MonthlySP(Algorithm):
             "GOOGL",
         ]
 
+        self.monthly_starting_values = {symbol: 0 for symbol in self.target_stocks}
+        self.monthly_stock_returns = {symbol: 0 for symbol in self.target_stocks}
+
         # Some initial stock purchases, optional
+        for symbol in self.target_stocks:
+            self.portfolio.place_order(symbol, 0, OrderType.BUY)
 
     def run_for_one_time_frame(self):
 
         for symbol, position in self.portfolio.positions.items():
+
+            breakpoint()
+
             data_manager = position.data_manager
 
             df = data_manager.df

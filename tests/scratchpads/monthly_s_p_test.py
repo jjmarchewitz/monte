@@ -25,7 +25,7 @@ def main():
         end_date="2019-01-01",
         time_frame=TimeFrame.Day,
         stat_dict=stat_dict,
-        max_rows_in_df=5_000,
+        max_rows_in_df=500,
         start_buffer_time_delta=timedelta(days=20),
         time_frames_between_algo_runs=1
     )

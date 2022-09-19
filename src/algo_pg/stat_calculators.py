@@ -63,6 +63,7 @@ def net_last_5(df, last_row_index):
 
     return net
 
+
 def best_return(df, last_row_index):
     """
     Computes the net value over the last 5 TimeFrames.

@@ -1,4 +1,4 @@
-from algo_pg.monthly_s_p.alg import MonthlySP
+from algo_pg.algorithms.monthly_s_p.alg import MonthlySP
 from algo_pg.machine import TradingMachine, DataSettings
 from algo_pg.portfolio import Portfolio
 from algo_pg.stat_calculators import dummy_420_69, avg_last_5, net_last_5
@@ -32,7 +32,7 @@ def main():
 
     # Define an instance of an algorithm with a portfolio
     portfolio1 = Portfolio(alpaca_api, data_settings, starting_cash=5_000, name="P1")
-    algo1 = BangBang(alpaca_api, data_settings, portfolio1)
+    algo1 = MonthlySP(alpaca_api, data_settings, portfolio1)
 
     machine.add_algo_instance(algo1)
 

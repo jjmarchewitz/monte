@@ -62,3 +62,20 @@ def net_last_5(df, last_row_index):
     net = df.loc[last_row_index].vwap - df.loc[last_row_index - 4].vwap
 
     return net
+
+def best_return(df, last_row_index):
+    """
+    Computes the net value over the last 5 TimeFrames.
+
+    Args:
+        df: A dataframe of raw input data, almost straight from Alpaca.
+        last_row_index: The index of the last valid row in the provided dataframe.
+
+    Returns:
+        The net value over the last 5 TimeFrames.
+
+    """
+
+    net = df.loc[last_row_index].vwap - df.loc[last_row_index - 4].vwap
+
+    return net

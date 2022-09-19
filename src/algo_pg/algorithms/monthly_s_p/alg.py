@@ -2,17 +2,12 @@ from algo_pg.algorithms.base_algorithm import Algorithm
 from algo_pg.portfolio import OrderType
 
 
-class BangBang(Algorithm):
+class Monthly_S_P(Algorithm):
     def __init__(self, alpaca_api, data_settings, portfolio):
         super().__init__(alpaca_api, data_settings, portfolio)
         self.alpaca_api = alpaca_api
         self.data_settings = data_settings
         self.portfolio = portfolio
-
-        # Some initial stock purchases, optional
-        self.portfolio.place_order("AAPL", 5, OrderType.BUY)
-        self.portfolio.place_order("SPY", 5, OrderType.BUY)
-        self.portfolio.place_order("GME", 5, OrderType.BUY)
 
     def run_for_one_time_frame(self):
 

@@ -1,4 +1,4 @@
-from algo_pg.algorithms.SurGup_Test1.test_alg import GradedAction
+from algo_pg.algorithms.monthly_s_p import Monthly_S_P
 from algo_pg.machine import TradingMachine, DataSettings
 from algo_pg.portfolio import Portfolio
 from algo_pg.stat_calculators import dummy_420_69, avg_last_5, net_last_5

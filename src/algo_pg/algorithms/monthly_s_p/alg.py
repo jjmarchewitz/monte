@@ -9,14 +9,19 @@ class MonthlySP(Algorithm):
         self.data_settings = data_settings
         self.portfolio = portfolio
 
+        self.target_stocks = [
+            "AAPL",
+            "MSFT",
+            "AMZN",
+            "TSLA",
+            "GOOGL",
+        ]
+
         # Some initial stock purchases, optional
-        self.portfolio.place_order("AAPL", 5, OrderType.BUY)
-        self.portfolio.place_order("SPY", 5, OrderType.BUY)
-        self.portfolio.place_order("GME", 5, OrderType.BUY)
 
     def run_for_one_time_frame(self):
 
-        for position in self.portfolio.positions:
+        for symbol, position in self.portfolio.positions.items():
             data_manager = position.data_manager
 
             df = data_manager.df
@@ -32,10 +37,10 @@ class MonthlySP(Algorithm):
 
             # If this percentage growth number is more than 1%, buy 1 share
             if percent_change_l5_over_current_vwap > 1:
-                self.portfolio.place_order(position.symbol, 1, OrderType.BUY)
+                self.portfolio.place_order(symbol, 1, OrderType.BUY)
 
             # If this percentage growth number is less than -1%, sell 1 share
             elif percent_change_l5_over_current_vwap < -1:
-                self.portfolio.place_order(position.symbol, 1, OrderType.SELL)
+                self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
             # breakpoint()

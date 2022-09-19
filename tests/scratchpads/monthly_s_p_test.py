@@ -13,6 +13,9 @@ def main():
     # Keys will become column names and the function object that is the value will be
     # called on every row of every Position's DataManager
     stat_dict = {
+        "WS": dummy_420_69,
+        "avg_l5_vwap": avg_last_5,
+        "net_l5_vwap": net_last_5
     }
 
     # A dataclass that stores general information about data settings and how the data
@@ -23,7 +26,7 @@ def main():
         time_frame=TimeFrame.Day,
         stat_dict=stat_dict,
         max_rows_in_df=5_000,
-        start_buffer_time_delta=timedelta(days=5),
+        start_buffer_time_delta=timedelta(days=20),
         time_frames_between_algo_runs=1
     )
 

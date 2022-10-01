@@ -1,9 +1,0 @@
-# This value can be either "paper" or "live", and corresponds to either paper or live
-# trading
-TRADING_CONTEXT="paper"
-
-# Your alpaca API key ID
-APCA-API-KEY-ID="paste here"
-
-# Your alpaca secret key ID
-APCA-API-SECRET-KEY="paste here"

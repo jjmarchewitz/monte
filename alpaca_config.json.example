@@ -1,0 +1,9 @@
+{
+    "ENDPOINT": "https://paper-api.alpaca.markets",
+    "API_KEYS": [
+        {
+            "API_KEY_ID": "",
+            "SECRET_KEY": ""
+        },
+    ]
+}

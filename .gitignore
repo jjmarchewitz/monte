@@ -10,7 +10,7 @@
 *.DS_Store
 
 # Project specific
-alpaca.config
+*alpaca_config.json
 docs/generated
 docs/source/
 

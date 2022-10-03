@@ -40,6 +40,8 @@ class AlpacaAPIBundle():
     @property
     def trading(self):
         """DOC:"""
+        # The least-recently used trading instance is also the index of the next trading instance,
+        # since they're stored as a circular queue
         lru_trading_instance = self._trading_instances[self._trading_instance_index]
         self._trading_instance_index += 1
 
@@ -52,6 +54,8 @@ class AlpacaAPIBundle():
     @property
     def market_data(self):
         """DOC:"""
+        # The least-recently used market data instance is also the index of the next market data instance,
+        # since they're stored as a circular queue
         lru_market_data_instance = self._market_data_instances[self._market_data_instance_index]
         self._market_data_instance_index += 1
 
@@ -64,6 +68,8 @@ class AlpacaAPIBundle():
     @property
     def crypto(self):
         """DOC:"""
+        # The least-recently used crypto instance is also the index of the next crypto instance,
+        # since they're stored as a circular queue
         lru_crypto_instance = self._crypto_instances[self._crypto_instance_index]
         self._crypto_instance_index += 1
 

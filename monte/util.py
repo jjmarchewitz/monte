@@ -32,7 +32,7 @@ class AlpacaAPIBundle():
             except:
                 raise RuntimeError("Failed to load alpaca_config.json")
 
-        # Create an instance of each API for each API key
+        # Create an instance of each of alpaca's APIs for each API key-pair
         self._trading_instances = self._create_api_instances(
             self.alpaca_config["ENDPOINT"])
         self._market_data_instances = self._create_api_instances(
@@ -40,53 +40,55 @@ class AlpacaAPIBundle():
         self._crypto_instances = self._create_api_instances(
             CRYPTO_ENDPOINT)
 
+        # Store the number of API instances there are in every instance list. The number of API instances
+        # is equivalent to the number of API key pairs
+        self._num_api_instances = len(self.alpaca_config["API_KEYS"])
+
         # Create an index variable to track which instance within the API instance lists
         # should be used
-        self._trading_instance_index = 0
-        self._market_data_instance_index = 0
-        self._crypto_instance_index = 0
+        self._api_instance_index = 0
 
     @property
     def trading(self):
         """DOC:"""
-        # The least-recently used trading instance is also the index of the next trading instance,
-        # since they're stored as a circular queue
-        lru_trading_instance = self._trading_instances[self._trading_instance_index]
-        self._trading_instance_index += 1
+        # The least recently-used instance should be located at self._api_instance_index, since the instances
+        # are stored in a circular queue. The next instance is always the least-recently used one.
+        lru_instance = self._trading_instances[self._api_instance_index]
+        self._api_instance_index += 1
 
         # Reset the trading instance index if it's past the end of the list
-        if self._trading_instance_index >= len(self._trading_instances):
-            self._trading_instance_index = 0
+        if self._api_instance_index >= self._num_api_instances:
+            self._api_instance_index = 0
 
-        return lru_trading_instance
+        return lru_instance
 
     @property
     def market_data(self):
         """DOC:"""
-        # The least-recently used market data instance is also the index of the next market data instance,
-        # since they're stored as a circular queue
-        lru_market_data_instance = self._market_data_instances[self._market_data_instance_index]
-        self._market_data_instance_index += 1
+        # The least recently-used instance should be located at self._api_instance_index, since the instances
+        # are stored in a circular queue. The next instance is always the least-recently used one.
+        lru_instance = self._market_data_instances[self._api_instance_index]
+        self._api_instance_index += 1
 
         # Reset the market data instance index if it's past the end of the list
-        if self._market_data_instance_index >= len(self._market_data_instances):
-            self._market_data_instance_index = 0
+        if self._api_instance_index >= self._num_api_instances:
+            self._api_instance_index = 0
 
-        return lru_market_data_instance
+        return lru_instance
 
     @property
     def crypto(self):
         """DOC:"""
-        # The least-recently used crypto instance is also the index of the next crypto instance,
-        # since they're stored as a circular queue
-        lru_crypto_instance = self._crypto_instances[self._crypto_instance_index]
-        self._crypto_instance_index += 1
+        # The least recently-used instance should be located at self._api_instance_index, since the instances
+        # are stored in a circular queue. The next instance is always the least-recently used one.
+        lru_instance = self._crypto_instances[self._api_instance_index]
+        self._api_instance_index += 1
 
         # Reset the crypto instance index if it's past the end of the lsit
-        if self._crypto_instance_index >= len(self._crypto_instances):
-            self._crypto_instance_index = 0
+        if self._api_instance_index >= self._num_api_instances:
+            self._api_instance_index = 0
 
-        return lru_crypto_instance
+        return lru_instance
 
     def _create_api_instances(self, endpoint):
         """DOC:"""

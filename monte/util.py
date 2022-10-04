@@ -1,14 +1,23 @@
-from alpaca_trade_api import REST, TimeFrameUnit
+"""DOC:"""
+
+from alpaca_trade_api import REST
 import json
 import os
 import re
 
+
+#############
+# CONSTANTS #
+#############
+
 REPO_NAME = "monte"
+MARKET_DATA_ENDPOINT = "https://data.alpaca.markets"
+CRYPTO_ENDPOINT = "https://data.alpaca.markets/v1beta1/crypto"
+
 
 ##############
 # ALPACA API #
 ##############
-
 
 class AlpacaAPIBundle():
     """DOC:"""
@@ -27,9 +36,9 @@ class AlpacaAPIBundle():
         self._trading_instances = self._create_api_instances(
             self.alpaca_config["ENDPOINT"])
         self._market_data_instances = self._create_api_instances(
-            "https://data.alpaca.markets")
+            MARKET_DATA_ENDPOINT)
         self._crypto_instances = self._create_api_instances(
-            "https://data.alpaca.markets/v1beta1/crypto")
+            CRYPTO_ENDPOINT)
 
         # Create an index variable to track which instance within the API instance lists
         # should be used
@@ -83,6 +92,8 @@ class AlpacaAPIBundle():
         """DOC:"""
         api_instance_list = []
 
+        # For every loaded API key-secret key pair, create an instance of the REST API using the "endpoint"
+        # argument.
         for api_key in self.alpaca_config["API_KEYS"]:
             api_instance = REST(
                 api_key["API_KEY_ID"],
@@ -102,7 +113,7 @@ class AlpacaAPIBundle():
         if not repo_name_matches:
             raise FileNotFoundError("Could not find the parent repo directory.")
 
-        # sTrims the end of the path so that it says "/monte" instead of "/monte/monte"
+        # Trims the end of the path so that it says "/monte" instead of "/monte/monte"
         repo_dir = re.sub(f"{os.sep}monte{os.sep}monte",
                           f"{os.sep}monte", repo_name_matches[0])
 

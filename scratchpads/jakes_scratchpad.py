@@ -1,5 +1,6 @@
 from alpaca_trade_api import TimeFrame
 from datetime import timedelta
+from algorithms import test
 from monte import asset_manager, machine, util
 
 
@@ -18,6 +19,9 @@ def main():
     )
 
     am = asset_manager.AssetManager(alpaca_api, machine_settings)
+
+    symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA",
+               "UNH", "JNJ", "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG"]
 
     breakpoint()
 

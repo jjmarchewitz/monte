@@ -4,6 +4,8 @@ from alpaca_trade_api import REST
 from dataclasses import dataclass
 from datetime import date, datetime
 from pytz import timezone
+import asks
+import gzip
 import json
 import os
 import re
@@ -14,13 +16,82 @@ import re
 #############
 
 REPO_NAME = "monte"
-MARKET_DATA_ENDPOINT = "https://data.alpaca.markets"
-CRYPTO_ENDPOINT = "https://data.alpaca.markets/v1beta1/crypto"
+MARKET_DATA_BASE_URL = "https://data.alpaca.markets"
+CRYPTO_BASE_URL = "https://data.alpaca.markets/v1beta1/crypto"
 
 
 ##############
 # ALPACA API #
 ##############
+
+class AsyncAlpacaBars():
+    """DOC:"""
+
+    def __init__(self, key_id, secret_id, base_url) -> None:
+        """DOC:"""
+        # HTTPS header, this contains the API key info to authenticate with Alpaca
+        self.headers = {
+            "APCA-API-KEY-ID": key_id,
+            "APCA-API-SECRET-KEY": secret_id
+        }
+
+        # The base url is something like "https://data.alpaca.markets"
+        self.base_url = base_url
+
+    async def get_bars(self, symbol, time_frame, start_date, end_date, adjustment='raw', limit=1000):
+        """DOC:"""
+
+        # TODO: Format output as a dataframe, and sort by timestamp
+
+        # Create an empty list to store all of the bars received from Alpaca
+        output_list = []
+
+        # HTTPS GET request parameters
+        params = {
+            "adjustment": adjustment,
+            "start": start_date,
+            "end": end_date,
+            "timeframe": str(time_frame),
+            "limit": limit
+        }
+
+        # Alpaca does not let us request all the data at once, and instead forces us to request it in
+        # "pages". This loop goes through all the pages until there is no more data to get and returns.
+        while True:
+
+            # Get the data from Alpaca asynchronously
+            response = await asks.get(
+                f"https://data.alpaca.markets/v2/stocks/{symbol}/bars",
+                headers=self.headers,
+                params=params,
+                follow_redirects=False
+            )
+
+            # Response code 200 means success. If the data was received successfully, load it as a dictionary
+            if response.status_code == 200:
+                body_dict = json.loads(str(gzip.decompress(response.body), 'utf-8'))
+
+            # If the response code was not 200, something went wrong. Raise an error.
+            else:
+                raise ConnectionError(
+                    f"Bad response from Alpaca with response code: {response.status_code}")
+
+            # Add the bars from the latest Alpaca request to the list of all the bars
+            output_list.extend(body_dict['bars'])
+
+            # Extract the token ID for the next data 'page' from the parsed body of the HTTPS response.
+            next_page_token = body_dict['next_page_token']
+
+            # If there is a next_page_token, add it as an HTTPS parameter for the next request.
+            if next_page_token:
+                params['next_page_token'] = next_page_token
+
+            # Else, there is no more data to request.
+            else:
+                break
+
+        return output_list
+
 
 class AlpacaAPIBundle():
     """DOC:"""
@@ -37,11 +108,13 @@ class AlpacaAPIBundle():
 
         # Create an instance of each of alpaca's APIs for each API key-pair
         self._trading_instances = self._create_api_instances(
-            self.alpaca_config["ENDPOINT"])
+            REST, self.alpaca_config["ENDPOINT"])
         self._market_data_instances = self._create_api_instances(
-            MARKET_DATA_ENDPOINT)
+            REST, MARKET_DATA_BASE_URL)
         self._crypto_instances = self._create_api_instances(
-            CRYPTO_ENDPOINT)
+            REST, CRYPTO_BASE_URL)
+        self._async_market_data_instances = self._create_api_instances(
+            AsyncAlpacaBars, MARKET_DATA_BASE_URL)
 
         # Store the number of API instances there are in every instance list. The number of API instances
         # is equivalent to the number of API key pairs
@@ -93,14 +166,14 @@ class AlpacaAPIBundle():
 
         return lru_instance
 
-    def _create_api_instances(self, endpoint):
+    def _create_api_instances(self, api_class, endpoint):
         """DOC:"""
         api_instance_list = []
 
         # For every loaded API key-secret key pair, create an instance of the REST API using the "endpoint"
         # argument.
         for api_key in self.alpaca_config["API_KEYS"]:
-            api_instance = REST(
+            api_instance = api_class(
                 api_key["API_KEY_ID"],
                 api_key["SECRET_KEY"],
                 endpoint

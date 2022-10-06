@@ -1,6 +1,6 @@
 from alpaca_trade_api import TimeFrame
 from datetime import timedelta
-from monte import machine, util
+from monte import asset_manager, machine, util
 
 
 def main():
@@ -16,6 +16,8 @@ def main():
         max_rows_in_df=10_000,
         start_buffer_time_delta=timedelta(days=5),
     )
+
+    am = asset_manager.AssetManager(alpaca_api, machine_settings)
 
     breakpoint()
 

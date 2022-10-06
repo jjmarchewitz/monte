@@ -1,8 +1,9 @@
-from alpaca_trade_api import TimeFrame, TimeFrameUnit
-import trio
-import asks
 import gzip
 import json
+
+import asks
+import trio
+from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 KEY_ID = ""
 SECRET_KEY = ""

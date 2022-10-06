@@ -2,11 +2,12 @@
 TODO:
 """
 
+from datetime import timedelta
+
+import pandas as pd
 from algo_pg.util import get_list_of_trading_days_in_range
 from alpaca_trade_api import TimeFrame
-from datetime import timedelta
 from dateutil.parser import isoparse
-import pandas as pd
 
 
 class DataManager():

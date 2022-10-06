@@ -1,15 +1,15 @@
 """DOC:"""
 
-from alpaca_trade_api import REST
-from dataclasses import dataclass
-from datetime import date, datetime
-from pytz import timezone
-import asks
 import gzip
 import json
 import os
 import re
+from typing import Dict
 
+import asks
+import pandas as pd
+import trio
+from alpaca_trade_api import REST
 
 #############
 # CONSTANTS #
@@ -38,13 +38,14 @@ class AsyncAlpacaBars():
         # The base url is something like "https://data.alpaca.markets"
         self.base_url = base_url
 
-    async def get_bars(self, symbol, time_frame, start_date, end_date, adjustment='raw', limit=1000):
+    async def get_bars(self, symbol, time_frame, start_date, end_date, output_dict, adjustment='all',
+                       limit=10000):
         """DOC:"""
 
         # TODO: Format output as a dataframe, and sort by timestamp
 
         # Create an empty list to store all of the bars received from Alpaca
-        output_list = []
+        list_of_bars = []
 
         # HTTPS GET request parameters
         params = {
@@ -69,7 +70,11 @@ class AsyncAlpacaBars():
 
             # Response code 200 means success. If the data was received successfully, load it as a dictionary
             if response.status_code == 200:
-                body_dict = json.loads(str(gzip.decompress(response.body), 'utf-8'))
+                try:
+                    body_dict = json.loads(str(gzip.decompress(response.body), 'utf-8'))
+                except gzip.BadGzipFile:
+                    raise ValueError(
+                        f"Alpaca does not have any data for {symbol} between {start_date} and {end_date}")
 
             # If the response code was not 200, something went wrong. Raise an error.
             else:
@@ -77,7 +82,7 @@ class AsyncAlpacaBars():
                     f"Bad response from Alpaca with response code: {response.status_code}")
 
             # Add the bars from the latest Alpaca request to the list of all the bars
-            output_list.extend(body_dict['bars'])
+            list_of_bars.extend(body_dict['bars'])
 
             # Extract the token ID for the next data 'page' from the parsed body of the HTTPS response.
             next_page_token = body_dict['next_page_token']
@@ -90,7 +95,38 @@ class AsyncAlpacaBars():
             else:
                 break
 
-        return output_list
+        # Put the data into a dataframe
+        df = pd.DataFrame(list_of_bars)
+
+        # If an output_dict is
+        if output_dict is not None:
+            output_dict[symbol] = df
+        else:
+            return df
+
+    def get_bulk_bars(self, symbols, time_frame, start_date, end_date,
+                      adjustment='all', limit=10000) -> Dict[str, pd.DataFrame]:
+
+        output_dict = {}
+
+        trio.run(
+            self._async_get_bulk_bars,
+            symbols,
+            time_frame,
+            start_date,
+            end_date,
+            output_dict,
+            adjustment,
+            limit)
+
+        return output_dict
+
+    async def _async_get_bulk_bars(self, symbols, time_frame, start_date, end_date, output_dict,
+                                   adjustment='all', limit=10000) -> None:
+        async with trio.open_nursery() as n:
+            for symbol in symbols:
+                n.start_soon(self.get_bars, symbol, time_frame, start_date,
+                             end_date, output_dict, adjustment, limit)
 
 
 class AlpacaAPIBundle():
@@ -103,10 +139,10 @@ class AlpacaAPIBundle():
         with open(f"{repo_dir}{os.sep}alpaca_config.json", "r") as alpaca_config_file:
             try:
                 self.alpaca_config = json.load(alpaca_config_file)
-            except:
+            except BaseException:
                 raise RuntimeError("Failed to load alpaca_config.json")
 
-        # Create an instance of each of alpaca's APIs for each API key-pair
+        # Create an instance of each of alpaca API for each API key-pair
         self._trading_instances = self._create_api_instances(
             REST, self.alpaca_config["ENDPOINT"])
         self._market_data_instances = self._create_api_instances(
@@ -125,42 +161,55 @@ class AlpacaAPIBundle():
         self._api_instance_index = 0
 
     @property
-    def trading(self):
+    def trading(self) -> REST:
         """DOC:"""
         # The least recently-used instance should be located at self._api_instance_index, since the instances
         # are stored in a circular queue. The next instance is always the least-recently used one.
         lru_instance = self._trading_instances[self._api_instance_index]
         self._api_instance_index += 1
 
-        # Reset the trading instance index if it's past the end of the list
+        # Reset the api instance index if it's past the end of the list
         if self._api_instance_index >= self._num_api_instances:
             self._api_instance_index = 0
 
         return lru_instance
 
     @property
-    def market_data(self):
+    def market_data(self) -> REST:
         """DOC:"""
         # The least recently-used instance should be located at self._api_instance_index, since the instances
         # are stored in a circular queue. The next instance is always the least-recently used one.
         lru_instance = self._market_data_instances[self._api_instance_index]
         self._api_instance_index += 1
 
-        # Reset the market data instance index if it's past the end of the list
+        # Reset the api instance index if it's past the end of the list
         if self._api_instance_index >= self._num_api_instances:
             self._api_instance_index = 0
 
         return lru_instance
 
     @property
-    def crypto(self):
+    def crypto(self) -> REST:
         """DOC:"""
         # The least recently-used instance should be located at self._api_instance_index, since the instances
         # are stored in a circular queue. The next instance is always the least-recently used one.
         lru_instance = self._crypto_instances[self._api_instance_index]
         self._api_instance_index += 1
 
-        # Reset the crypto instance index if it's past the end of the lsit
+        # Reset the api instance index if it's past the end of the lsit
+        if self._api_instance_index >= self._num_api_instances:
+            self._api_instance_index = 0
+
+        return lru_instance
+
+    @property
+    def async_market_data_bars(self) -> AsyncAlpacaBars:
+        # The least recently-used instance should be located at self._api_instance_index, since the instances
+        # are stored in a circular queue. The next instance is always the least-recently used one.
+        lru_instance = self._async_market_data_instances[self._api_instance_index]
+        self._api_instance_index += 1
+
+        # Reset the api instance index if it's past the end of the lsit
         if self._api_instance_index >= self._num_api_instances:
             self._api_instance_index = 0
 
@@ -196,86 +245,3 @@ class AlpacaAPIBundle():
                           f"{os.sep}monte", repo_name_matches[0])
 
         return repo_dir
-
-
-##################
-# DATE UTILITIES #
-##################
-
-@dataclass
-class TradingDay():
-    """
-    A dataclass holding information for a single day the market is open, like the date.
-    This dataclass also stores the market open time and close time in the ISO-8601
-    format.
-    """
-    date: str
-    open_time_iso: str
-    close_time_iso: str
-
-
-def get_list_of_trading_days_in_range(alpaca_api, start_date, end_date):
-    """
-    DOC:
-    """
-    raw_market_days = get_raw_trading_dates_in_range(alpaca_api, start_date, end_date)
-    return get_trading_day_obj_list_from_date_list(raw_market_days)
-
-
-def get_raw_trading_dates_in_range(alpaca_api, start_date, end_date):
-    """
-    DOC:
-    """
-    return alpaca_api.trading.get_calendar(start_date, end_date)
-
-
-def get_trading_day_obj_list_from_date_list(trading_date_list):
-    """
-    DOC:
-    """
-    trading_days = []
-
-    for day in trading_date_list:
-
-        # Create a date object (from the datetime library) for the calendar date of the
-        # market day
-        trading_date = date(
-            day.date.year,
-            day.date.month,
-            day.date.day
-        )
-
-        # Grab the DST-aware timezone object for eastern time
-        timezone_ET = timezone("America/New_York")
-
-        # Create a datetime object for the opening time with the timezone info attached
-        open_time = timezone_ET.localize(datetime(
-            day.date.year,
-            day.date.month,
-            day.date.day,
-            day.open.hour,
-            day.open.minute
-        ))
-
-        # Create a datetime object for the closing time with the timezone info attached
-        close_time = timezone_ET.localize(datetime(
-            day.date.year,
-            day.date.month,
-            day.date.day,
-            day.close.hour,
-            day.close.minute
-        ))
-
-        # Convert the opening and closing times to ISO-8601
-        # Literally dont even fucking ask me how long it took to get the data in the
-        # right format for this to work.
-        open_time = open_time.isoformat()
-        close_time = close_time.isoformat()
-
-        # Create a TradingDay object with the right open/close times and append it to
-        # the list of all such TradingDay objects within the span between start_date and
-        # end_date
-        trading_day = TradingDay(trading_date, open_time, close_time)
-        trading_days.append(trading_day)
-
-    return trading_days

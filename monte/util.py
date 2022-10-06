@@ -4,12 +4,12 @@ import gzip
 import json
 import os
 import re
-from typing import Dict
+from typing import TypeVar
 
 import asks
 import pandas as pd
 import trio
-from alpaca_trade_api import REST
+from alpaca_trade_api import REST, TimeFrame
 
 #############
 # CONSTANTS #
@@ -27,7 +27,10 @@ CRYPTO_BASE_URL = "https://data.alpaca.markets/v1beta1/crypto"
 class AsyncAlpacaBars():
     """DOC:"""
 
-    def __init__(self, key_id, secret_id, base_url) -> None:
+    headers: dict[str, str]
+    base_url: str
+
+    def __init__(self, key_id: str, secret_id: str, base_url: str) -> None:
         """DOC:"""
         # HTTPS header, this contains the API key info to authenticate with Alpaca
         self.headers = {
@@ -38,8 +41,8 @@ class AsyncAlpacaBars():
         # The base url is something like "https://data.alpaca.markets"
         self.base_url = base_url
 
-    async def get_bars(self, symbol, time_frame, start_date, end_date, output_dict, adjustment='all',
-                       limit=10000):
+    async def get_bars(self, symbol: str, time_frame: TimeFrame, start_date: str, end_date: str,
+                       output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
         """DOC:"""
 
         # TODO: Format output as a dataframe, and sort by timestamp
@@ -76,7 +79,11 @@ class AsyncAlpacaBars():
                     raise ValueError(
                         f"Alpaca does not have any data for {symbol} between {start_date} and {end_date}")
 
-            # If the response code was not 200, something went wrong. Raise an error.
+            # Response code 500 means "internal error", retry with the same parameters
+            elif response.status_code == 500:
+                continue
+
+            # Something went wrong and we can't recover. Raise an error.
             else:
                 raise ConnectionError(
                     f"Bad response from Alpaca with response code: {response.status_code}")
@@ -98,14 +105,10 @@ class AsyncAlpacaBars():
         # Put the data into a dataframe
         df = pd.DataFrame(list_of_bars)
 
-        # If an output_dict is
-        if output_dict is not None:
-            output_dict[symbol] = df
-        else:
-            return df
+        output_dict[symbol] = df
 
-    def get_bulk_bars(self, symbols, time_frame, start_date, end_date,
-                      adjustment='all', limit=10000) -> Dict[str, pd.DataFrame]:
+    def get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: str, end_date: str,
+                      adjustment: str = 'all', limit: int = 10000) -> dict[str, pd.DataFrame]:
 
         output_dict = {}
 
@@ -121,16 +124,28 @@ class AsyncAlpacaBars():
 
         return output_dict
 
-    async def _async_get_bulk_bars(self, symbols, time_frame, start_date, end_date, output_dict,
-                                   adjustment='all', limit=10000) -> None:
+    async def _async_get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: str, end_date: str, output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
         async with trio.open_nursery() as n:
             for symbol in symbols:
-                n.start_soon(self.get_bars, symbol, time_frame, start_date,
-                             end_date, output_dict, adjustment, limit)
+                n.start_soon(
+                    self.get_bars,
+                    symbol,
+                    time_frame,
+                    start_date,
+                    end_date,
+                    output_dict,
+                    adjustment,
+                    limit)
 
 
 class AlpacaAPIBundle():
     """DOC:"""
+
+    _trading_instances: list[REST]
+    _market_data_instances: list[REST]
+    _crypto_instances: list[REST]
+    _async_market_data_instances: list[AsyncAlpacaBars]
+    T = TypeVar('T')
 
     def __init__(self) -> None:
         # Get the repo dir as a string
@@ -215,7 +230,7 @@ class AlpacaAPIBundle():
 
         return lru_instance
 
-    def _create_api_instances(self, api_class, endpoint):
+    def _create_api_instances(self, api_class: T, endpoint: str) -> list[T]:
         """DOC:"""
         api_instance_list = []
 
@@ -232,7 +247,7 @@ class AlpacaAPIBundle():
 
         return api_instance_list
 
-    def _get_repo_dir(self):
+    def _get_repo_dir(self) -> str:
         """DOC:"""
         repo_name_matches = re.findall(f"^.*monte{os.sep}monte", __file__)
 

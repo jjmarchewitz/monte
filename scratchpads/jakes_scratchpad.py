@@ -17,7 +17,7 @@ def main():
         derived_columns={},
         max_rows_in_df=500,
         start_buffer_size=timedelta(days=5),
-        data_buffer_size=timedelta(weeks=1),
+        data_buffer_size=timedelta(weeks=25),
     )
 
     am = asset_manager.AssetManager(alpaca_api, machine_settings)

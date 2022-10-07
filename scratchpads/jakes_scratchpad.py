@@ -11,7 +11,7 @@ def main():
     machine_settings = machine.MachineSettings(
         start_date="2016-09-09",
         end_date="2022-10-04",
-        time_frame=TimeFrame(1, TimeFrameUnit.Minute),
+        time_frame=TimeFrame(1, TimeFrameUnit.Hour),
         derived_columns={},
         max_rows_in_df=500,
         start_buffer_days=5,  # TradingDays
@@ -20,19 +20,17 @@ def main():
 
     am = asset_manager.AssetManager(alpaca_api, machine_settings)
 
-    symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
-               "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC", "ABBV",
-               "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS", "ABT",
-               "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE", "ROK"]
+    # symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
+    #            "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC", "ABBV",
+    #            "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS", "ABT",
+    #            "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE", "ROK"]
 
-    # symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA"]
+    symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA"]
 
     # symbols = ["AAPL"]
 
     for symbol in symbols:
         am.watch_asset(symbol)
-
-    breakpoint()
 
     count = 0
 

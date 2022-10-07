@@ -114,8 +114,16 @@ class Asset:
         self.symbol = symbol
 
         # Columns that come from the Alpaca API
-        # TODO: add datetime object column
-        self.base_columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'trade_count', 'vwap']
+        self.base_columns = [
+            'timestamp',
+            'open',
+            'high',
+            'low',
+            'close',
+            'volume',
+            'trade_count',
+            'vwap',
+            'datetime']
 
         # Create empty dataframes
         self.reset_df()
@@ -147,6 +155,7 @@ class Asset:
             row_datetime = isoparse(row.t)
 
             date_in_buffer_range = False
+            dropped = False
 
             for trading_day in trading_days_in_buffer_range:
 
@@ -174,6 +183,9 @@ class Asset:
             "n": self.base_columns[6],  # trade_count
             "vw": self.base_columns[7],  # vwap
         }, inplace=True)
+
+        # Add datetimes as a column
+        self.buffer[self.base_columns[8]] = self.buffer.apply(lambda row: isoparse(row.timestamp), axis=1)
 
     def increment_dataframe(self):
         """DOC:"""
@@ -270,6 +282,8 @@ class AssetManager:
 
     def _populate_buffers(self, symbols, buffer_start_date: str, buffer_end_date: str):
         """DOC:"""
+
+        # TODO: put get_bulk_bars on another process, make this a call to mp.Queue.get()
 
         # Get the bars for all assets from the calculated date range as a dictionary
         bars_for_all_assets = self.alpaca_api.async_market_data_bars.get_bulk_bars(

@@ -45,8 +45,6 @@ class AsyncAlpacaBars():
                        output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
         """DOC:"""
 
-        # TODO: Format output as a dataframe, and sort by timestamp
-
         # Create an empty list to store all of the bars received from Alpaca
         list_of_bars = []
 

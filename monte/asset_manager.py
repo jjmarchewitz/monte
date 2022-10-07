@@ -6,7 +6,6 @@ from datetime import date, datetime, timedelta
 import pandas as pd
 from alpaca_trade_api import TimeFrameUnit
 from dateutil.parser import isoparse
-from more_itertools import windowed
 from pytz import timezone
 
 from monte import machine, util
@@ -134,6 +133,9 @@ class Asset:
 
     def populate_buffer(self, df, buffer_start_date, buffer_end_date):
         """DOC:"""
+
+        # TODO: Derived columns
+
         self.buffer = df
 
         trading_days_in_buffer_range = get_list_of_trading_days_in_range(
@@ -259,10 +261,12 @@ class AssetManager:
         # The end date is the minimum between the current trading date plus the data buffer size, and
         # the last trading date. In other words, the buffer end date will be one "data buffer size" past
         # the start date unless that end date is past the end date of the whole simulation.
-        self.most_recent_buffer_end_date = min(
-            (self.trading_days[0].date + self.machine_settings.data_buffer_size),
-            self.trading_days[-1].date
-        ).isoformat()
+        if self.machine_settings.data_buffer_days > len(self.trading_days):
+            self.most_recent_buffer_end_date = self.trading_days[-1]
+        else:
+            self.most_recent_buffer_end_date = self.trading_days[self.machine_settings.data_buffer_days]
+
+        self.most_recent_buffer_end_date = self.most_recent_buffer_end_date.date.isoformat()
 
     def _populate_buffers(self, symbols, buffer_start_date: str, buffer_end_date: str):
         """DOC:"""
@@ -286,11 +290,13 @@ class AssetManager:
     def add_start_buffer_data(self, symbol):
         """DOC:"""
 
-        buffer_start_date = (
-            self.trading_days[0].date -
-            self.machine_settings.start_buffer_size).isoformat()
+        trading_days_before_current = get_list_of_trading_days_in_range(
+            self.alpaca_api,
+            (self.trading_days[0].date - timedelta(days=2 * self.machine_settings.start_buffer_days)).isoformat(),
+            self.trading_days[0].date - timedelta(days=1))
 
-        buffer_end_date = self.trading_days[0].date.isoformat()
+        buffer_start_date = trading_days_before_current[-self.machine_settings.start_buffer_days].date.isoformat()
+        buffer_end_date = trading_days_before_current[-1].date.isoformat()
 
         self._populate_buffers([symbol], buffer_start_date, buffer_end_date)
 
@@ -324,8 +330,9 @@ class AssetManager:
                 self.trading_days[0].date.isoformat(),
                 self.most_recent_buffer_end_date)
 
-            # if isoparse(self.watched_assets[symbol].df.iloc[-1].timestamp).date() < self.trading_days[0].date:
-            #     self.watched_assets[symbol].increment_dataframe()
+            while isoparse(
+                    self.watched_assets[symbol].df.iloc[-1].timestamp).date() < self.trading_days[0].date:
+                self.watched_assets[symbol].increment_dataframe()
 
     def is_watching_asset(self, symbol: str) -> bool:
         """DOC:"""

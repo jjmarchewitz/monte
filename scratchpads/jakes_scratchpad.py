@@ -1,7 +1,5 @@
 """DOC:"""
 
-from datetime import timedelta
-
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 from monte import asset_manager, machine, util
@@ -13,38 +11,35 @@ def main():
     machine_settings = machine.MachineSettings(
         start_date="2016-09-09",
         end_date="2022-10-04",
-        time_frame=TimeFrame(1, TimeFrameUnit.Day),
+        time_frame=TimeFrame(1, TimeFrameUnit.Minute),
         derived_columns={},
         max_rows_in_df=500,
-        start_buffer_size=timedelta(days=5),
-        data_buffer_size=timedelta(weeks=52),
+        start_buffer_days=5,  # TradingDays
+        data_buffer_days=10,  # TradingDays
     )
 
     am = asset_manager.AssetManager(alpaca_api, machine_settings)
 
-    # symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
-    #            "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC", "ABBV",
-    #            "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS", "ABT",
-    #            "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE", "ROK"]
+    symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
+               "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC", "ABBV",
+               "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS", "ABT",
+               "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE", "ROK"]
 
     # symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA"]
 
-    symbols = ["AAPL"]
+    # symbols = ["AAPL"]
 
     for symbol in symbols:
         am.watch_asset(symbol)
 
-    # breakpoint()
+    breakpoint()
 
     count = 0
 
     while True:
 
-        if count == 3:
-            breakpoint()
-
-        if count == 3:
-            am.watch_asset("GOOG")
+        # if count < len(symbols):
+        #     am.watch_asset(symbols[count])
 
         try:
             am.increment_dataframes()

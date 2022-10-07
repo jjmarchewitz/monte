@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from datetime import timedelta
 
-from alpaca_trade_api import TimeFrame
+from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 
 class MachineSettings():
@@ -33,6 +33,12 @@ class MachineSettings():
         self.validate()
 
     def validate(self):
+
+        if self.time_frame.unit not in (TimeFrameUnit.Hour, TimeFrameUnit.Minute) and not (
+                self.time_frame.unit == TimeFrameUnit.Day and self.time_frame.amount == 1):
+            raise ValueError(
+                f"TimeFrames must be 1Day or shorter. The TimeFrame is currently set to {self.time_frame}")
+
         if self.data_buffer_size < timedelta(weeks=1):
             raise ValueError(
                 f"Data buffers need to be greater than or equal to 1 week. The current data buffer is {self.data_buffer_size}")

@@ -12,12 +12,12 @@ def main():
 
     machine_settings = machine.MachineSettings(
         start_date="2016-09-09",
-        end_date="2016-10-04",
-        time_frame=TimeFrame(1, TimeFrameUnit.Hour),
+        end_date="2022-10-04",
+        time_frame=TimeFrame(1, TimeFrameUnit.Day),
         derived_columns={},
         max_rows_in_df=500,
         start_buffer_size=timedelta(days=5),
-        data_buffer_size=timedelta(weeks=200),
+        data_buffer_size=timedelta(weeks=104),
     )
 
     am = asset_manager.AssetManager(alpaca_api, machine_settings)
@@ -32,22 +32,13 @@ def main():
     for symbol in symbols:
         am.watch_asset(symbol)
 
-    breakpoint()
-
-    # bb = alpaca_api.market_data.get_bars(
-    #     'AMZN', machine_settings.time_frame, machine_settings.start_date, machine_settings.end_date,
-    #     adjustment='all')
-
     while True:
-        # breakpoint()
         try:
             am.increment_dataframes()
         except StopIteration:
             break
         finally:
             print(f"{am['AAPL'].iloc[-1].timestamp} - ${round(am['AAPL'].iloc[-1].vwap, 2):.2f}")
-
-    # am.watched_assets['AAPL'].increment_dataframe()
 
     breakpoint()
 

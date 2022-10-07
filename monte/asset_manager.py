@@ -112,6 +112,7 @@ class Asset:
         self.machine_settings = machine_settings
 
         # Columns that come from the Alpaca API
+        # TODO: add datetime object column
         self.base_columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'trade_count', 'vwap']
 
         # Create empty dataframes
@@ -221,39 +222,18 @@ class AssetManager:
 
         # If any asset's data buffer is empty, populate all assets with new data
         if any(asset.buffer.empty for asset in self.watched_assets.values()):
-
-            symbols = self.watched_assets.keys()
-
-            # The start date of the current batch of data is the current/most recent trading day in ISO format
-            buffer_start_date = self.trading_days[0].date.isoformat()
-
-            # The end date of the current batch of data is the start date plus the
-            # data buffer size in ISO format
-            buffer_end_date = min(
-                (self.trading_days[0].date + self.machine_settings.data_buffer_size),
-                self.trading_days[-1].date
-            ).isoformat()
-
-            # Get the bars for all assets from the calculated date range as a dictionary
-            bars_for_all_assets = self.alpaca_api.async_market_data_bars.get_bulk_bars(
-                symbols,
-                self.machine_settings.time_frame,
-                buffer_start_date,
-                buffer_end_date)
-
-            # Add the data to each Asset instance's "buffer" DataFrame
-            for symbol in bars_for_all_assets.keys():
-                # DataFrame containing unfiltered data (i.e. bars that are outside normal market hours) that
-                # corresponds to the symbol at hand
-                df = bars_for_all_assets[symbol]
-
-                # Add the newly acquired data to the buffer
-                self.watched_assets[symbol].populate_buffer(df, buffer_start_date, buffer_end_date)
+            self._populate_buffers()
 
         # Then, add the next row of buffered data to the watched assets (update the asset DFs)
         for asset in self.watched_assets.values():
             asset.increment_dataframe()
 
+        # If the buffer dataframes are on the next day, pop off the current TradingDay instance so it matches
+        if self._trading_date_needs_to_be_incremented():
+            self.trading_days.pop(0)
+
+    def _trading_date_needs_to_be_incremented(self) -> bool:
+        """DOC:"""
         # Detect when the buffer dataframes have moved on past the current trading day (i.e. the TradingDay
         # instance at index 0 in self.trading_days).
         date_has_changed = False
@@ -273,9 +253,37 @@ class AssetManager:
             elif any(asset.buffer.empty for asset in self.watched_assets.values()):
                 raise StopIteration("Reached the end of simulation. No more trading days to run.")
 
-        # If the buffer dataframes are on the next day, pop off the current TradingDay instance so it matches
-        if date_has_changed:
-            self.trading_days.pop(0)
+        return date_has_changed
+
+    def _populate_buffers(self):
+        """DOC:"""
+        symbols = self.watched_assets.keys()
+
+        # The start date of the current batch of data is the current/most recent trading day in ISO format
+        buffer_start_date = self.trading_days[0].date.isoformat()
+
+        # The end date of the current batch of data is the start date plus the
+        # data buffer size in ISO format
+        buffer_end_date = min(
+            (self.trading_days[0].date + self.machine_settings.data_buffer_size),
+            self.trading_days[-1].date
+        ).isoformat()
+
+        # Get the bars for all assets from the calculated date range as a dictionary
+        bars_for_all_assets = self.alpaca_api.async_market_data_bars.get_bulk_bars(
+            symbols,
+            self.machine_settings.time_frame,
+            buffer_start_date,
+            buffer_end_date)
+
+        # Add the data to each Asset instance's "buffer" DataFrame
+        for symbol in bars_for_all_assets.keys():
+            # DataFrame containing unfiltered data (i.e. bars that are outside normal market hours) that
+            # corresponds to the symbol at hand
+            df = bars_for_all_assets[symbol]
+
+            # Add the newly acquired data to the buffer
+            self.watched_assets[symbol].populate_buffer(df, buffer_start_date, buffer_end_date)
 
     def watch_asset(self, symbol: str) -> None:
         """DOC:"""

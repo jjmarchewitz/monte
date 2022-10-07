@@ -34,8 +34,15 @@ class MachineSettings():
 
     def validate(self):
 
-        if self.time_frame.unit not in (TimeFrameUnit.Hour, TimeFrameUnit.Minute) and not (
-                self.time_frame.unit == TimeFrameUnit.Day and self.time_frame.amount == 1):
+        # if self.time_frame.unit not in (TimeFrameUnit.Hour, TimeFrameUnit.Minute) and not (
+        #         self.time_frame.unit == TimeFrameUnit.Day and self.time_frame.amount == 1):
+
+        if (
+            (self.time_frame.unit == TimeFrameUnit.Minute and self.time_frame.amount > 59) or
+            (self.time_frame.unit == TimeFrameUnit.Hour and self.time_frame.amount > 7) or  # 7 hours in a market day
+            (self.time_frame.unit == TimeFrameUnit.Day and self.time_frame.amount != 1) or
+            (self.time_frame.unit in (TimeFrameUnit.Week, TimeFrameUnit.Month))
+        ):
             raise ValueError(
                 f"TimeFrames must be 1Day or shorter. The TimeFrame is currently set to {self.time_frame}")
 

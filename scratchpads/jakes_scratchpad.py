@@ -33,6 +33,9 @@ def main():
         am.watch_asset(symbol)
 
     while True:
+
+        # breakpoint()
+
         try:
             am.increment_dataframes()
         except StopIteration:

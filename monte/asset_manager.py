@@ -1,10 +1,12 @@
 """DOC:"""
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import pandas as pd
+from alpaca_trade_api import TimeFrameUnit
 from dateutil.parser import isoparse
+from more_itertools import windowed
 from pytz import timezone
 
 from monte import machine, util
@@ -121,12 +123,6 @@ class Asset:
 
         # TODO: start buffer
 
-        # self._next_row_index = 0
-
-    # @property
-    # def price(self):
-    #     return self.df.tail(1).vwap
-
     def reset_df(self) -> None:
         """DOC:"""
         columns = self.base_columns.copy()
@@ -155,10 +151,14 @@ class Asset:
             date_in_buffer_range = False
 
             for trading_day in trading_days_in_buffer_range:
+
+                # Check that the date is a valid day where the market was open
                 if row_datetime.date() == trading_day.date:
                     date_in_buffer_range = True
 
-                    if row_datetime < trading_day.open_time or row_datetime > trading_day.close_time:
+                    # If the TimeFrameUnit
+                    if (self.machine_settings.time_frame.unit != TimeFrameUnit.Day and (
+                            row_datetime < trading_day.open_time or row_datetime > trading_day.close_time)):
                         self.buffer.drop(index, inplace=True)
 
             if not date_in_buffer_range:
@@ -232,28 +232,15 @@ class AssetManager:
         if self._trading_date_needs_to_be_incremented():
             self.trading_days.pop(0)
 
-    def _trading_date_needs_to_be_incremented(self) -> bool:
-        """DOC:"""
-        # Detect when the buffer dataframes have moved on past the current trading day (i.e. the TradingDay
-        # instance at index 0 in self.trading_days).
-        date_has_changed = False
+        # If any buffers are empty at this point, that means they just ran out of data on the last
+        # asset.increment_dataframe() call. A new buffer's worth of data must be requested from Alpaca
+        # and another trading day must be skipped so that the new data does not overlap with the current
+        # data. Without this, they overlap by one day.
+        if any(asset.buffer.empty for asset in self.watched_assets.values()):
+            self.trading_days.pop(0)
 
-        for asset in self.watched_assets.values():
-            most_recent_row_timestamp = isoparse(asset.df.iloc[-1].timestamp)
-
-            if len(self.trading_days) > 1:
-
-                if most_recent_row_timestamp.date() != self.trading_days[0].date:
-
-                    if most_recent_row_timestamp.date() == self.trading_days[1].date:
-                        date_has_changed = True
-
-            # If any buffer is empty with only the current trading day remaining in the list, then iteration
-            # is complete
-            elif any(asset.buffer.empty for asset in self.watched_assets.values()):
-                raise StopIteration("Reached the end of simulation. No more trading days to run.")
-
-        return date_has_changed
+        if len(self.trading_days) == 0:
+            raise StopIteration("Reached the end of simulation. No more trading days to run.")
 
     def _populate_buffers(self):
         """DOC:"""
@@ -262,8 +249,9 @@ class AssetManager:
         # The start date of the current batch of data is the current/most recent trading day in ISO format
         buffer_start_date = self.trading_days[0].date.isoformat()
 
-        # The end date of the current batch of data is the start date plus the
-        # data buffer size in ISO format
+        # The end date is the minimum between the current trading date plus the data buffer size, and
+        # the last trading date. In other words, the buffer end date will be one "data buffer size" past
+        # the start date unless that end date is past the end date of the whole simulation.
         buffer_end_date = min(
             (self.trading_days[0].date + self.machine_settings.data_buffer_size),
             self.trading_days[-1].date
@@ -284,6 +272,29 @@ class AssetManager:
 
             # Add the newly acquired data to the buffer
             self.watched_assets[symbol].populate_buffer(df, buffer_start_date, buffer_end_date)
+
+    def _trading_date_needs_to_be_incremented(self) -> bool:
+        """DOC:"""
+        # Detect when the buffer dataframes have moved on past the current trading day (i.e. the TradingDay
+        # instance at index 0 in self.trading_days).
+        date_has_changed = False
+
+        for asset in self.watched_assets.values():
+            most_recent_row_timestamp = isoparse(asset.df.iloc[-1].timestamp)
+
+            if len(self.trading_days) > 1:
+
+                if most_recent_row_timestamp.date() != self.trading_days[0].date:
+                    if most_recent_row_timestamp.date() == self.trading_days[1].date:
+                        date_has_changed = True
+
+                # # If the buffer is empty but there are more trading days left, the trading date needs to
+                # # be incremented.
+                # elif asset.buffer.empty:
+                #     breakpoint()
+                #     date_has_changed = True
+
+        return date_has_changed
 
     def watch_asset(self, symbol: str) -> None:
         """DOC:"""

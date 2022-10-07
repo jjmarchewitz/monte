@@ -83,6 +83,12 @@ class AsyncAlpacaBars():
             elif response.status_code == 500:
                 continue
 
+            elif response.status_code == 400 and len(list_of_bars) >= limit:
+                raise OverflowError(
+                    "Hit the limit of 10,000 rows in a single request from alpaca. To get around this, "
+                    "consider making your data buffer size smaller. This will break up the request into "
+                    "smaller requests.")
+
             # Something went wrong and we can't recover. Raise an error.
             else:
                 raise ConnectionError(

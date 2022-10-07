@@ -24,7 +24,6 @@ class TradingDay():
     date: date
     open_time: datetime
     close_time: datetime
-    # df: Optional[pd.DataFrame]
 
 
 def get_list_of_trading_days_in_range(alpaca_api, start_date, end_date):
@@ -112,20 +111,30 @@ class Asset:
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
 
+        # Columns that come from the Alpaca API
+        self.base_columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'trade_count', 'vwap']
+
         # Create empty dataframes
         self.reset_df()
         self.reset_buffer()
 
+        # TODO: start buffer
+
+        # self._next_row_index = 0
+
+    # @property
+    # def price(self):
+    #     return self.df.tail(1).vwap
+
     def reset_df(self) -> None:
         """DOC:"""
-        columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'trade_count', 'vwap']
+        columns = self.base_columns.copy()
         columns.extend(self.machine_settings.derived_columns.keys())
         self.df = pd.DataFrame({}, columns=columns)
 
     def reset_buffer(self) -> None:
         """DOC:"""
-        columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'trade_count', 'vwap']
-        self.buffer = pd.DataFrame({}, columns=columns)
+        self.buffer = pd.DataFrame({}, columns=self.base_columns)
 
     def populate_buffer(self, df, buffer_start_date, buffer_end_date):
         """DOC:"""
@@ -155,6 +164,29 @@ class Asset:
                 self.buffer.drop(index, inplace=True)
 
         self.buffer.reset_index(drop=True, inplace=True)
+
+        self.buffer.rename(columns={
+            "t": self.base_columns[0],  # timestamp
+            "o": self.base_columns[1],  # open
+            "h": self.base_columns[2],  # high
+            "l": self.base_columns[3],  # low
+            "c": self.base_columns[4],  # close
+            "v": self.base_columns[5],  # volume
+            "n": self.base_columns[6],  # trade_count
+            "vw": self.base_columns[7],  # vwap
+        }, inplace=True)
+
+    def increment_dataframe(self):
+        """DOC:"""
+
+        latest_row = self.buffer.head(1)
+
+        self.df = pd.concat(objs=[self.df, latest_row], ignore_index=True)
+
+        self.buffer.drop(self.buffer.head(1).index, inplace=True)
+
+        if len(self.df.index) > self.machine_settings.max_rows_in_df:
+            self.df.drop(self.df.head(1).index, inplace=True)
 
 
 class AssetManager:
@@ -188,41 +220,62 @@ class AssetManager:
         """DOC:"""
 
         # If any asset's data buffer is empty, populate all assets with new data
-        # TODO: add conditional
+        if any(asset.buffer.empty for asset in self.watched_assets.values()):
 
-        symbols = self.watched_assets.keys()
+            symbols = self.watched_assets.keys()
 
-        # The start date of the current batch of data is the current/most recent trading day in ISO format
-        buffer_start_date = self.trading_days[0].date.isoformat()
+            # The start date of the current batch of data is the current/most recent trading day in ISO format
+            buffer_start_date = self.trading_days[0].date.isoformat()
 
-        # The end date of the current batch of data is the start date plus the data buffer size in ISO format
-        buffer_end_date = min(
-            (self.trading_days[0].date + self.machine_settings.data_buffer_size),
-            self.trading_days[-1].date
-        ).isoformat()
+            # The end date of the current batch of data is the start date plus the
+            # data buffer size in ISO format
+            buffer_end_date = min(
+                (self.trading_days[0].date + self.machine_settings.data_buffer_size),
+                self.trading_days[-1].date
+            ).isoformat()
 
-        # Get the bars for all assets from the calculated date range as a dictionary
-        bars_for_all_assets = self.alpaca_api.async_market_data_bars.get_bulk_bars(
-            symbols,
-            self.machine_settings.time_frame,
-            buffer_start_date,
-            buffer_end_date)
+            # Get the bars for all assets from the calculated date range as a dictionary
+            bars_for_all_assets = self.alpaca_api.async_market_data_bars.get_bulk_bars(
+                symbols,
+                self.machine_settings.time_frame,
+                buffer_start_date,
+                buffer_end_date)
 
-        # Add the data to each Asset instance's "buffer" DataFrame
-        for symbol in bars_for_all_assets.keys():
-            # DataFrame containing unfiltered data (i.e. bars that are outside normal market hours) that
-            # corresponds to the symbol at hand
-            df = bars_for_all_assets[symbol]
+            # Add the data to each Asset instance's "buffer" DataFrame
+            for symbol in bars_for_all_assets.keys():
+                # DataFrame containing unfiltered data (i.e. bars that are outside normal market hours) that
+                # corresponds to the symbol at hand
+                df = bars_for_all_assets[symbol]
 
-            # Add the newly acquired data to the buffer
-            self.watched_assets[symbol].populate_buffer(df, buffer_start_date, buffer_end_date)
-
-        breakpoint()
+                # Add the newly acquired data to the buffer
+                self.watched_assets[symbol].populate_buffer(df, buffer_start_date, buffer_end_date)
 
         # Then, add the next row of buffered data to the watched assets (update the asset DFs)
+        for asset in self.watched_assets.values():
+            asset.increment_dataframe()
 
-        # TODO: Figure out when to remove the current trading day from the list.
-        # Need to detect when the day changes. Maybe inside the "then" block above
+        # Detect when the buffer dataframes have moved on past the current trading day (i.e. the TradingDay
+        # instance at index 0 in self.trading_days).
+        date_has_changed = False
+
+        for asset in self.watched_assets.values():
+            most_recent_row_timestamp = isoparse(asset.df.iloc[-1].timestamp)
+
+            if len(self.trading_days) > 1:
+
+                if most_recent_row_timestamp.date() != self.trading_days[0].date:
+
+                    if most_recent_row_timestamp.date() == self.trading_days[1].date:
+                        date_has_changed = True
+
+            # If any buffer is empty with only the current trading day remaining in the list, then iteration
+            # is complete
+            elif any(asset.buffer.empty for asset in self.watched_assets.values()):
+                raise StopIteration("Reached the end of simulation. No more trading days to run.")
+
+        # If the buffer dataframes are on the next day, pop off the current TradingDay instance so it matches
+        if date_has_changed:
+            self.trading_days.pop(0)
 
     def watch_asset(self, symbol: str) -> None:
         """DOC:"""

@@ -222,7 +222,18 @@ class AssetManager:
 
         # If any asset's data buffer is empty, populate all assets with new data
         if any(asset.buffer.empty for asset in self.watched_assets.values()):
-            self._populate_buffers()
+            # The start date of the current batch of data is the current/most recent trading day in ISO format
+            buffer_start_date = self.trading_days[0].date.isoformat()
+
+            # The end date is the minimum between the current trading date plus the data buffer size, and
+            # the last trading date. In other words, the buffer end date will be one "data buffer size" past
+            # the start date unless that end date is past the end date of the whole simulation.
+            buffer_end_date = min(
+                (self.trading_days[0].date + self.machine_settings.data_buffer_size),
+                self.trading_days[-1].date
+            ).isoformat()
+
+            self._populate_buffers(buffer_start_date, buffer_end_date)
 
         # Then, add the next row of buffered data to the watched assets (update the asset DFs)
         for asset in self.watched_assets.values():
@@ -242,20 +253,10 @@ class AssetManager:
         if len(self.trading_days) == 0:
             raise StopIteration("Reached the end of simulation. No more trading days to run.")
 
-    def _populate_buffers(self):
+    def _populate_buffers(self, buffer_start_date: str, buffer_end_date: str):
         """DOC:"""
+
         symbols = self.watched_assets.keys()
-
-        # The start date of the current batch of data is the current/most recent trading day in ISO format
-        buffer_start_date = self.trading_days[0].date.isoformat()
-
-        # The end date is the minimum between the current trading date plus the data buffer size, and
-        # the last trading date. In other words, the buffer end date will be one "data buffer size" past
-        # the start date unless that end date is past the end date of the whole simulation.
-        buffer_end_date = min(
-            (self.trading_days[0].date + self.machine_settings.data_buffer_size),
-            self.trading_days[-1].date
-        ).isoformat()
 
         # Get the bars for all assets from the calculated date range as a dictionary
         bars_for_all_assets = self.alpaca_api.async_market_data_bars.get_bulk_bars(

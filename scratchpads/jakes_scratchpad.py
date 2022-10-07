@@ -13,11 +13,11 @@ def main():
     machine_settings = machine.MachineSettings(
         start_date="2016-09-09",
         end_date="2022-10-04",
-        time_frame=TimeFrame(1, TimeFrameUnit.Day),
+        time_frame=TimeFrame(1, TimeFrameUnit.Hour),
         derived_columns={},
         max_rows_in_df=500,
         start_buffer_size=timedelta(days=5),
-        data_buffer_size=timedelta(weeks=104),
+        data_buffer_size=timedelta(weeks=52),
     )
 
     am = asset_manager.AssetManager(alpaca_api, machine_settings)

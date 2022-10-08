@@ -4,11 +4,8 @@ from __future__ import annotations
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
-import monte.asset_manager as asset_manager
-import monte.machine as machine
-import monte.machine_settings as machine_settings
-import monte.util as util
 from algorithms import test
+from monte import machine, machine_settings, util
 
 
 def main():
@@ -33,8 +30,6 @@ def main():
     algo1 = test.TestAlg(alpaca_api, ms)
 
     trading_machine.add_algo_instance(algo1)
-
-    breakpoint()
 
     trading_machine.run()
 

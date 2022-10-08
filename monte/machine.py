@@ -46,7 +46,9 @@ class TradingMachine():
 
             # A
             for algo in self.algo_instances:
-                processed_orders = algo.get_portfolio().process_pending_orders()
+                portfolio = algo.get_portfolio()
+                processed_orders = portfolio.process_pending_orders()
+                portfolio.delete_empty_positions()
                 algo.run_one_time_frame(processed_orders)
 
             # B

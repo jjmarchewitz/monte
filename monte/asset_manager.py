@@ -8,9 +8,7 @@ from alpaca_trade_api import TimeFrameUnit, entity
 from dateutil.parser import isoparse
 from pytz import timezone
 
-import monte.machine as machine
-import monte.machine_settings as machine_settings
-import monte.util as util
+from monte import machine_settings, util
 
 ##################
 # DATE UTILITIES #
@@ -192,6 +190,9 @@ class Asset:
         # Create empty dataframes
         self.reset_df()
         self.reset_buffer()
+
+    def price(self):
+        return self.df.iloc[-1].vwap
 
     def reset_df(self) -> None:
         """

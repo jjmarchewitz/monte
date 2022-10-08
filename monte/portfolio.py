@@ -1,44 +1,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from enum import Enum
 from typing import Union
 
 import monte.asset_manager as asset_manager
 import monte.machine_settings as machine_settings
 import monte.position as position
 import monte.util as util
-
-
-class OrderType(Enum):
-    """
-    An Enum holding a value for an order either being a buy or a sell order.
-    """
-    BUY = 1
-    SELL = 2
-
-
-class OrderStatus(Enum):
-    """
-    An Enum holding a value for the status of an order (pending, completed, failed).
-    """
-    PENDING = 1
-    COMPLETED = 2
-    FAILED = 3
-    CANCELLED = 4
-
-
-@dataclass
-class Order():
-    """
-    A dataclass that represents a market order.
-    """
-    id_number: int
-    symbol: str
-    quantity: float
-    order_type: OrderType
-    status: OrderStatus
+from monte.orders import Order, OrderStatus, OrderType
 
 
 class Portfolio():
@@ -88,7 +57,10 @@ class Portfolio():
     def __getitem__(self, key: str) -> position.Position:
         return self.positions[key]
 
-    def _delete_empty_positions(self) -> None:
+    def items(self):
+        return self.positions.items()
+
+    def delete_empty_positions(self) -> None:
         """DOC:"""
         for symbol in list(self.positions.keys()):
             if self.positions[symbol].quantity == 0:
@@ -97,6 +69,10 @@ class Portfolio():
     def contains_position(self, symbol: str) -> bool:
         """DOC:"""
         return symbol in self.positions.keys()
+
+    def _create_position(self, symbol: str, initial_quantity: int) -> position.Position:
+        """DOC:"""
+        return position.Position(self.alpaca_api, self.machine_settings, self.am, symbol, initial_quantity)
 
     def total_value(self) -> float:
         """DOC:"""
@@ -169,12 +145,15 @@ class Portfolio():
 
             # Process the order based on buy/sell
             if order.order_type == OrderType.BUY:
-                processed_order = self._execute_buy_order(order)
+                self._execute_buy_order(order)
             elif order.order_type == OrderType.SELL:
-                processed_order = self._execute_sell_order(order)
+                self._execute_sell_order(order)
 
-            if processed_order.status == OrderStatus.PENDING:
+            # Add the order back to the queue if it is still pending
+            if order.status == OrderStatus.PENDING:
                 new_order_queue.append(order)
+
+            # Add the order to the output list if it completed or failed
             else:
                 list_of_processed_orders.append(order)
 
@@ -182,13 +161,47 @@ class Portfolio():
 
         return list_of_processed_orders
 
-    def _execute_buy_order(self, order):
-        breakpoint()
-        pass
+    def _execute_buy_order(self, order: Order) -> None:
+        """DOC:"""
+        order_cost = self.am[order.symbol].iloc[-1].vwap * order.quantity
 
-    def _execute_sell_order(self, order):
-        breakpoint()
-        pass
+        # If the portfolio has insufficient funds to make the purchase, the order fails
+        if self.cash < order_cost:
+            order.status = OrderStatus.FAILED
+
+        # Otherwise, execute the order
+        else:
+            # Take the money out of the portfolio's account
+            self.cash -= order_cost
+
+            # If there is an existing position for this symbol, add to its existing quantity
+            if self.contains_position(order.symbol):
+                self.positions[order.symbol].quantity += order.quantity
+
+            # If no position exists for this symbol, create a new one
+            else:
+                self.positions[order.symbol] = self._create_position(order.symbol, order.quantity)
+
+            # Update the order status
+            order.status = OrderStatus.COMPLETED
+
+    def _execute_sell_order(self, order: Order) -> None:
+        """DOC:"""
+
+        # If the portfolio doesn't contain the symbol being sold, the order fails
+        if not self.contains_position(order.symbol):
+            order.status = OrderStatus.FAILED
+
+        else:
+            # If the portfolio has too little of the asset for this sell order, the order fails
+            if self.positions[order.symbol].quantity < order.quantity:
+                order.status = OrderStatus.FAILED
+
+            # Otherwise, execute the order
+            else:
+                self.positions[order.symbol].quantity -= order.quantity
+                self.cash += self.am[order.symbol].iloc[-1].vwap * order.quantity
+                order.status = OrderStatus.COMPLETED
 
     def copy(self):
-        pass
+        raise NotImplementedError

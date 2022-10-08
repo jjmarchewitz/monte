@@ -4,6 +4,7 @@ import monte.machine_settings as machine_settings
 import monte.portfolio as portfolio
 import monte.util as util
 from monte.algorithm import Algorithm
+from monte.orders import Order, OrderType
 
 
 class TestAlg(Algorithm):
@@ -13,7 +14,6 @@ class TestAlg(Algorithm):
 
     def __init__(self, alpaca_api: util.AlpacaAPIBundle,
                  machine_settings: machine_settings.MachineSettings) -> None:
-        super().__init__()
 
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
@@ -29,12 +29,17 @@ class TestAlg(Algorithm):
 
         # symbols = ["AAPL"]
 
+    def get_portfolio(self) -> portfolio.Portfolio:
+        return self.portfolio
+
     def startup(self) -> None:
         for symbol in self.symbols:
             self.portfolio.watch(symbol)
 
-    def get_portfolio(self) -> portfolio.Portfolio:
-        return self.portfolio
+        for symbol in self.symbols:
+            self.portfolio.place_order(symbol, 10, OrderType.BUY)
 
-    def run_one_time_frame(self, processed_orders):
-        pass
+    def run_one_time_frame(self, processed_orders: list[Order]):
+
+        for symbol in self.symbols:
+            self.portfolio.place_order(symbol, 1, OrderType.SELL)

@@ -62,7 +62,7 @@ class Portfolio():
     def items(self):
         return self.positions.items()
 
-    def get_symbol(self, symbol) -> Union[pd.DataFrame, None]:
+    def get_data(self, symbol) -> Union[pd.DataFrame, None]:
         result = None
 
         if self.am.is_watching_asset(symbol):

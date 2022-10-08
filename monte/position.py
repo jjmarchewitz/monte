@@ -3,9 +3,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import monte.asset_manager as asset_manager
-import monte.machine_settings as machine_settings
-import monte.util as util
+from monte import asset_manager, machine_settings, util
 
 
 class Position():

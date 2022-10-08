@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import monte.portfolio as portfolio
+from monte import portfolio
 
 
 class Algorithm():

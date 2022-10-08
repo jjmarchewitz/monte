@@ -1,11 +1,7 @@
 """DOC:"""
 from __future__ import annotations
 
-import monte.algorithm as algorithm
-import monte.asset_manager as asset_manager
-import monte.machine_settings as machine_settings
-import monte.portfolio as portfolio
-import monte.util as util
+from monte import algorithm, asset_manager, machine_settings, portfolio, util
 
 
 class TradingMachine():
@@ -35,23 +31,20 @@ class TradingMachine():
     def run(self):
         """DOC:"""
 
+        # Run startup code for algorithms
         for algo in self.algo_instances:
             algo.startup()
 
         while True:
 
-            # TODO: Test the order of these blocks
-
-            print(self.am['AAPL'].iloc[-1].datetime.isoformat())
-
-            # A
+            # Process any orders and run each algorithm
             for algo in self.algo_instances:
                 portfolio = algo.get_portfolio()
                 processed_orders = portfolio.process_pending_orders()
                 portfolio.delete_empty_positions()
                 algo.run_one_time_frame(processed_orders)
 
-            # B
+            # Update the dataframes in the asset_manager
             try:
                 self.am.increment_dataframes()
             except StopIteration:

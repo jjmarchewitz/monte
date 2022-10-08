@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import monte.machine_settings as machine_settings
-import monte.portfolio as portfolio
-import monte.util as util
+from monte import machine_settings, portfolio, util
 from monte.algorithm import Algorithm
 from monte.orders import Order, OrderType
 

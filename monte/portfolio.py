@@ -3,10 +3,7 @@ from __future__ import annotations
 
 from typing import Union
 
-import monte.asset_manager as asset_manager
-import monte.machine_settings as machine_settings
-import monte.position as position
-import monte.util as util
+from monte import asset_manager, machine_settings, position, util
 from monte.orders import Order, OrderStatus, OrderType
 
 

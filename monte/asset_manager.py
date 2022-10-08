@@ -326,6 +326,9 @@ class AssetManager:
         self.watched_assets = {}  # Dict of Assets
         self.trading_days = get_list_of_trading_days_in_range(
             self.alpaca_api, self.machine_settings.start_date, self.machine_settings.end_date)
+
+        # self._calculate_list_of_buffer_dates()
+
         self._set_next_buffer_dates()
 
     def __setitem__(self, key: str, value) -> None:
@@ -337,6 +340,10 @@ class AssetManager:
             raise KeyError("Only strings are accepted as keys for this object.")
 
         return self.watched_assets[key].df
+
+    def cleanup(self) -> None:
+        # TODO: Join on the process
+        pass
 
     def items(self) -> dict[str, Asset]:
         """DOC:"""
@@ -371,6 +378,19 @@ class AssetManager:
 
         if len(self.trading_days) == 0:
             raise StopIteration("Reached the end of simulation. No more trading days to run.")
+
+    def _calculate_list_of_buffer_dates(self) -> list[tuple[TradingDay, TradingDay]]:
+        """DOC:"""
+
+        finished = False
+        start_index = 0
+        end_index = self.machine_settings.data_buffer_days - 1
+
+        while not finished:
+
+            buffer_start_date = self.trading_days[0].date.isoformat()
+
+        breakpoint()
 
     def _set_next_buffer_dates(self):
         """DOC:"""

@@ -32,6 +32,7 @@ def main():
 
     trading_machine = TradingMachine(alpaca_api, ms)
 
+    # TODO: Buy and hold algorithm
     algo1 = test.TestAlg(alpaca_api, ms)
 
     trading_machine.add_algo_instance(algo1)

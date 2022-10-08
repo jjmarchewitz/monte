@@ -38,6 +38,7 @@ class TradingMachine():
         for algo in self.algo_instances:
             algo.startup()
 
+        # Run the algorithms
         while True:
 
             # Process any orders and run each algorithm
@@ -56,3 +57,6 @@ class TradingMachine():
         # Run cleanup code for algorithms
         for algo in self.algo_instances:
             algo.cleanup()
+
+        # Run cleanup code for asset_manager
+        self.am.cleanup()

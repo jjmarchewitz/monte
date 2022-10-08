@@ -49,6 +49,3 @@ class TradingMachine():
                 self.am.increment_dataframes()
             except StopIteration:
                 break
-
-
-# Increment dataframes, then run algo

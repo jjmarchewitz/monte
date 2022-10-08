@@ -9,6 +9,7 @@ class TestAlg(Algorithm):
 
     alpaca_api: util.AlpacaAPIBundle
     machine_settings: machine_settings.MachineSettings
+    portfolio: portfolio.Portfolio
 
     def __init__(self, alpaca_api: util.AlpacaAPIBundle,
                  machine_settings: machine_settings.MachineSettings) -> None:
@@ -41,3 +42,5 @@ class TestAlg(Algorithm):
 
         for symbol in self.symbols:
             self.portfolio.place_order(symbol, 1, OrderType.SELL)
+
+        print(f"Total Value: ${self.portfolio.total_value():.2f}")

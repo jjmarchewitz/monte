@@ -44,7 +44,7 @@ class TestAlg(Algorithm):
     def run_one_time_frame(self, processed_orders: list[Order]):
 
         for symbol in self.symbols:
-            df = self.portfolio.get_data(symbol)
+            df = self.portfolio.get_symbol(symbol)
 
             if (df.iloc[-1].avg_l5 - df.iloc[-1].vwap) > 0:
                 self.portfolio.place_order(symbol, 1, OrderType.BUY)
@@ -53,6 +53,3 @@ class TestAlg(Algorithm):
                 self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
         print(f"Total Value: ${self.portfolio.total_value():.2f}")
-
-    def cleanup(self) -> None:
-        pass

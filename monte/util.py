@@ -3,6 +3,7 @@
 import gzip
 import json
 import os
+import pathlib
 import re
 from typing import TypeVar
 
@@ -253,14 +254,17 @@ class AlpacaAPIBundle():
 
     def _get_repo_dir(self) -> str:
         """DOC:"""
-        repo_name_matches = re.findall(f"^.*monte{os.sep}monte", __file__)
 
-        # If the repo name can't be found inside of the full file path
-        if not repo_name_matches:
-            raise FileNotFoundError("Could not find the parent repo directory.")
+        current_file_path = pathlib.Path(__file__)
 
-        # Trims the end of the path so that it says "/monte" instead of "/monte/monte"
-        repo_dir = re.sub(f"{os.sep}monte{os.sep}monte",
-                          f"{os.sep}monte", repo_name_matches[0])
+        while True:
 
-        return repo_dir
+            if (os.path.basename(current_file_path) == 'monte' and
+                    os.path.basename(current_file_path.parent) == 'monte'):
+                repo_dir = current_file_path.parent
+                break
+
+            else:
+                current_file_path = current_file_path.parent
+
+        return str(repo_dir)

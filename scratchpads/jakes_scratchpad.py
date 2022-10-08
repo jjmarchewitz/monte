@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from functools import partial
+
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 from algorithms import test
-from monte import machine, machine_settings, util
+from monte import derived_columns, machine, machine_settings, util
 
 
 def main():
@@ -19,7 +21,9 @@ def main():
         start_date="2016-09-09",
         end_date="2022-10-04",
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
-        derived_columns={},
+        derived_columns={
+            "test": partial(derived_columns.avg_last_n, n=5)
+        },
         max_rows_in_df=500,
         start_buffer_days=5,  # TradingDays
         data_buffer_days=500,  # TradingDays

@@ -53,3 +53,6 @@ class TestAlg(Algorithm):
                 self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
         print(f"Total Value: ${self.portfolio.total_value():.2f}")
+
+    def cleanup(self) -> None:
+        pass

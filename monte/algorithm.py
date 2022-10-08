@@ -16,3 +16,6 @@ class Algorithm():
 
     def run_one_time_frame(self, processed_orders) -> None:
         raise NotImplementedError("You have to implement run_one_time_frame()!")
+
+    def cleanup(self) -> None:
+        raise NotImplementedError("You have to implement cleanup()!")

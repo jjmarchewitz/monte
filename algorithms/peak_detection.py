@@ -39,3 +39,6 @@ class PeakDetection(Algorithm):
         # Rules go here
 
         print(f"Total Value: ${self.portfolio.total_value():.2f}")
+
+    def cleanup(self) -> None:
+        pass

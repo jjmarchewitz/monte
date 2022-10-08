@@ -52,3 +52,7 @@ class TradingMachine():
                 self.am.increment_dataframes()
             except StopIteration:
                 break
+
+        # Run cleanup code for algorithms
+        for algo in self.algo_instances:
+            algo.cleanup()

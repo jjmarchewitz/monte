@@ -1,14 +1,16 @@
-"""DOC:"""
+from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 
 import pandas as pd
-from alpaca_trade_api import TimeFrameUnit
+from alpaca_trade_api import TimeFrameUnit, entity
 from dateutil.parser import isoparse
 from pytz import timezone
 
-from monte import machine, util
+import monte.machine as machine
+import monte.machine_settings as machine_settings
+import monte.util as util
 
 ##################
 # DATE UTILITIES #
@@ -27,28 +29,74 @@ class TradingDay():
     close_time: datetime
 
 
-def get_list_of_trading_days_in_range(alpaca_api, start_date, end_date):
+def get_list_of_trading_days_in_range(alpaca_api: util.AlpacaAPIBundle,
+                                      start_date: str, end_date: str) -> list[TradingDay]:
     """
-    DOC:
+    Returns a list of days (as TradingDay instances) that U.S. markets are open between the start and end
+    dates provided. The result is inclusive of both the start and end dates.
+
+    Args:
+        alpaca_api:
+            A valid, authenticated util.AlpacaAPIBundle instance.
+
+        start_date:
+            The beginning of the range of trading days. The date is represented as YYYY-MM-DD. This follows
+            the ISO-8601 date standard.
+
+        end_date:
+            The end of the range of trading days. The date is represented as YYYY-MM-DD. This follows the
+            ISO-8601 date standard.
+
+    Returns:
+        A list of TradingDay instances that represents all of the days that U.S. markets were open.
     """
-    raw_market_days = get_raw_trading_dates_in_range(alpaca_api, start_date, end_date)
-    return get_trading_day_obj_list_from_date_list(raw_market_days)
+    raw_market_days = _get_raw_trading_dates_in_range(alpaca_api, start_date, end_date)
+    return _get_trading_day_obj_list_from_date_list(raw_market_days)
 
 
-def get_raw_trading_dates_in_range(alpaca_api, start_date, end_date):
+def _get_raw_trading_dates_in_range(alpaca_api: util.AlpacaAPIBundle,
+                                    start_date: str, end_date: str) -> list[entity.Calendar]:
     """
-    DOC:
+    This should not be used by end-users.
+
+    Returns a list of days (as alpaca_trade_api.Calendar instances) that U.S. markets are open between the
+    start and end dates provided. The result is inclusive of both the start and end dates.
+
+    Args:
+        alpaca_api:
+            A valid, authenticated util.AlpacaAPIBundle instance.
+
+        start_date:
+            The beginning of the range of trading days. The date is represented as YYYY-MM-DD. This follows
+            the ISO-8601 date standard.
+
+        end_date:
+            The end of the range of trading days. The date is represented as YYYY-MM-DD. This follows the
+            ISO-8601 date standard.
+
+    Returns:
+        A list of alpaca_trade_api.Calendar instances that represents all of the days that U.S. markets were
+        open.
     """
     return alpaca_api.trading.get_calendar(start_date, end_date)
 
 
-def get_trading_day_obj_list_from_date_list(trading_date_list):
+def _get_trading_day_obj_list_from_date_list(
+        calendar_instance_list: list[entity.Calendar]) -> list[TradingDay]:
     """
-    DOC:
+    Converts a list of alpaca_trade_api.Calendar instances into a list of TradingDay instances.
+
+    Args:
+        calendar_instance_list:
+            A list of alpaca_trade_api.Calendar instances that represents a range of days the market was
+            open.
+
+    Returns:
+        A list of TradingDay instances that represents a range of days the market was open.
     """
     trading_days = []
 
-    for day in trading_date_list:
+    for day in calendar_instance_list:
 
         # Create a date object (from the datetime library) for the calendar date of the
         # market day
@@ -100,15 +148,31 @@ def get_trading_day_obj_list_from_date_list(trading_date_list):
 
 class Asset:
     """
-    DOC:
+    Represents one single asset from the markets, this object constructs and manages dataframes for the given
+    symbol.
     """
 
     alpaca_api: util.AlpacaAPIBundle
-    machine_settings: machine.MachineSettings
+    machine_settings: machine_settings.MachineSettings
     df: pd.DataFrame
     buffer: pd.DataFrame
 
-    def __init__(self, alpaca_api, machine_settings, symbol) -> None:
+    def __init__(self, alpaca_api: util.AlpacaAPIBundle,
+                 machine_settings: machine_settings.MachineSettings, symbol: str) -> None:
+        """
+        Constructor for Asset
+
+        Args:
+            alpaca_api:
+                A bundle of Alpaca APIs all created and authenticated with the keys in the repo's
+                alpaca_config.json
+
+            machine_settings:
+                An instance of machine.MachineSettings that contains configuration for the current simulation.
+
+            symbol:
+                A string containing the market symbol that this Asset represents.
+        """
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
         self.symbol = symbol
@@ -130,22 +194,32 @@ class Asset:
         self.reset_buffer()
 
     def reset_df(self) -> None:
-        """DOC:"""
+        """
+        Creates a new, empty dataframe with all of the base columns and derived columns. The result is
+        stored in self.df.
+        """
         columns = self.base_columns.copy()
         columns.extend(self.machine_settings.derived_columns.keys())
         self.df = pd.DataFrame({}, columns=columns)
 
     def reset_buffer(self) -> None:
-        """DOC:"""
+        """
+        Creates a new, empty dataframe with only the base columns (NOT derived columns). The result is
+        stored in self.buffer.
+        """
         self.buffer = pd.DataFrame({}, columns=self.base_columns)
 
     def populate_buffer(self, df, buffer_start_date, buffer_end_date):
-        """DOC:"""
+        """
+        DOC:
+        """
 
         # TODO: Derived columns
 
+        # Store the incoming dataframe in the buffer
         self.buffer = df
 
+        # Get a list of TradingDays between the first and last date of the buffer
         trading_days_in_buffer_range = get_list_of_trading_days_in_range(
             self.alpaca_api, buffer_start_date, buffer_end_date)
 
@@ -154,6 +228,7 @@ class Asset:
             # The date of the current row
             row_datetime = isoparse(row.t)
 
+            # Flag variables
             date_in_buffer_range = False
             dropped = False
 
@@ -163,16 +238,20 @@ class Asset:
                 if row_datetime.date() == trading_day.date:
                     date_in_buffer_range = True
 
-                    # If the TimeFrameUnit
+                    # The current row should be dropped if its timestamp is outside the market hours for this
+                    # TradingDay, except if the TimeFrameUnit is a Day. The timestamp doesnt matter then.
                     if (self.machine_settings.time_frame.unit != TimeFrameUnit.Day and (
                             row_datetime < trading_day.open_time or row_datetime > trading_day.close_time)):
                         self.buffer.drop(index, inplace=True)
 
+            # If the date of the row does not correspond to a valid TradingDay, drop it.
             if not date_in_buffer_range:
                 self.buffer.drop(index, inplace=True)
 
+        # Reset the index to 'forget' about the dropped rows
         self.buffer.reset_index(drop=True, inplace=True)
 
+        # Rename columns to more human-friendly names
         self.buffer.rename(columns={
             "t": self.base_columns[0],  # timestamp
             "o": self.base_columns[1],  # open
@@ -206,7 +285,7 @@ class AssetManager:
     """
 
     alpaca_api: util.AlpacaAPIBundle
-    machine_settings: machine.MachineSettings
+    machine_settings: machine_settings.MachineSettings
     watched_assets: dict[str, Asset]
     trading_days: list[TradingDay]
     buffer_start_date: str

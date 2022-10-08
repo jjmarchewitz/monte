@@ -1,47 +1,59 @@
 """DOC:"""
+from __future__ import annotations
 
-from alpaca_trade_api import TimeFrame, TimeFrameUnit
+import monte.algorithm as algorithm
+import monte.asset_manager as asset_manager
+import monte.machine_settings as machine_settings
+import monte.portfolio as portfolio
+import monte.util as util
 
 
-class MachineSettings():
-    """
-    DOC:
-    """
-    start_date: str
-    end_date: str
-    time_frame: TimeFrame
-    derived_columns: dict
-    max_rows_in_df: int
-    start_buffer_days: int
-    data_buffer_days: int
+class TradingMachine():
+    """DOC:"""
 
-    def __init__(
-            self, start_date: str, end_date: str, time_frame: TimeFrame, derived_columns: dict = {},
-            max_rows_in_df: int = 1_000, start_buffer_days: int = 10, data_buffer_days: int = 100) -> None:
-        self.start_date = start_date
-        self.end_date = end_date
-        self.time_frame = time_frame
-        self.derived_columns = derived_columns
-        self.max_rows_in_df = max_rows_in_df
-        self.start_buffer_days = start_buffer_days
-        self.data_buffer_days = data_buffer_days
+    alpaca_api: util.AlpacaAPIBundle
+    machine_settings: machine_settings.MachineSettings
+    am: asset_manager.AssetManager
+    algo_instances: list[algorithm.Algorithm]
 
-        self.validate()
+    def __init__(self, alpaca_api: util.AlpacaAPIBundle,
+                 machine_settings: machine_settings.MachineSettings) -> None:
+        self.alpaca_api = alpaca_api
+        self.machine_settings = machine_settings
+        self.am = asset_manager.AssetManager(alpaca_api, machine_settings)
+        self.algo_instances = []
 
-    def validate(self):
+    def add_algo_instance(self, algorithm_with_portfolio: algorithm.Algorithm):
+        """DOC:"""
 
-        if (
-            (self.time_frame.unit == TimeFrameUnit.Minute and self.time_frame.amount > 59) or
-            (self.time_frame.unit == TimeFrameUnit.Hour and self.time_frame.amount > 7) or  # 7 hours in a market day
-            (self.time_frame.unit == TimeFrameUnit.Day and self.time_frame.amount != 1) or
-            (self.time_frame.unit in (TimeFrameUnit.Week, TimeFrameUnit.Month))
-        ):
-            raise ValueError(
-                f"TimeFrames must be 1Day or shorter. The TimeFrame is currently set to {self.time_frame}")
+        algorithm_with_portfolio.get_portfolio().am = self.am
 
-        if self.data_buffer_days < 7:
-            raise ValueError(
-                f"Data buffers need to be greater than or equal to 7 days. The current data buffer is {self.data_buffer_days} days")
+        if (isinstance(algorithm_with_portfolio, algorithm.Algorithm) and
+                isinstance(algorithm_with_portfolio.get_portfolio(), portfolio.Portfolio)):
+            self.algo_instances.append(algorithm_with_portfolio)
+
+    def run(self):
+        """DOC:"""
+
+        for algo in self.algo_instances:
+            algo.startup()
+
+        while True:
+
+            # TODO: Test the order of these blocks
+
+            print(self.am['AAPL'].iloc[-1].datetime.isoformat())
+
+            # A
+            for algo in self.algo_instances:
+                processed_orders = algo.get_portfolio().process_pending_orders()
+                algo.run_one_time_frame(processed_orders)
+
+            # B
+            try:
+                self.am.increment_dataframes()
+            except StopIteration:
+                break
 
 
 # Increment dataframes, then run algo

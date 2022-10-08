@@ -1,31 +1,34 @@
-"""DOC:"""
 from __future__ import annotations
 
-from monte import algorithm, asset_manager, machine_settings, portfolio, util
+from monte.algorithm import Algorithm
+from monte.asset_manager import AssetManager
+from monte.machine_settings import MachineSettings
+from monte.portfolio import Portfolio
+from monte.util import AlpacaAPIBundle
 
 
 class TradingMachine():
     """DOC:"""
 
-    alpaca_api: util.AlpacaAPIBundle
-    machine_settings: machine_settings.MachineSettings
-    am: asset_manager.AssetManager
-    algo_instances: list[algorithm.Algorithm]
+    alpaca_api: AlpacaAPIBundle
+    machine_settings: MachineSettings
+    am: AssetManager
+    algo_instances: list[Algorithm]
 
-    def __init__(self, alpaca_api: util.AlpacaAPIBundle,
-                 machine_settings: machine_settings.MachineSettings) -> None:
+    def __init__(self, alpaca_api: AlpacaAPIBundle,
+                 machine_settings: MachineSettings) -> None:
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
-        self.am = asset_manager.AssetManager(alpaca_api, machine_settings)
+        self.am = AssetManager(alpaca_api, machine_settings)
         self.algo_instances = []
 
-    def add_algo_instance(self, algorithm_with_portfolio: algorithm.Algorithm):
+    def add_algo_instance(self, algorithm_with_portfolio: Algorithm):
         """DOC:"""
 
         algorithm_with_portfolio.get_portfolio().am = self.am
 
-        if (isinstance(algorithm_with_portfolio, algorithm.Algorithm) and
-                isinstance(algorithm_with_portfolio.get_portfolio(), portfolio.Portfolio)):
+        if (isinstance(algorithm_with_portfolio, Algorithm) and
+                isinstance(algorithm_with_portfolio.get_portfolio(), Portfolio)):
             self.algo_instances.append(algorithm_with_portfolio)
 
     def run(self):

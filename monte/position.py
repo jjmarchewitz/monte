@@ -3,19 +3,21 @@ from __future__ import annotations
 
 import pandas as pd
 
-from monte import asset_manager, machine_settings, util
+from monte.asset_manager import AssetManager
+from monte.machine_settings import MachineSettings
+from monte.util import AlpacaAPIBundle
 
 
 class Position():
 
-    alpaca_api: util.AlpacaAPIBundle
-    machine_settings: machine_settings.MachineSettings
-    am: asset_manager.AssetManager
+    alpaca_api: AlpacaAPIBundle
+    machine_settings: MachineSettings
+    am: AssetManager
     symbol: str
     initial_quantity: int
 
-    def __init__(self, alpaca_api: util.AlpacaAPIBundle, machine_settings: machine_settings.MachineSettings,
-                 am: asset_manager.AssetManager, symbol: str, initial_quantity: int) -> None:
+    def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings,
+                 am: AssetManager, symbol: str, initial_quantity: int) -> None:
         """DOC:"""
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings

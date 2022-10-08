@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from monte import portfolio
+from monte.portfolio import Portfolio
 
 
 class Algorithm():
@@ -8,7 +8,7 @@ class Algorithm():
     def __init__(self) -> None:
         pass
 
-    def get_portfolio(self) -> portfolio.Portfolio:
+    def get_portfolio(self) -> Portfolio:
         raise NotImplementedError("You have to implement portfolio()!")
 
     def startup(self) -> None:

@@ -1,23 +1,25 @@
 from __future__ import annotations
 
-from monte import machine_settings, portfolio, util
 from monte.algorithm import Algorithm
+from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
+from monte.portfolio import Portfolio
+from monte.util import AlpacaAPIBundle
 
 
 class TestAlg(Algorithm):
 
-    alpaca_api: util.AlpacaAPIBundle
-    machine_settings: machine_settings.MachineSettings
-    portfolio: portfolio.Portfolio
+    alpaca_api: AlpacaAPIBundle
+    machine_settings: MachineSettings
+    portfolio: Portfolio
 
-    def __init__(self, alpaca_api: util.AlpacaAPIBundle,
-                 machine_settings: machine_settings.MachineSettings) -> None:
+    def __init__(self, alpaca_api: AlpacaAPIBundle,
+                 machine_settings: MachineSettings) -> None:
 
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
 
-        self.portfolio = portfolio.Portfolio(self.alpaca_api, self.machine_settings)
+        self.portfolio = Portfolio(self.alpaca_api, self.machine_settings)
 
         # symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
         #            "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC", "ABBV",
@@ -28,7 +30,7 @@ class TestAlg(Algorithm):
 
         # symbols = ["AAPL"]
 
-    def get_portfolio(self) -> portfolio.Portfolio:
+    def get_portfolio(self) -> Portfolio:
         return self.portfolio
 
     def startup(self) -> None:
@@ -38,9 +40,16 @@ class TestAlg(Algorithm):
         for symbol in self.symbols:
             self.portfolio.place_order(symbol, 10, OrderType.BUY)
 
+    # TODO: Make 'timestamp' be one of the args passed in
     def run_one_time_frame(self, processed_orders: list[Order]):
 
         for symbol in self.symbols:
-            self.portfolio.place_order(symbol, 1, OrderType.SELL)
+            df = self.portfolio.get_symbol(symbol)
+
+            if (df.iloc[-1].avg_l5 - df.iloc[-1].vwap) > 0:
+                self.portfolio.place_order(symbol, 1, OrderType.BUY)
+
+            elif (df.iloc[-1].avg_l5 - df.iloc[-1].vwap) > 0:
+                self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
         print(f"Total Value: ${self.portfolio.total_value():.2f}")

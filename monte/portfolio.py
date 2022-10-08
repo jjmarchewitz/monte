@@ -3,8 +3,13 @@ from __future__ import annotations
 
 from typing import Union
 
-from monte import asset_manager, machine_settings, position, util
+import pandas as pd
+
+from monte.asset_manager import AssetManager
+from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderStatus, OrderType
+from monte.position import Position
+from monte.util import AlpacaAPIBundle
 
 
 class Portfolio():
@@ -12,16 +17,16 @@ class Portfolio():
     A portfolio is simply a collection of individual positions.
     """
 
-    alpaca_api: util.AlpacaAPIBundle
-    machine_settings: machine_settings.MachineSettings
+    alpaca_api: AlpacaAPIBundle
+    machine_settings: MachineSettings
     cash: int
     name: str
-    positions: dict[str, position.Position]
-    am: asset_manager.AssetManager
+    positions: dict[str, Position]
+    am: AssetManager
     _order_queue: list[Order]
     _current_order_id_number: int
 
-    def __init__(self, alpaca_api: util.AlpacaAPIBundle, machine_settings: machine_settings.MachineSettings,
+    def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings,
                  starting_cash: int = 10000, name: str = None) -> None:
         """
         Constructor for the Portfolio class.
@@ -51,11 +56,19 @@ class Portfolio():
         self._order_queue = []
         self._current_order_id_number = 0
 
-    def __getitem__(self, key: str) -> position.Position:
+    def __getitem__(self, key: str) -> Position:
         return self.positions[key]
 
     def items(self):
         return self.positions.items()
+
+    def get_symbol(self, symbol) -> Union[pd.DataFrame, None]:
+        result = None
+
+        if self.am.is_watching_asset(symbol):
+            result = self.am[symbol]
+
+        return result
 
     def delete_empty_positions(self) -> None:
         """DOC:"""
@@ -67,9 +80,9 @@ class Portfolio():
         """DOC:"""
         return symbol in self.positions.keys()
 
-    def _create_position(self, symbol: str, initial_quantity: int) -> position.Position:
+    def _create_position(self, symbol: str, initial_quantity: int) -> Position:
         """DOC:"""
-        return position.Position(self.alpaca_api, self.machine_settings, self.am, symbol, initial_quantity)
+        return Position(self.alpaca_api, self.machine_settings, self.am, symbol, initial_quantity)
 
     def total_value(self) -> float:
         """DOC:"""

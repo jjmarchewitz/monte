@@ -8,7 +8,8 @@ from alpaca_trade_api import TimeFrameUnit, entity
 from dateutil.parser import isoparse
 from pytz import timezone
 
-from monte import machine_settings, util
+from monte.machine_settings import MachineSettings
+from monte.util import AlpacaAPIBundle
 
 ##################
 # DATE UTILITIES #
@@ -27,7 +28,7 @@ class TradingDay():
     close_time: datetime
 
 
-def get_list_of_trading_days_in_range(alpaca_api: util.AlpacaAPIBundle,
+def get_list_of_trading_days_in_range(alpaca_api: AlpacaAPIBundle,
                                       start_date: str, end_date: str) -> list[TradingDay]:
     """
     Returns a list of days (as TradingDay instances) that U.S. markets are open between the start and end
@@ -52,7 +53,7 @@ def get_list_of_trading_days_in_range(alpaca_api: util.AlpacaAPIBundle,
     return _get_trading_day_obj_list_from_date_list(raw_market_days)
 
 
-def _get_raw_trading_dates_in_range(alpaca_api: util.AlpacaAPIBundle,
+def _get_raw_trading_dates_in_range(alpaca_api: AlpacaAPIBundle,
                                     start_date: str, end_date: str) -> list[entity.Calendar]:
     """
     This should not be used by end-users.
@@ -150,15 +151,15 @@ class Asset:
     symbol.
     """
 
-    alpaca_api: util.AlpacaAPIBundle
-    machine_settings: machine_settings.MachineSettings
+    alpaca_api: AlpacaAPIBundle
+    machine_settings: MachineSettings
     df: pd.DataFrame
     buffer: pd.DataFrame
     base_columns: list[str]
     _df_has_start_buffer_rows: bool
 
-    def __init__(self, alpaca_api: util.AlpacaAPIBundle,
-                 machine_settings: machine_settings.MachineSettings, symbol: str) -> None:
+    def __init__(self, alpaca_api: AlpacaAPIBundle,
+                 machine_settings: MachineSettings, symbol: str) -> None:
         """
         Constructor for Asset
 
@@ -312,14 +313,14 @@ class AssetManager:
     DOC:
     """
 
-    alpaca_api: util.AlpacaAPIBundle
+    alpaca_api: AlpacaAPIBundle
     machine_settings: machine_settings.MachineSettings
     watched_assets: dict[str, Asset]
     trading_days: list[TradingDay]
     buffer_start_date: str
     buffer_end_date: str
 
-    def __init__(self, alpaca_api, machine_settings) -> None:
+    def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings) -> None:
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
         self.watched_assets = {}  # Dict of Assets

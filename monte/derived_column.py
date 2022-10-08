@@ -1,7 +1,1 @@
-class DerivedColumn():
-
-    def __init__(self):
-        pass
-
-    def calculate(self, df):
-        raise NotImplementedError("You have to implement calculate()!")
+# TODO: Global derived column variable that gets updated by increment_dataframe in Asset

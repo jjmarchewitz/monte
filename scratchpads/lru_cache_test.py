@@ -1,11 +1,18 @@
 import time
-from functools import cache
 
 import numpy as np
 import pandas as pd
+from cacheout import Cache
+
+# from cachetools import Cache
+
+# from functools import cache
 
 
-@cache
+cache = Cache()
+
+
+@cache.memoize()
 def avg_last_n(df, n):
     total = 0
 

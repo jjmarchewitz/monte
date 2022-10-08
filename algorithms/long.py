@@ -40,7 +40,6 @@ class TestAlg(Algorithm):
         for symbol in self.symbols:
             self.portfolio.place_order(symbol, 10, OrderType.BUY)
 
-    # TODO: Make 'timestamp' be one of the args passed in
     def run_one_time_frame(self, processed_orders: list[Order]):
 
         for symbol in self.symbols:

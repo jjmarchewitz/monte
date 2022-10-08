@@ -14,10 +14,6 @@ from monte.util import AlpacaAPIBundle
 def main():
     alpaca_api = AlpacaAPIBundle()
 
-    # TODO: Create pre-defined "configs" for the most commonly used TimeFrames that auto-sets the TimeFrame
-    # and data_buffer_days.
-    # TODO: Add logging
-
     ms = MachineSettings(
         start_date="2020-09-09",
         end_date="2022-10-04",

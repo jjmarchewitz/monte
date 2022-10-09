@@ -23,8 +23,3 @@ def avg_vwap_last_n(ident: DFIdentifier, df: pd.DataFrame, n: int) -> float:
     avg = total / n
 
     return avg
-
-
-def jake_test(ident: DFIdentifier, df: pd.DataFrame, n: int) -> float:
-    print("CCCCCC")
-    return net_vwap_last_n(ident, df, n) / avg_vwap_last_n(ident, df, n)

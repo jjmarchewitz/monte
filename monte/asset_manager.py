@@ -9,7 +9,6 @@ from dateutil.parser import isoparse
 from pytz import timezone
 
 from derived_columns.decorator import DFIdentifier
-from monte import global_vars
 from monte.machine_settings import MachineSettings
 from monte.util import AlpacaAPIBundle
 

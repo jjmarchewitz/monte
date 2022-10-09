@@ -4,7 +4,6 @@ import gzip
 import json
 import os
 import pathlib
-import re
 from typing import TypeVar
 
 import asks

@@ -10,7 +10,7 @@ class DFIdentifier():
 
 def derived_column(func):
     """DOC:"""
-    derived_column.cache_ = {}
+    func.cache_ = {}
 
     def inner(identifier: DFIdentifier, *args, **kwargs):
 
@@ -21,9 +21,9 @@ def derived_column(func):
 
         # TODO: purge cache if incoming identifier's timestamp is different
 
-        if identifier not in derived_column.cache_:
-            derived_column.cache_[identifier] = func(identifier, *args, **kwargs)
+        if identifier not in func.cache_:
+            func.cache_[identifier] = func(identifier, *args, **kwargs)
 
-        return derived_column.cache_[identifier]
+        return func.cache_[identifier]
 
     return inner

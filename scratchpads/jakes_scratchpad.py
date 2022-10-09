@@ -18,6 +18,7 @@ def main():
     # and data_buffer_days.
     # TODO: Auto-calculate the data buffer size based on TimeFrame
     # TODO: Add logging
+    # TODO: Buy and hold algorithm
 
     ms = MachineSettings(
         start_date="2016-09-09",
@@ -33,7 +34,6 @@ def main():
 
     trading_machine = TradingMachine(alpaca_api, ms)
 
-    # TODO: Buy and hold algorithm
     algo1 = test.TestAlg(alpaca_api, ms)
 
     trading_machine.add_algo_instance(algo1)

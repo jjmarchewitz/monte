@@ -5,7 +5,7 @@ from functools import partial
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 from algorithms import test
-from monte import derived_column
+from monte import global_vars
 from monte.machine import TradingMachine
 from monte.machine_settings import MachineSettings
 from monte.util import AlpacaAPIBundle
@@ -19,7 +19,7 @@ def main():
         end_date="2022-10-04",
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
         derived_columns={
-            "avg_l5": partial(derived_column.avg_last_n, n=5)
+            "avg_l5": partial(global_vars.avg_last_n, n=5)
         },
         max_rows_in_df=500,
         start_buffer_days=5,  # TradingDays

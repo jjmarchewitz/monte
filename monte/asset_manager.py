@@ -8,6 +8,8 @@ from alpaca_trade_api import TimeFrameUnit, entity
 from dateutil.parser import isoparse
 from pytz import timezone
 
+from derived_columns.decorator import DFIdentifier
+from monte import global_vars
 from monte.machine_settings import MachineSettings
 from monte.util import AlpacaAPIBundle
 
@@ -293,10 +295,13 @@ class Asset:
 
             self._df_has_start_buffer_rows = True
 
+            # Create an identifier for the dataframe in its current state
+            timestamp = self.df.iloc[-1].timestamp
+            identifier = DFIdentifier(self.symbol, timestamp)
+
             # Calculate and add the values of all derived columns
             for column_title, column_func in self.machine_settings.derived_columns.items():
-
-                self.df.at[self.df.index[-1], column_title] = column_func(self.df)
+                self.df.at[self.df.index[-1], column_title] = column_func(identifier, self.df)
 
     def _count_unique_days_in_dataframe(self):
         """DOC:"""

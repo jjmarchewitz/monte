@@ -34,6 +34,9 @@ class TradingMachine():
     def run(self):
         """DOC:"""
 
+        # Run startup code for asset_manager
+        self.am.startup()
+
         # Run startup code for algorithms
         for algo in self.algo_instances:
             algo.startup()
@@ -46,7 +49,8 @@ class TradingMachine():
                 portfolio = algo.get_portfolio()
                 processed_orders = portfolio.process_pending_orders()
                 portfolio.delete_empty_positions()
-                algo.run_one_time_frame(processed_orders)
+                current_datetime = portfolio.am._get_reference_asset().datetime()
+                algo.run_one_time_frame(current_datetime, processed_orders)
 
             # Update the dataframes in the asset_manager
             try:

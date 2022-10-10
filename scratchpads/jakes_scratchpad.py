@@ -14,11 +14,13 @@ from monte.util import AlpacaAPIBundle
 def main():
     alpaca_api = AlpacaAPIBundle()
 
+    # TODO: Add timestamp as a function in asset_manager (and portfolio)
     # TODO: Create pre-defined "configs" for the most commonly used TimeFrames that auto-sets the TimeFrame
     # and data_buffer_days.
     # TODO: Auto-calculate the data buffer size based on TimeFrame
     # TODO: Add logging
     # TODO: Buy and hold algorithm
+    # TODO: Verify all timestamps are the same across assets for a given row
 
     ms = MachineSettings(
         start_date="2016-09-09",
@@ -29,7 +31,7 @@ def main():
             "avg_l10": partial(dcolumns.avg_over_last_n, col="vwap", n=10),
             "std_dev_l10": partial(dcolumns.std_dev_over_last_n, col="vwap", n=10)
         },
-        max_rows_in_df=500,
+        max_rows_in_df=500,  # TODO: Derive start buffer days from this (by overestimating it)
         start_buffer_days=5,  # TradingDays
         data_buffer_days=500,  # TradingDays
     )

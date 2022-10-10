@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from monte.algorithm import Algorithm
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
@@ -32,13 +34,14 @@ class PeakDetection(Algorithm):
         # Initial buy
         self.portfolio.place_order(self.symbol, 10, OrderType.BUY)
 
-    def run_one_time_frame(self, processed_orders: list[Order]):
+    def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
 
         df = self.portfolio.get_data(self.symbol)
 
         # Rules go here
 
-        print(f"Total Value: ${self.portfolio.total_value():.2f}")
+        print(f"{current_datetime.date()} {current_datetime.hour}:{current_datetime.minute:02d} | "
+              f"Total Value: ${self.portfolio.total_value():.2f}")
 
     def cleanup(self) -> None:
         pass

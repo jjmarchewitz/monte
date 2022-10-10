@@ -213,5 +213,13 @@ class Portfolio():
                 self.cash += self.am[order.symbol].iloc[-1].vwap * order.quantity
                 order.status = OrderStatus.COMPLETED
 
+    def latest_datetime(self):
+        """DOC:"""
+        return self.am.latest_datetime()
+
+    def latest_timestamp(self):
+        """DOC:"""
+        return self.am.latest_timestamp()
+
     def copy(self):
         raise NotImplementedError

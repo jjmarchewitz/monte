@@ -200,6 +200,12 @@ class Asset:
     def price(self):
         return self.df.iloc[-1].vwap
 
+    def timestamp(self):
+        return self.df.iloc[-1].timestamp
+
+    def datetime(self):
+        return self.df.iloc[-1].datetime
+
     def reset_df(self) -> None:
         """
         Creates a new, empty dataframe with all of the base columns and derived columns. The result is
@@ -269,7 +275,8 @@ class Asset:
         }, inplace=True)
 
         # Add datetimes as a column
-        self.buffer[self.base_columns[8]] = self.buffer.apply(lambda row: isoparse(row.timestamp), axis=1)
+        self.buffer[self.base_columns[8]] = self.buffer.apply(
+            lambda row: isoparse(row.timestamp).astimezone(timezone('UTC')), axis=1)
 
     def increment_dataframe(self):
         """DOC:"""
@@ -335,6 +342,11 @@ class AssetManager:
 
         self._set_next_buffer_dates()
 
+        self._reference_symbol = "SPY"
+        self.watch_asset(self._reference_symbol)
+
+        self.simulation_running = False
+
     def __setitem__(self, key: str, value) -> None:
         raise AttributeError(
             f"All keys of the AssetManager (such as \"{key}\") are read-only, and cannot be written to.")
@@ -344,6 +356,9 @@ class AssetManager:
             raise KeyError("Only strings are accepted as keys for this object.")
 
         return self.watched_assets[key].df
+
+    def startup(self) -> None:
+        self.simulation_running = True
 
     def cleanup(self) -> None:
         # TODO: Join on the process
@@ -355,6 +370,9 @@ class AssetManager:
 
     def increment_dataframes(self):
         """DOC:"""
+
+        if not self.simulation_running:
+            raise StopIteration("Reached the end of simulation. No more trading days to run.")
 
         # If any asset's data buffer is empty, populate all assets with new data
         if any(asset.buffer.empty for asset in self.watched_assets.values()):
@@ -381,11 +399,12 @@ class AssetManager:
             self.trading_days.pop(0)
 
         if len(self.trading_days) == 0:
-            raise StopIteration("Reached the end of simulation. No more trading days to run.")
+            self.simulation_running = False
 
     def _calculate_list_of_buffer_dates(self) -> list[tuple[TradingDay, TradingDay]]:
         """DOC:"""
 
+        # TODO:
         finished = False
         start_index = 0
         end_index = self.machine_settings.data_buffer_days - 1
@@ -412,7 +431,7 @@ class AssetManager:
 
         self.most_recent_buffer_end_date = self.most_recent_buffer_end_date.date.isoformat()
 
-    def _populate_buffers(self, symbols, buffer_start_date: str, buffer_end_date: str):
+    def _populate_buffers(self, symbols: list[str], buffer_start_date: str, buffer_end_date: str):
         """DOC:"""
 
         # TODO: put get_bulk_bars on another process, make this a call to mp.Queue.get()
@@ -487,7 +506,22 @@ class AssetManager:
     def unwatch_asset(self, symbol: str) -> bool:
         """DOC:"""
         if self.is_watching_asset(symbol):
-            self.watched_assets.pop(symbol)
+            if symbol != self._reference_symbol:
+                self.watched_assets.pop(symbol)
+
+            # This still returns true so the user thinks the reference symbol has been removed
             return True
         else:
             return False
+
+    def _get_reference_asset(self):
+        """DOC:"""
+        return self.watched_assets[self._reference_symbol]
+
+    def latest_timestamp(self):
+        """DOC:"""
+        return self._get_reference_asset().timestamp()
+
+    def latest_datetime(self):
+        """DOC:"""
+        return self._get_reference_asset().datetime()

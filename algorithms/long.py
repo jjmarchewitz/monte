@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from monte.algorithm import Algorithm
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
@@ -7,7 +9,7 @@ from monte.portfolio import Portfolio
 from monte.util import AlpacaAPIBundle
 
 
-class TestAlg(Algorithm):
+class Long(Algorithm):
 
     alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
@@ -40,7 +42,7 @@ class TestAlg(Algorithm):
         for symbol in self.symbols:
             self.portfolio.place_order(symbol, 10, OrderType.BUY)
 
-    def run_one_time_frame(self, processed_orders: list[Order]):
+    def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
 
         for symbol in self.symbols:
             df = self.portfolio.get_symbol(symbol)
@@ -51,4 +53,5 @@ class TestAlg(Algorithm):
             elif (df.iloc[-1].avg_l5 - df.iloc[-1].vwap) <= 0:
                 self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
-        print(f"Total Value: ${self.portfolio.total_value():.2f}")
+        print(f"{current_datetime.date()} {current_datetime.hour}:{current_datetime.minute:02d} | "
+              f"Total Value: ${self.portfolio.total_value():.2f}")

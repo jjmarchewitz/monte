@@ -45,10 +45,10 @@ class TestAlg(Algorithm):
         for symbol in self.symbols:
             df = self.portfolio.get_data(symbol)
 
-            if (df.iloc[-1].avg_l5 - df.iloc[-1].vwap) > 0:
+            if (df.iloc[-1].avg_l10 - df.iloc[-1].vwap) > 0:
                 self.portfolio.place_order(symbol, 1, OrderType.BUY)
 
-            elif (df.iloc[-1].avg_l5 - df.iloc[-1].vwap) < 0:
+            elif (df.iloc[-1].avg_l10 - df.iloc[-1].vwap) < 0:
                 self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
         print(f"Total Value: ${self.portfolio.total_value():.2f}")

@@ -274,6 +274,9 @@ class Asset:
             "vw": self.base_columns[7],  # vwap
         }, inplace=True)
 
+        # TODO: Standardize the timestamps and datetimes to be DST-aware (i.e. the market should always
+        # open at 9:30, not 10:30 or 13:30 or 14:30)
+
         # Add datetimes as a column
         self.buffer[self.base_columns[8]] = self.buffer.apply(
             lambda row: isoparse(row.timestamp).astimezone(timezone('UTC')), axis=1)
@@ -373,6 +376,8 @@ class AssetManager:
 
         if not self.simulation_running:
             raise StopIteration("Reached the end of simulation. No more trading days to run.")
+
+        # TODO: Verify all timestamps are the same across assets for a given row
 
         # If any asset's data buffer is empty, populate all assets with new data
         if any(asset.buffer.empty for asset in self.watched_assets.values()):

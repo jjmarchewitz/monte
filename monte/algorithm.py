@@ -14,7 +14,7 @@ class Algorithm():
     def startup(self) -> None:
         raise NotImplementedError("You have to implement startup()!")
 
-    def run_one_time_frame(self, processed_orders) -> None:
+    def run_one_time_frame(self, current_datetime, processed_orders) -> None:
         raise NotImplementedError("You have to implement run_one_time_frame()!")
 
     def cleanup(self) -> None:

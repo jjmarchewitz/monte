@@ -14,26 +14,22 @@ from monte.util import AlpacaAPIBundle
 def main():
     alpaca_api = AlpacaAPIBundle()
 
-    # TODO: Add timestamp as a function in asset_manager (and portfolio)
-    # TODO: Create pre-defined "configs" for the most commonly used TimeFrames that auto-sets the TimeFrame
-    # and data_buffer_days.
-    # TODO: Auto-calculate the data buffer size based on TimeFrame
+    # TODO: Documentation
     # TODO: Add logging
-    # TODO: Buy and hold algorithm
-    # TODO: Verify all timestamps are the same across assets for a given row
+    # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
 
     ms = MachineSettings(
         start_date="2016-09-09",
         end_date="2017-10-04",
-        time_frame=TimeFrame(1, TimeFrameUnit.Hour),
+        time_frame=TimeFrame(1, TimeFrameUnit.Minute),
         derived_columns={
             "net_l10": partial(dcolumns.net_over_last_n, col="vwap", n=10),
             "avg_l10": partial(dcolumns.avg_over_last_n, col="vwap", n=10),
             "std_dev_l10": partial(dcolumns.std_dev_over_last_n, col="vwap", n=10)
         },
-        max_rows_in_df=500,  # TODO: Derive start buffer days from this (by overestimating it)
+        max_rows_in_df=500,
         start_buffer_days=5,  # TradingDays
-        data_buffer_days=500,  # TradingDays
+        data_buffer_days=10,  # TradingDays
     )
 
     trading_machine = TradingMachine(alpaca_api, ms)

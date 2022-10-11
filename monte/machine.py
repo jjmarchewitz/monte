@@ -31,7 +31,7 @@ class TradingMachine():
                 isinstance(algorithm_with_portfolio.get_portfolio(), Portfolio)):
             self.algo_instances.append(algorithm_with_portfolio)
 
-    def run(self):
+    def startup(self):
         """DOC:"""
 
         # Run startup code for asset_manager
@@ -40,6 +40,12 @@ class TradingMachine():
         # Run startup code for algorithms
         for algo in self.algo_instances:
             algo.startup()
+
+    def run(self):
+        """DOC:"""
+
+        # Run Machine startup code
+        self.startup()
 
         # Run the algorithms
         while True:
@@ -57,6 +63,12 @@ class TradingMachine():
                 self.am.increment_dataframes()
             except StopIteration:
                 break
+
+        # Run Machine cleanup code
+        self.cleanup()
+
+    def cleanup(self):
+        """DOC:"""
 
         # Run cleanup code for algorithms
         for algo in self.algo_instances:

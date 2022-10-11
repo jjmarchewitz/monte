@@ -1,3 +1,5 @@
+from typing import Union
+
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 
@@ -15,7 +17,8 @@ class MachineSettings():
 
     def __init__(
             self, start_date: str, end_date: str, time_frame: TimeFrame, derived_columns: dict = {},
-            max_rows_in_df: int = 1_000, start_buffer_days: int = 10, data_buffer_days: int = 100) -> None:
+            max_rows_in_df: int = 1_000, start_buffer_days: Union[int, None] = None,
+            data_buffer_days: Union[int, None] = None) -> None:
         self.start_date = start_date
         self.end_date = end_date
         self.time_frame = time_frame
@@ -25,6 +28,9 @@ class MachineSettings():
         self.data_buffer_days = data_buffer_days
 
         self.validate()
+
+        # TODO: Auto-calculate the data buffer size based on time_frame
+        # TODO: Auto-calculate the start buffer size based on max_rows_in_df and time_frame
 
     def validate(self):
 

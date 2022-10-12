@@ -19,8 +19,8 @@ def main():
     # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
 
     ms = MachineSettings(
-        start_date="2016-09-09",
-        end_date="2017-10-04",
+        start_date="2016-06-20",
+        end_date="2016-06-25",
         time_frame=TimeFrame(1, TimeFrameUnit.Minute),
         derived_columns={
             "net_l10": partial(dcolumns.net_over_last_n, col="vwap", n=10),

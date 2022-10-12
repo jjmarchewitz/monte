@@ -1,150 +1,17 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import timedelta
 
 import pandas as pd
-from alpaca_trade_api import TimeFrameUnit, entity
+from alpaca_trade_api import TimeFrameUnit
 from dateutil.parser import isoparse
 from pytz import timezone
 
 from derived_columns.decorator import DFIdentifier
+from monte.dates import TradingDay, get_list_of_trading_days_in_range
 from monte.machine_settings import MachineSettings
 from monte.util import AlpacaAPIBundle
 
-##################
-# DATE UTILITIES #
-##################
-
-
-@dataclass
-class TradingDay():
-    """
-    A dataclass holding information for a single day the market is open, like the date.
-    This dataclass also stores the market open time and close time in the ISO-8601
-    format.
-    """
-    date: date
-    open_time: datetime
-    close_time: datetime
-
-
-def get_list_of_trading_days_in_range(alpaca_api: AlpacaAPIBundle,
-                                      start_date: str, end_date: str) -> list[TradingDay]:
-    """
-    Returns a list of days (as TradingDay instances) that U.S. markets are open between the start and end
-    dates provided. The result is inclusive of both the start and end dates.
-
-    Args:
-        alpaca_api:
-            A valid, authenticated util.AlpacaAPIBundle instance.
-
-        start_date:
-            The beginning of the range of trading days. The date is represented as YYYY-MM-DD. This follows
-            the ISO-8601 date standard.
-
-        end_date:
-            The end of the range of trading days. The date is represented as YYYY-MM-DD. This follows the
-            ISO-8601 date standard.
-
-    Returns:
-        A list of TradingDay instances that represents all of the days that U.S. markets were open.
-    """
-    raw_market_days = _get_raw_trading_dates_in_range(alpaca_api, start_date, end_date)
-    return _get_trading_day_obj_list_from_date_list(raw_market_days)
-
-
-def _get_raw_trading_dates_in_range(alpaca_api: AlpacaAPIBundle,
-                                    start_date: str, end_date: str) -> list[entity.Calendar]:
-    """
-    This should not be used by end-users.
-
-    Returns a list of days (as alpaca_trade_api.Calendar instances) that U.S. markets are open between the
-    start and end dates provided. The result is inclusive of both the start and end dates.
-
-    Args:
-        alpaca_api:
-            A valid, authenticated util.AlpacaAPIBundle instance.
-
-        start_date:
-            The beginning of the range of trading days. The date is represented as YYYY-MM-DD. This follows
-            the ISO-8601 date standard.
-
-        end_date:
-            The end of the range of trading days. The date is represented as YYYY-MM-DD. This follows the
-            ISO-8601 date standard.
-
-    Returns:
-        A list of alpaca_trade_api.Calendar instances that represents all of the days that U.S. markets were
-        open.
-    """
-    return alpaca_api.trading.get_calendar(start_date, end_date)
-
-
-def _get_trading_day_obj_list_from_date_list(
-        calendar_instance_list: list[entity.Calendar]) -> list[TradingDay]:
-    """
-    Converts a list of alpaca_trade_api.Calendar instances into a list of TradingDay instances.
-
-    Args:
-        calendar_instance_list:
-            A list of alpaca_trade_api.Calendar instances that represents a range of days the market was
-            open.
-
-    Returns:
-        A list of TradingDay instances that represents a range of days the market was open.
-    """
-    trading_days = []
-
-    for day in calendar_instance_list:
-
-        # Create a date object (from the datetime library) for the calendar date of the
-        # market day
-        trading_date = date(
-            day.date.year,
-            day.date.month,
-            day.date.day
-        )
-
-        # Grab the DST-aware timezone object for eastern time
-        timezone_ET = timezone("America/New_York")
-
-        # Create a datetime object for the opening time with the timezone info attached
-        open_time = timezone_ET.localize(datetime(
-            day.date.year,
-            day.date.month,
-            day.date.day,
-            day.open.hour,
-            day.open.minute
-        ))
-
-        # Create a datetime object for the closing time with the timezone info attached
-        close_time = timezone_ET.localize(datetime(
-            day.date.year,
-            day.date.month,
-            day.date.day,
-            day.close.hour,
-            day.close.minute
-        ))
-
-        # Convert the opening and closing times to ISO-8601
-        # Literally dont even fucking ask me how long it took to get the data in the
-        # right format for this to work.
-        open_time = isoparse(open_time.isoformat())
-        close_time = isoparse(close_time.isoformat())
-
-        # Create a TradingDay object with the right open/close times and append it to
-        # the list of all such TradingDay objects within the span between start_date and
-        # end_date
-        trading_day = TradingDay(trading_date, open_time, close_time)
-        trading_days.append(trading_day)
-
-    return trading_days
-
-
-#################
-# ASSET MANAGER #
-#################
 
 class Asset:
     """
@@ -331,8 +198,8 @@ class AssetManager:
     machine_settings: machine_settings.MachineSettings
     watched_assets: dict[str, Asset]
     trading_days: list[TradingDay]
-    buffer_start_date: str
-    buffer_end_date: str
+    most_recent_buffer_start_date: str
+    most_recent_buffer_end_date: str
 
     def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings) -> None:
         self.alpaca_api = alpaca_api
@@ -341,8 +208,7 @@ class AssetManager:
         self.trading_days = get_list_of_trading_days_in_range(
             self.alpaca_api, self.machine_settings.start_date, self.machine_settings.end_date)
 
-        # self._calculate_list_of_buffer_dates()
-
+        self._buffer_dates = self._calculate_list_of_buffer_dates()
         self._set_next_buffer_dates()
 
         self._reference_symbol = "SPY"
@@ -409,32 +275,47 @@ class AssetManager:
     def _calculate_list_of_buffer_dates(self) -> list[tuple[TradingDay, TradingDay]]:
         """DOC:"""
 
-        # TODO:
-        finished = False
         start_index = 0
-        end_index = self.machine_settings.data_buffer_days - 1
+        end_index = min(self.machine_settings.data_buffer_days - 1, len(self.trading_days) - 1)
+        list_of_pairs = []
 
-        while not finished:
+        while True:
+            # Get the start and end buffer dates from the list of TradingDays
+            buffer_start_date = self.trading_days[start_index].date.isoformat()
+            buffer_end_date = self.trading_days[end_index].date.isoformat()
 
-            buffer_start_date = self.trading_days[0].date.isoformat()
+            # Add the start and end buffer dates to the list
+            list_of_pairs.append((buffer_start_date, buffer_end_date))
 
-        breakpoint()
+            # If the next start index would go past the end of self.trading_days, break out of the loop
+            if start_index + self.machine_settings.data_buffer_days > len(self.trading_days):
+                break
+
+            # Update the indexes
+            start_index = min(start_index + self.machine_settings.data_buffer_days,
+                              len(self.trading_days) - 1)
+            end_index = min(end_index + self.machine_settings.data_buffer_days,
+                            len(self.trading_days) - 1)
+
+        return list_of_pairs
 
     def _set_next_buffer_dates(self):
         """DOC:"""
 
-        # The start date of the current batch of data is the current/most recent trading day in ISO format
-        self.most_recent_buffer_start_date = self.trading_days[0].date.isoformat()
+        # # The start date of the current batch of data is the current/most recent trading day in ISO format
+        # self.most_recent_buffer_start_date = self.trading_days[0].date.isoformat()
 
-        # The end date is the minimum between the current trading date plus the data buffer size, and
-        # the last trading date. In other words, the buffer end date will be one "data buffer size" past
-        # the start date unless that end date is past the end date of the whole simulation.
-        if self.machine_settings.data_buffer_days > len(self.trading_days):
-            self.most_recent_buffer_end_date = self.trading_days[-1]
-        else:
-            self.most_recent_buffer_end_date = self.trading_days[self.machine_settings.data_buffer_days]
+        # # The end date is the minimum between the current trading date plus the data buffer size, and
+        # # the last trading date. In other words, the buffer end date will be one "data buffer size" past
+        # # the start date unless that end date is past the end date of the whole simulation.
+        # if self.machine_settings.data_buffer_days > len(self.trading_days):
+        #     self.most_recent_buffer_end_date = self.trading_days[-1]
+        # else:
+        #     self.most_recent_buffer_end_date = self.trading_days[self.machine_settings.data_buffer_days]
 
-        self.most_recent_buffer_end_date = self.most_recent_buffer_end_date.date.isoformat()
+        # self.most_recent_buffer_end_date = self.most_recent_buffer_end_date.date.isoformat()
+
+        self.most_recent_buffer_start_date, self.most_recent_buffer_end_date = self._buffer_dates.pop(0)
 
     def _populate_buffers(self, symbols: list[str], buffer_start_date: str, buffer_end_date: str):
         """DOC:"""
@@ -462,7 +343,11 @@ class AssetManager:
 
         trading_days_before_current = get_list_of_trading_days_in_range(
             self.alpaca_api,
-            (self.trading_days[0].date - timedelta(days=2 * self.machine_settings.start_buffer_days)).isoformat(),
+            (
+                self.trading_days[0].date -
+                timedelta(days=self.machine_settings.start_buffer_days) -
+                timedelta(days=30)
+            ).isoformat(),
             self.trading_days[0].date - timedelta(days=1))
 
         buffer_start_date = trading_days_before_current[-self.machine_settings.start_buffer_days].date.isoformat()

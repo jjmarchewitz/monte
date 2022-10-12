@@ -28,9 +28,9 @@ class TestAlg(Algorithm):
         #            "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS", "ABT",
         #            "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE", "ROK"]
 
-        # self.symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA"]
+        self.symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA"]
 
-        self.symbols = ["AAPL"]
+        # self.symbols = ["AAPL"]
 
     def get_portfolio(self) -> Portfolio:
         return self.portfolio

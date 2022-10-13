@@ -30,6 +30,9 @@ class AsyncAlpacaBars():
     headers: dict[str, str]
     base_url: str
 
+    # TODO: Rewrite this to use asyncio and aiohttp when Python 3.11 comes out with the new asyncio.TaskGroup
+    # class
+
     def __init__(self, key_id: str, secret_id: str, base_url: str) -> None:
         """DOC:"""
         # HTTPS header, this contains the API key info to authenticate with Alpaca

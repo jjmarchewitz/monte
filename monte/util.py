@@ -32,6 +32,7 @@ class AsyncAlpacaBars():
 
     # TODO: Rewrite this to use asyncio and aiohttp when Python 3.11 comes out with the new asyncio.TaskGroup
     # class
+    # TODO: Move to using the newer Alpaca API (alpaca-py)
 
     def __init__(self, key_id: str, secret_id: str, base_url: str) -> None:
         """DOC:"""

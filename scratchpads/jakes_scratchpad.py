@@ -14,14 +14,17 @@ from monte.util import AlpacaAPIBundle
 def main():
     alpaca_api = AlpacaAPIBundle()
 
+    # TODO: Add optional "training data" section
     # TODO: Documentation
     # TODO: Add logging
     # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
+    # TODO: Convert entire repo to datetime objects instead of date strings
+    # TODO: Move algos and scratchpads to a separate repo, publish monte on pypi
 
     ms = MachineSettings(
         start_date="2016-06-20",
         end_date="2016-06-25",
-        time_frame=TimeFrame(1, TimeFrameUnit.Minute),
+        time_frame=TimeFrame(1, TimeFrameUnit.Hour),
         derived_columns={
             "net_l10": partial(dcolumns.net_over_last_n, col="vwap", n=10),
             "avg_l10": partial(dcolumns.avg_over_last_n, col="vwap", n=10),

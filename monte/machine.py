@@ -25,21 +25,27 @@ class TradingMachine():
     def add_algo_instance(self, algorithm_with_portfolio: Algorithm):
         """DOC:"""
 
+        if not issubclass(algorithm_with_portfolio, Algorithm):
+            raise TypeError("You must pass an instance of a subclass of Algorithm into add_algo_instance().")
+
+        if not isinstance(algorithm_with_portfolio.get_portfolio(), Portfolio):
+            raise TypeError("The get_portfolio() method of the algorithm must be an instance of Portfolio.")
+
         algorithm_with_portfolio.get_portfolio().am = self.am
 
-        if (isinstance(algorithm_with_portfolio, Algorithm) and
-                isinstance(algorithm_with_portfolio.get_portfolio(), Portfolio)):
-            self.algo_instances.append(algorithm_with_portfolio)
+        self.algo_instances.append(algorithm_with_portfolio)
 
     def startup(self):
         """DOC:"""
 
-        # Run startup code for asset_manager
-        self.am.startup()
-
         # Run startup code for algorithms
         for algo in self.algo_instances:
             algo.startup()
+
+        # Run startup code for asset_manager. This must happen after the algos startup code so that the algos
+        # can 'watch' all of the assets they need first. When am.startup() is called, the data getter process
+        # is constructed and spawned with all of the assets it needs to get data for as an argument.
+        self.am.startup()
 
     def run(self):
         """DOC:"""

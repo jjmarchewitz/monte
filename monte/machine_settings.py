@@ -31,6 +31,7 @@ class MachineSettings():
 
         # TODO: Auto-calculate the data buffer size based on time_frame
         # TODO: Auto-calculate the start buffer size based on max_rows_in_df and time_frame
+        # TODO: Convert constructor args to start date, simulation length, and training length
 
     def validate(self):
 

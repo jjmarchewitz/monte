@@ -135,3 +135,32 @@ def _get_trading_day_obj_list_from_date_list(
         trading_days.append(trading_day)
 
     return trading_days
+
+
+def get_list_of_buffer_ranges(alpaca_api: AlpacaAPIBundle, buffer_length: int, start_date: str,
+                              end_date: str) -> list[tuple[TradingDay, TradingDay]]:
+    """DOC:"""
+
+    trading_days = get_list_of_trading_days_in_range(alpaca_api, start_date, end_date)
+
+    start_index = 0
+    end_index = min(buffer_length - 1, len(trading_days) - 1)
+    list_of_pairs = []
+
+    while True:
+        # Get the start and end buffer dates from the list of TradingDays
+        buffer_start_date = trading_days[start_index].date.isoformat()
+        buffer_end_date = trading_days[end_index].date.isoformat()
+
+        # Add the start and end buffer dates to the list
+        list_of_pairs.append((buffer_start_date, buffer_end_date))
+
+        # If the next start index would go past the end of trading_days, break out of the loop
+        if start_index + buffer_length > len(trading_days):
+            break
+
+        # Update the indexes
+        start_index = min(start_index + buffer_length, len(trading_days) - 1)
+        end_index = min(end_index + buffer_length, len(trading_days) - 1)
+
+    return list_of_pairs

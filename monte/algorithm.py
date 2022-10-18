@@ -1,21 +1,30 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
+from datetime import datetime
+
+from monte.orders import Order
 from monte.portfolio import Portfolio
 
 
-class Algorithm():
+class Algorithm(ABC):
 
+    @abstractmethod
     def __init__(self) -> None:
         pass
 
+    @abstractmethod
     def get_portfolio(self) -> Portfolio:
-        raise NotImplementedError("You have to implement portfolio()!")
+        pass
 
+    @abstractmethod
     def startup(self) -> None:
-        raise NotImplementedError("You have to implement startup()!")
+        pass
 
-    def run_one_time_frame(self, current_datetime, processed_orders) -> None:
-        raise NotImplementedError("You have to implement run_one_time_frame()!")
+    @abstractmethod
+    def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]) -> None:
+        pass
 
+    @abstractmethod
     def cleanup(self) -> None:
-        raise NotImplementedError("You have to implement cleanup()!")
+        pass

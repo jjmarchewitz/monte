@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from functools import partial
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
@@ -15,8 +16,8 @@ def main():
     alpaca_api = AlpacaAPIBundle()
 
     ms = MachineSettings(
-        start_date="2020-09-09",
-        end_date="2022-10-04",
+        start_date=datetime(2020, 9, 9),
+        end_date=datetime(2022, 10, 4),
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
         derived_columns={
             "avg_l5": partial(global_vars.avg_last_n, n=5)

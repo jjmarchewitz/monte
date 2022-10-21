@@ -20,7 +20,6 @@ def main():
     # TODO: Documentation
     # TODO: Add logging
     # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
-    # TODO: Convert entire repo to datetime objects instead of date strings
     # TODO: Move algos and scratchpads to a separate repo, publish monte on pypi
 
     ms = MachineSettings(

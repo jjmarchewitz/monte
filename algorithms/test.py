@@ -53,7 +53,7 @@ class TestAlg(Algorithm):
             elif (df.iloc[-1].avg_l10 - df.iloc[-1].vwap) < 0:
                 self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
-        print(f"{current_datetime.date()} {current_datetime.hour}:{current_datetime.minute:02d} | "
+        print(f"{current_datetime.date()} {current_datetime.hour:02d}:{current_datetime.minute:02d} | "
               f"Total Value: ${self.portfolio.total_value():.2f}")
 
     def cleanup(self) -> None:

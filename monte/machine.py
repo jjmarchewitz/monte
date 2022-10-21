@@ -56,6 +56,12 @@ class TradingMachine():
         # Run the algorithms
         while True:
 
+            # Update the dataframes in the asset_manager
+            try:
+                self.am.increment_dataframes()
+            except StopIteration:
+                break
+
             # Process any orders and run each algorithm
             for algo in self.algo_instances:
                 portfolio = algo.get_portfolio()
@@ -63,12 +69,6 @@ class TradingMachine():
                 portfolio.delete_empty_positions()
                 current_datetime = portfolio.am._get_reference_asset().datetime()
                 algo.run_one_time_frame(current_datetime, processed_orders)
-
-            # Update the dataframes in the asset_manager
-            try:
-                self.am.increment_dataframes()
-            except StopIteration:
-                break
 
         # Run Machine cleanup code
         self.cleanup()

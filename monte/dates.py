@@ -25,7 +25,7 @@ class TradingDay():
 
 
 def get_list_of_trading_days_in_range(alpaca_api: AlpacaAPIBundle,
-                                      start_date: str, end_date: str) -> list[TradingDay]:
+                                      start_date: datetime, end_date: datetime) -> list[TradingDay]:
     """
     Returns a list of days (as TradingDay instances) that U.S. markets are open between the start and end
     dates provided. The result is inclusive of both the start and end dates.
@@ -50,7 +50,7 @@ def get_list_of_trading_days_in_range(alpaca_api: AlpacaAPIBundle,
 
 
 def _get_raw_trading_dates_in_range(alpaca_api: AlpacaAPIBundle,
-                                    start_date: str, end_date: str) -> list[entity.Calendar]:
+                                    start_date: datetime, end_date: datetime) -> list[entity.Calendar]:
     """
     This should not be used by end-users.
 
@@ -73,7 +73,7 @@ def _get_raw_trading_dates_in_range(alpaca_api: AlpacaAPIBundle,
         A list of alpaca_trade_api.Calendar instances that represents all of the days that U.S. markets were
         open.
     """
-    return alpaca_api.trading.get_calendar(start_date, end_date)
+    return alpaca_api.trading.get_calendar(start_date.isoformat(), end_date.isoformat())
 
 
 def _get_trading_day_obj_list_from_date_list(
@@ -137,8 +137,8 @@ def _get_trading_day_obj_list_from_date_list(
     return trading_days
 
 
-def get_list_of_buffer_ranges(alpaca_api: AlpacaAPIBundle, buffer_length: int, start_date: str,
-                              end_date: str) -> list[tuple[TradingDay, TradingDay]]:
+def get_list_of_buffer_ranges(alpaca_api: AlpacaAPIBundle, buffer_length: int, start_date: datetime,
+                              end_date: datetime) -> list[tuple[TradingDay, TradingDay]]:
     """DOC:"""
 
     trading_days = get_list_of_trading_days_in_range(alpaca_api, start_date, end_date)
@@ -149,8 +149,8 @@ def get_list_of_buffer_ranges(alpaca_api: AlpacaAPIBundle, buffer_length: int, s
 
     while True:
         # Get the start and end buffer dates from the list of TradingDays
-        buffer_start_date = trading_days[start_index].date.isoformat()
-        buffer_end_date = trading_days[end_index].date.isoformat()
+        buffer_start_date = trading_days[start_index].date
+        buffer_end_date = trading_days[end_index].date
 
         # Add the start and end buffer dates to the list
         list_of_pairs.append((buffer_start_date, buffer_end_date))

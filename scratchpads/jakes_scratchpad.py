@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from datetime import datetime
 from functools import partial
 
+import pytz
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 import derived_columns.definitions as dcolumns
@@ -22,9 +24,11 @@ def main():
     # TODO: Move algos and scratchpads to a separate repo, publish monte on pypi
 
     ms = MachineSettings(
-        start_date="2016-06-20",
-        end_date="2016-06-25",
-        time_frame=TimeFrame(1, TimeFrameUnit.Hour),
+        start_date=datetime(2016, 6, 20),
+        end_date=datetime(2019, 6, 25),
+        # start_date=datetime(2022, 3, 8),
+        # end_date=datetime(2022, 3, 15),
+        time_frame=TimeFrame(1, TimeFrameUnit.Minute),
         derived_columns={
             "net_l10": partial(dcolumns.net_over_last_n, col="vwap", n=10),
             "avg_l10": partial(dcolumns.avg_over_last_n, col="vwap", n=10),

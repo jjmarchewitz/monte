@@ -134,14 +134,12 @@ class Asset:
 
 def _get_alpaca_data(
         alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, symbols: list[str],
-        start_date: str, end_date: str) -> dict[str, pd.DataFrame]:
+        start_date: datetime, end_date: datetime) -> dict[str, pd.DataFrame]:
 
     buffer_data = alpaca_api.async_market_data_bars.get_bulk_bars(
         symbols, machine_settings.time_frame, start_date, end_date)
 
-    trading_days = get_list_of_trading_days_in_range(start_date, end_date)
-
-    # TODO: Filter and validate data
+    trading_days = get_list_of_trading_days_in_range(alpaca_api, start_date, end_date)
 
     for _, buffer in buffer_data.items():
 
@@ -184,12 +182,12 @@ def _get_alpaca_data(
             "vw": BASE_COLUMNS[7],  # vwap
         }, inplace=True)
 
-        # TODO: Standardize the timestamps and datetimes to be DST-aware (i.e. the market should always
-        # open at 9:30, not 10:30 or 13:30 or 14:30)
-
         # Add datetimes as a column
+        buffer.insert(loc=8, column=BASE_COLUMNS[8], value=-1)
+
+        # Populate datetime column
         buffer[BASE_COLUMNS[8]] = buffer.apply(
-            lambda row: isoparse(row.timestamp).astimezone(timezone('UTC')), axis=1)
+            lambda row: isoparse(row.timestamp).astimezone(machine_settings.time_zone), axis=1)
 
     # TODO: Verify all timestamps are the same across assets for a given row
 
@@ -199,9 +197,10 @@ def _get_alpaca_data(
 def _get_alpaca_data_as_process(
         output_queue: Queue, alpaca_api: AlpacaAPIBundle,
         machine_settings: MachineSettings, symbols: list[str],
-        start_date: str, end_date: str) -> None:
+        start_date: datetime, end_date: datetime) -> None:
 
-    buffer_ranges = get_list_of_buffer_ranges(alpaca_api, start_date, end_date)
+    buffer_ranges = get_list_of_buffer_ranges(
+        alpaca_api, machine_settings.data_buffer_days, start_date, end_date)
 
     for buffer_range in buffer_ranges:
         buffer_start_date = buffer_range[0]
@@ -236,15 +235,10 @@ class AssetManager:
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
         self.watched_assets = {}  # Dict of Assets
-        # self.trading_days = get_list_of_trading_days_in_range(
-        #     self.alpaca_api, self.machine_settings.start_date, self.machine_settings.end_date)
-
-        # self._buffer_ranges = self._calculate_list_of_buffer_dates()
+        self.simulation_running = False
 
         self._reference_symbol = "SPY"
         self.watch_asset(self._reference_symbol)
-
-        self.simulation_running = False
 
         self.buffered_df_queue = Queue()
 
@@ -287,9 +281,6 @@ class AssetManager:
     def increment_dataframes(self):
         """DOC:"""
 
-        # if not self.simulation_running:
-        #     raise StopIteration("Reached the end of simulation. No more trading days to run.")
-
         # If any asset's data buffer is empty, populate all assets with new data
         if any(asset.buffer.empty for asset in self.watched_assets.values()):
             self._populate_buffers()
@@ -297,20 +288,6 @@ class AssetManager:
         # Then, add the next row of buffered data to the watched assets (update the asset DFs)
         for asset in self.watched_assets.values():
             asset.increment_dataframe()
-
-        # If the buffer dataframes are on the next day, pop off the current TradingDay instance so it matches
-        # if self._trading_date_needs_to_be_incremented():
-        #     self.trading_days.pop(0)
-
-        # # If any buffers are empty at this point, that means they just ran out of data on the last
-        # # asset.increment_dataframe() call. A new buffer's worth of data must be requested from Alpaca
-        # # and another trading day must be skipped so that the new data does not overlap with the current
-        # # data. Without this, they overlap by one day.
-        # if any(asset.buffer.empty for asset in self.watched_assets.values()):
-        #     self.trading_days.pop(0)
-
-        # if len(self.trading_days) == 0:
-        #     self.simulation_running = False
 
     def _populate_buffers(self):
         """DOC:"""
@@ -331,18 +308,17 @@ class AssetManager:
         trading_days_before_current = get_list_of_trading_days_in_range(
             self.alpaca_api,
             (
-                datetime.fromisoformat(self.machine_settings.start_date) -
+                self.machine_settings.start_date -
                 timedelta(days=self.machine_settings.start_buffer_days) -
                 timedelta(days=30)
-            ).isoformat(),
+            ),
             (
-                datetime.fromisoformat(self.machine_settings.end_date) -
+                self.machine_settings.start_date -
                 timedelta(days=1)
-            ).isoformat())
+            ))
 
-        buffer_start_date = trading_days_before_current[-self.machine_settings.start_buffer_days].date.isoformat(
-        )
-        buffer_end_date = trading_days_before_current[-1].date.isoformat()
+        buffer_start_date = trading_days_before_current[-self.machine_settings.start_buffer_days].date
+        buffer_end_date = trading_days_before_current[-1].date
 
         start_buffer_data = _get_alpaca_data(
             self.alpaca_api,
@@ -358,27 +334,13 @@ class AssetManager:
             while not self.watched_assets[symbol].buffer.empty:
                 self.watched_assets[symbol].increment_dataframe()
 
-    # def _trading_date_needs_to_be_incremented(self) -> bool:
-    #     """DOC:"""
-    #     # Detect when the buffer dataframes have moved on past the current trading day (i.e. the TradingDay
-    #     # instance at index 0 in self.trading_days).
-    #     date_has_changed = False
-
-    #     for asset in self.watched_assets.values():
-    #         most_recent_row_timestamp = isoparse(asset.df.iloc[-1].timestamp)
-
-    #         if len(self.trading_days) > 1:
-    #             if most_recent_row_timestamp.date() != self.trading_days[0].date:
-    #                 if most_recent_row_timestamp.date() == self.trading_days[1].date:
-    #                     date_has_changed = True
-
-    #     return date_has_changed
-
     def watch_asset(self, symbol: str) -> None:
         """DOC:"""
 
-        # TODO: Raise error if trying to add a symbol when the simulation has already started
-        if not self.is_watching_asset(symbol):
+        if self.simulation_running:
+            raise RuntimeError("Cannot watch assets while a simulation is running.")
+
+        elif not self.is_watching_asset(symbol):
             self.watched_assets[symbol] = Asset(self.alpaca_api, self.machine_settings, symbol)
 
     def is_watching_asset(self, symbol: str) -> bool:

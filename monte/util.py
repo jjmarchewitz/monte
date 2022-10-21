@@ -4,6 +4,7 @@ import gzip
 import json
 import os
 import pathlib
+from datetime import datetime
 from typing import TypeVar
 
 import asks
@@ -45,7 +46,7 @@ class AsyncAlpacaBars():
         # The base url is something like "https://data.alpaca.markets"
         self.base_url = base_url
 
-    async def get_bars(self, symbol: str, time_frame: TimeFrame, start_date: str, end_date: str,
+    async def get_bars(self, symbol: str, time_frame: TimeFrame, start_date: datetime, end_date: datetime,
                        output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
         """DOC:"""
 
@@ -55,8 +56,8 @@ class AsyncAlpacaBars():
         # HTTPS GET request parameters
         params = {
             "adjustment": adjustment,
-            "start": start_date,
-            "end": end_date,
+            "start": start_date.isoformat(),
+            "end": end_date.isoformat(),
             "timeframe": str(time_frame),
             "limit": limit
         }
@@ -115,7 +116,7 @@ class AsyncAlpacaBars():
 
         output_dict[symbol] = df
 
-    def get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: str, end_date: str,
+    def get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: datetime, end_date: datetime,
                       adjustment: str = 'all', limit: int = 10000) -> dict[str, pd.DataFrame]:
 
         output_dict = {}
@@ -132,7 +133,7 @@ class AsyncAlpacaBars():
 
         return output_dict
 
-    async def _async_get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: str, end_date: str, output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
+    async def _async_get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: datetime, end_date: datetime, output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
         async with trio.open_nursery() as n:
             for symbol in symbols:
                 n.start_soon(

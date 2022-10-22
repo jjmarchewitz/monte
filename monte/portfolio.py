@@ -27,7 +27,7 @@ class Portfolio():
     _current_order_id_number: int
 
     def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings,
-                 starting_cash: int = 10000, name: str = None) -> None:
+                 starting_cash: int = 10000, name: str = "") -> None:
         """
         Constructor for the Portfolio class.
 
@@ -52,7 +52,6 @@ class Portfolio():
         self.cash = starting_cash
         self.name = name
         self.positions = {}
-        self.am = None
         self._order_queue = []
         self._current_order_id_number = 0
 
@@ -80,7 +79,7 @@ class Portfolio():
         """DOC:"""
         return symbol in self.positions.keys()
 
-    def _create_position(self, symbol: str, initial_quantity: int) -> Position:
+    def _create_position(self, symbol: str, initial_quantity: float) -> Position:
         """DOC:"""
         return Position(self.alpaca_api, self.machine_settings, self.am, symbol, initial_quantity)
 
@@ -93,7 +92,7 @@ class Portfolio():
 
         return total
 
-    def watch(self, symbol) -> None:
+    def watch(self, symbol: str) -> None:
         """DOC:"""
         self.am.watch_asset(symbol)
 

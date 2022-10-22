@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from multiprocessing import Process, Queue
+from typing import ItemsView
 
-import numpy as np
 import pandas as pd
 from alpaca_trade_api import TimeFrameUnit
 from dateutil.parser import isoparse
-from pytz import timezone
 
-from derived_columns.decorator import DFIdentifier
 from monte.dates import (TradingDay, get_list_of_buffer_ranges,
                          get_list_of_trading_days_in_range)
 from monte.machine_settings import MachineSettings
@@ -24,7 +22,8 @@ BASE_COLUMNS = [
     'volume',
     'trade_count',
     'vwap',
-    'datetime']
+    'datetime',
+    'symbol']
 
 
 class Asset:
@@ -110,17 +109,13 @@ class Asset:
 
         # If the main dataframe has at least "start_buffer" amount of rows
         if (self._df_has_start_buffer_rows or
-                self._count_unique_days_in_dataframe() >= self.machine_settings.start_buffer_days):
+                self._count_unique_days_in_dataframe() > self.machine_settings.start_buffer_days):
 
             self._df_has_start_buffer_rows = True
 
-            # Create an identifier for the dataframe in its current state
-            timestamp = self.df.iloc[-1].timestamp
-            identifier = DFIdentifier(self.symbol, timestamp)
-
             # Calculate and add the values of all derived columns
             for column_title, column_func in self.machine_settings.derived_columns.items():
-                self.df.at[self.df.index[-1], column_title] = column_func(identifier, self.df)
+                self.df.at[self.df.index[-1], column_title] = column_func(self.df)
 
     def _count_unique_days_in_dataframe(self):
         """DOC:"""
@@ -134,15 +129,16 @@ class Asset:
 
 def _get_alpaca_data(
         alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, symbols: list[str],
-        start_date: datetime, end_date: datetime) -> dict[str, pd.DataFrame]:
+        start_date: date, end_date: date) -> dict[str, pd.DataFrame]:
 
     buffer_data = alpaca_api.async_market_data_bars.get_bulk_bars(
         symbols, machine_settings.time_frame, start_date, end_date)
 
     trading_days = get_list_of_trading_days_in_range(alpaca_api, start_date, end_date)
 
-    for _, buffer in buffer_data.items():
+    for symbol, buffer in buffer_data.items():
 
+        # Iterate over the rows
         for index, row in buffer.iterrows():
 
             # The date of the current row
@@ -188,6 +184,9 @@ def _get_alpaca_data(
         # Populate datetime column
         buffer[BASE_COLUMNS[8]] = buffer.apply(
             lambda row: isoparse(row.timestamp).astimezone(machine_settings.time_zone), axis=1)
+
+        # Add symbol as a column
+        buffer.insert(loc=9, column=BASE_COLUMNS[9], value=symbol)
 
     # TODO: Verify all timestamps are the same across assets for a given row
 
@@ -274,7 +273,7 @@ class AssetManager:
     def cleanup(self) -> None:
         self.data_getter_process.join()
 
-    def items(self) -> dict[str, Asset]:
+    def items(self) -> ItemsView[str, Asset]:
         """DOC:"""
         return self.watched_assets.items()
 

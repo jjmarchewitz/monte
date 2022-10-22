@@ -4,8 +4,8 @@ import gzip
 import json
 import os
 import pathlib
-from datetime import datetime
-from typing import TypeVar
+from datetime import date, datetime
+from typing import Type, TypeVar
 
 import asks
 import pandas as pd
@@ -116,7 +116,7 @@ class AsyncAlpacaBars():
 
         output_dict[symbol] = df
 
-    def get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: datetime, end_date: datetime,
+    def get_bulk_bars(self, symbols: list[str], time_frame: TimeFrame, start_date: date, end_date: date,
                       adjustment: str = 'all', limit: int = 10000) -> dict[str, pd.DataFrame]:
 
         output_dict = {}
@@ -133,7 +133,7 @@ class AsyncAlpacaBars():
 
         return output_dict
 
-    async def _async_get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: datetime, end_date: datetime, output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
+    async def _async_get_bulk_bars(self, symbols: list[str], time_frame: TimeFrame, start_date: datetime, end_date: datetime, output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
         async with trio.open_nursery() as n:
             for symbol in symbols:
                 n.start_soon(
@@ -239,7 +239,7 @@ class AlpacaAPIBundle():
 
         return lru_instance
 
-    def _create_api_instances(self, api_class: T, endpoint: str) -> list[T]:
+    def _create_api_instances(self, api_class: Type[T], endpoint: str) -> list[T]:
         """DOC:"""
         api_instance_list = []
 

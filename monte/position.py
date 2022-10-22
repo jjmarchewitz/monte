@@ -14,10 +14,10 @@ class Position():
     machine_settings: MachineSettings
     am: AssetManager
     symbol: str
-    initial_quantity: int
+    initial_quantity: float
 
     def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings,
-                 am: AssetManager, symbol: str, initial_quantity: int) -> None:
+                 am: AssetManager, symbol: str, initial_quantity: float) -> None:
         """DOC:"""
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings

@@ -4,6 +4,7 @@
 
 from dataclasses import dataclass
 from datetime import date, datetime
+from typing import no_type_check
 
 from alpaca_trade_api import entity
 from dateutil.parser import isoparse
@@ -25,7 +26,7 @@ class TradingDay():
 
 
 def get_list_of_trading_days_in_range(alpaca_api: AlpacaAPIBundle,
-                                      start_date: datetime, end_date: datetime) -> list[TradingDay]:
+                                      start_date: date, end_date: date) -> list[TradingDay]:
     """
     Returns a list of days (as TradingDay instances) that U.S. markets are open between the start and end
     dates provided. The result is inclusive of both the start and end dates.
@@ -50,7 +51,7 @@ def get_list_of_trading_days_in_range(alpaca_api: AlpacaAPIBundle,
 
 
 def _get_raw_trading_dates_in_range(alpaca_api: AlpacaAPIBundle,
-                                    start_date: datetime, end_date: datetime) -> list[entity.Calendar]:
+                                    start_date: date, end_date: date) -> list[entity.Calendar]:
     """
     This should not be used by end-users.
 
@@ -76,6 +77,7 @@ def _get_raw_trading_dates_in_range(alpaca_api: AlpacaAPIBundle,
     return alpaca_api.trading.get_calendar(start_date.isoformat(), end_date.isoformat())
 
 
+@no_type_check
 def _get_trading_day_obj_list_from_date_list(
         calendar_instance_list: list[entity.Calendar]) -> list[TradingDay]:
     """
@@ -89,6 +91,7 @@ def _get_trading_day_obj_list_from_date_list(
     Returns:
         A list of TradingDay instances that represents a range of days the market was open.
     """
+
     trading_days = []
 
     for day in calendar_instance_list:
@@ -96,9 +99,11 @@ def _get_trading_day_obj_list_from_date_list(
         # Create a date object (from the datetime library) for the calendar date of the
         # market day
         trading_date = date(
-            day.date.year,
-            day.date.month,
-            day.date.day
+            # Types are ignored because the Alpaca API is using a non-type-hinted __getattr__ function
+            # so Pylance freaks out when it doesn't need to.
+            day.date.year,  # type: ignore
+            day.date.month,  # type: ignore
+            day.date.day  # type: ignore
         )
 
         # Grab the DST-aware timezone object for eastern time
@@ -106,27 +111,25 @@ def _get_trading_day_obj_list_from_date_list(
 
         # Create a datetime object for the opening time with the timezone info attached
         open_time = timezone_ET.localize(datetime(
-            day.date.year,
-            day.date.month,
-            day.date.day,
-            day.open.hour,
-            day.open.minute
+            # Types are ignored because the Alpaca API is using a non-type-hinted __getattr__ function
+            # so Pylance freaks out when it doesn't need to.
+            day.date.year,  # type: ignore
+            day.date.month,  # type: ignore
+            day.date.day,  # type: ignore
+            day.open.hour,  # type: ignore
+            day.open.minute  # type: ignore
         ))
 
         # Create a datetime object for the closing time with the timezone info attached
         close_time = timezone_ET.localize(datetime(
-            day.date.year,
-            day.date.month,
-            day.date.day,
-            day.close.hour,
-            day.close.minute
+            # Types are ignored because the Alpaca API is using a non-type-hinted __getattr__ function
+            # so Pylance freaks out when it doesn't need to.
+            day.date.year,  # type: ignore
+            day.date.month,  # type: ignore
+            day.date.day,  # type: ignore
+            day.close.hour,  # type: ignore
+            day.close.minute  # type: ignore
         ))
-
-        # Convert the opening and closing times to ISO-8601
-        # Literally dont even fucking ask me how long it took to get the data in the
-        # right format for this to work.
-        open_time = isoparse(open_time.isoformat())
-        close_time = isoparse(close_time.isoformat())
 
         # Create a TradingDay object with the right open/close times and append it to
         # the list of all such TradingDay objects within the span between start_date and
@@ -137,8 +140,8 @@ def _get_trading_day_obj_list_from_date_list(
     return trading_days
 
 
-def get_list_of_buffer_ranges(alpaca_api: AlpacaAPIBundle, buffer_length: int, start_date: datetime,
-                              end_date: datetime) -> list[tuple[TradingDay, TradingDay]]:
+def get_list_of_buffer_ranges(alpaca_api: AlpacaAPIBundle, buffer_length: int, start_date: date,
+                              end_date: date) -> list[tuple[date, date]]:
     """DOC:"""
 
     trading_days = get_list_of_trading_days_in_range(alpaca_api, start_date, end_date)

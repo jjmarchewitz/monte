@@ -1,16 +1,16 @@
 import pandas as pd
 
-from derived_columns.decorator import DFIdentifier, derived_column
+from derived_columns.decorator import derived_column
 
 
 @derived_column
-def net_over_last_n(ident: DFIdentifier, df: pd.DataFrame, col: str, n: int) -> float:
+def net_over_last_n(df: pd.DataFrame, col: str, n: int) -> float:
     """DOC:"""
     return df.iloc[-n - 1][col] - df.iloc[-1][col]
 
 
 @derived_column
-def avg_over_last_n(ident: DFIdentifier, df: pd.DataFrame, col: str, n: int) -> float:
+def avg_over_last_n(df: pd.DataFrame, col: str, n: int) -> float:
     """DOC:"""
     total = 0
 
@@ -23,10 +23,10 @@ def avg_over_last_n(ident: DFIdentifier, df: pd.DataFrame, col: str, n: int) -> 
 
 
 @derived_column
-def std_dev_over_last_n(ident: DFIdentifier, df: pd.DataFrame, col: str, n: int) -> float:
+def std_dev_over_last_n(df: pd.DataFrame, col: str, n: int) -> float:
     """DOC:"""
 
-    avg = avg_over_last_n(ident, df, col, n)
+    avg = avg_over_last_n(df, col, n)
 
     sum_of_squared_differences = sum([(df.iloc[-i][col] - avg) ** 2 for i in range(1, n + 1)])
 

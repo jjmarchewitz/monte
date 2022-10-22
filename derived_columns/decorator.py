@@ -1,36 +1,45 @@
 from dataclasses import dataclass
 from functools import wraps
 
+import pandas as pd
+
 
 # Using eq=True and frozen=True makes the dataclass automatically hashable
 @dataclass(eq=True, frozen=True)
 class DFIdentifier():
-    """DOC:"""
+    """
+    Hashable Dataclass that acts as an ID for a Pandas DataFrame
+    """
     symbol: str
     timestamp: str
 
 
 def derived_column(func):
-    """DOC:"""
+    """
+    Wraps around a derived column function
+
+    Args:
+        func: A function that takes in a pd.DataFrame and returns a single value based on the bottom rows.
+
+    Returns:
+        A derived column function with a cache
+    """
     func.cache_ = {}
 
-    # TODO: Hide the DFIdentifier functionality. Create an identifier instance here (inside the decorator)
-    # based on the dataframe that was passed in. That way, the first argument just has to be the dataframe.
-
     @wraps(func)
-    def inner(identifier: DFIdentifier, *args, **kwargs):
+    def inner(df: pd.DataFrame, *args, **kwargs):
 
-        # Make sure the first argument is an instance of DFIdentifier
-        if not isinstance(identifier, DFIdentifier):
-            raise TypeError("The first parameter of a function decorated by derived_column must be an "
-                            "instance of DFIdentifier.")
+        current_identifier = DFIdentifier(df.iloc[-1].symbol, df.iloc[-1].timestamp)
 
-        # TODO: purge cache if incoming identifier's timestamp is different. Possible store latest
-        # timestamp as another function attribute (like cache_)
+        # Purge cache if incoming identifier's timestamp is different.
+        if any(existing_identifier.timestamp != current_identifier.timestamp
+               for existing_identifier in func.cache_.keys()):
+            func.cache_ = {}
 
-        if identifier not in func.cache_:
-            func.cache_[identifier] = func(identifier, *args, **kwargs)
+        # If the current identifier is not in the cache, add it to the cache
+        if current_identifier not in func.cache_:
+            func.cache_[current_identifier] = func(df, *args, **kwargs)
 
-        return func.cache_[identifier]
+        return func.cache_[current_identifier]
 
     return inner

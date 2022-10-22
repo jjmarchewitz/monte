@@ -22,7 +22,7 @@ def main():
         derived_columns={
 
         },
-        max_rows_in_df=500,
+        max_rows_in_test_df=500,
         start_buffer_days=5,  # TradingDays
         data_buffer_days=500,  # TradingDays
     )

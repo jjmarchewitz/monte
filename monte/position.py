@@ -30,10 +30,10 @@ class Position():
         """DOC:"""
         return self.am[self.symbol]
 
-    def price(self):
+    def price(self) -> float:
         """DOC:"""
         return self.am[self.symbol].iloc[-1].vwap
 
-    def total_value(self):
+    def total_value(self) -> float:
         """DOC:"""
         return self.price() * self.quantity

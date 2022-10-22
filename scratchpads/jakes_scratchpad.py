@@ -26,14 +26,14 @@ def main():
 
     ms = MachineSettings(
         start_date=datetime(2018, 3, 8),
-        end_date=datetime(2022, 3, 15),
+        end_date=datetime(2018, 3, 15),
         time_frame=TimeFrame(1, TimeFrameUnit.Minute),
         derived_columns={
-            "net_l10": partial(dcolumns.net_over_last_n, col="vwap", n=10),
-            "avg_l10": partial(dcolumns.avg_over_last_n, col="vwap", n=10),
-            "std_dev_l10": partial(dcolumns.std_dev_over_last_n, col="vwap", n=10)
+            "net_l10": partial(dcolumns.net_over, col="vwap", n=10),
+            "avg_l10": partial(dcolumns.avg_over, col="vwap", n=10),
+            "std_dev_l10": partial(dcolumns.std_dev, col="vwap", n=10)
         },
-        max_rows_in_df=100,
+        max_rows_in_test_df=100,
     )
 
     trading_machine = TradingMachine(alpaca_api, ms)

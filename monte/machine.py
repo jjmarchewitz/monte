@@ -82,3 +82,8 @@ class TradingMachine():
 
         # Run cleanup code for asset_manager
         self.am.cleanup()
+
+        # Print out final returns for all algos tested
+        print("\n\n -- FINAL RETURNS --\n")
+        for algo in self.algo_instances:
+            print(f"{type(algo)} | {algo.get_portfolio().total_value()} | {algo.get_portfolio().current_return()}")

@@ -104,7 +104,7 @@ class Asset:
 
         # Drop the oldest row in the main df if it exceeds the configured length limit
         # (machine_settings.max_rows_in_df)
-        if len(self.df.index) > self.machine_settings.max_rows_in_df:
+        if len(self.df.index) > self.machine_settings.max_rows_in_test_df:
             self.df.drop(self.df.head(1).index, inplace=True)
 
         # If the main dataframe has at least "start_buffer" amount of rows

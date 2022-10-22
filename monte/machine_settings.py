@@ -13,21 +13,21 @@ class MachineSettings():
     end_date: datetime
     time_frame: TimeFrame
     derived_columns: dict
-    max_rows_in_df: int
+    max_rows_in_test_df: int
     start_buffer_days: int
     data_buffer_days: int
     time_zone: pytz.tzinfo.BaseTzInfo
 
     def __init__(
             self, start_date: datetime, end_date: datetime, time_frame: TimeFrame, derived_columns: dict = {},
-            max_rows_in_df: int = 1_000, start_buffer_days: Union[int, None] = None,
+            max_rows_in_test_df: int = 1_000, start_buffer_days: Union[int, None] = None,
             data_buffer_days: Union[int, None] = None, time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone(
                 'US/Eastern')) -> None:
         self.start_date = start_date
         self.end_date = end_date
         self.time_frame = time_frame
         self.derived_columns = derived_columns
-        self.max_rows_in_df = max_rows_in_df
+        self.max_rows_in_test_df = max_rows_in_test_df
         self.time_zone = time_zone
 
         self.validate_dates()
@@ -114,7 +114,7 @@ class MachineSettings():
                 raise ValueError("machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
                                  "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
-        start_buffer_days = int(self.max_rows_in_df / rows_per_day) + 10
+        start_buffer_days = int(self.max_rows_in_test_df / rows_per_day) + 10
 
         return start_buffer_days
 

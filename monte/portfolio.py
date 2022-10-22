@@ -5,11 +5,11 @@ from typing import Union
 
 import pandas as pd
 
+from monte.api import AlpacaAPIBundle
 from monte.asset_manager import AssetManager
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderStatus, OrderType
 from monte.position import Position
-from monte.util import AlpacaAPIBundle
 
 
 class Portfolio():
@@ -96,7 +96,7 @@ class Portfolio():
 
     def current_return(self) -> float:
         """DOC:"""
-        return (self.total_value() / self.starting_cash) * 100
+        return ((self.total_value() - self.starting_cash) / self.starting_cash) * 100
 
     def watch(self, symbol: str) -> None:
         """DOC:"""

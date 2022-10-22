@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from monte.algorithm import Algorithm
+from monte.api import AlpacaAPIBundle
 from monte.asset_manager import AssetManager
 from monte.machine_settings import MachineSettings
 from monte.portfolio import Portfolio
-from monte.util import AlpacaAPIBundle
 
 
 class TradingMachine():
@@ -25,7 +25,7 @@ class TradingMachine():
     def add_algo_instance(self, algorithm_with_portfolio: Algorithm):
         """DOC:"""
 
-        if not issubclass(type(algorithm_with_portfolio), Algorithm):
+        if not isinstance(algorithm_with_portfolio, Algorithm):
             raise TypeError("You must pass an instance of a subclass of Algorithm into add_algo_instance().")
 
         if not isinstance(algorithm_with_portfolio.get_portfolio(), Portfolio):
@@ -84,6 +84,8 @@ class TradingMachine():
         self.am.cleanup()
 
         # Print out final returns for all algos tested
-        print("\n\n -- FINAL RETURNS --\n")
+        print("\n\n -- RESULTS -- \n")
         for algo in self.algo_instances:
-            print(f"{type(algo)} | {algo.get_portfolio().total_value()} | {algo.get_portfolio().current_return()}")
+            print(f"{algo.name} | ${round(algo.get_portfolio().total_value(), 2):,} | "
+                  f"{round(algo.get_portfolio().current_return(), 3):+}%")
+        print("\n")

@@ -10,7 +10,7 @@ from alpaca_trade_api import entity
 from dateutil.parser import isoparse
 from pytz import timezone
 
-from monte.util import AlpacaAPIBundle
+from monte.api import AlpacaAPIBundle
 
 
 @dataclass

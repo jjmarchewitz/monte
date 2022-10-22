@@ -8,10 +8,10 @@ import pandas as pd
 from alpaca_trade_api import TimeFrameUnit
 from dateutil.parser import isoparse
 
+from monte.api import AlpacaAPIBundle
 from monte.dates import (TradingDay, get_list_of_buffer_ranges,
                          get_list_of_trading_days_in_range)
 from monte.machine_settings import MachineSettings
-from monte.util import AlpacaAPIBundle
 
 BASE_COLUMNS = [
     'timestamp',

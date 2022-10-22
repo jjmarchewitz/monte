@@ -7,9 +7,9 @@ from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 from algorithms.peak_detection import PeakDetection
 from derived_columns import general
+from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
 from monte.machine_settings import MachineSettings
-from monte.util import AlpacaAPIBundle
 
 
 def main():

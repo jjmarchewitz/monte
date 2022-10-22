@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import pandas as pd
 
+from monte.api import AlpacaAPIBundle
 from monte.asset_manager import AssetManager
 from monte.machine_settings import MachineSettings
-from monte.util import AlpacaAPIBundle
 
 
 class Position():

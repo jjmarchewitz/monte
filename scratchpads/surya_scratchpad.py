@@ -7,9 +7,9 @@ from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 from algorithms import test
 from monte import global_vars
+from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
 from monte.machine_settings import MachineSettings
-from monte.util import AlpacaAPIBundle
 
 
 def main():

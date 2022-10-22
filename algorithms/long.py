@@ -3,10 +3,10 @@ from __future__ import annotations
 from datetime import datetime
 
 from monte.algorithm import Algorithm
+from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
 from monte.portfolio import Portfolio
-from monte.util import AlpacaAPIBundle
 
 
 class Long(Algorithm):

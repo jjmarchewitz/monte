@@ -1,5 +1,7 @@
+import math
 from datetime import datetime
-from typing import Union
+from functools import partial
+from typing import Callable, Union
 
 import pytz
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
@@ -22,16 +24,16 @@ class MachineSettings():
     def __init__(
             self, start_date: datetime, end_date: datetime, training_data_percentage: float,
             time_frame: TimeFrame, derived_columns: dict = {},
-            max_rows_in_test_df: int = 1_000, start_buffer_days: Union[int, None] = None,
-            data_buffer_days: Union[int, None] = None, time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone(
+            max_rows_in_test_df: int = 10, time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone(
                 'US/Eastern')) -> None:
         self.start_date = start_date
         self.end_date = end_date
         self.training_data_percentage = training_data_percentage
         self.time_frame = time_frame
         self.derived_columns = derived_columns
-        self.max_rows_in_test_df = max_rows_in_test_df
         self.time_zone = time_zone
+
+        self.max_rows_in_test_df = max_rows_in_test_df
 
         self.validate_dates()
         self.validate_trading_data_percentage()
@@ -41,16 +43,10 @@ class MachineSettings():
         self.add_tz_info_to_dates()
 
         # Derive the start buffer days if it is not provided
-        if start_buffer_days is not None:
-            self.start_buffer_days = start_buffer_days
-        else:
-            self.start_buffer_days = self.calculate_start_buffer_days()
+        self.start_buffer_days = self.calculate_start_buffer_days()
 
         # Derive the data buffer days if it is not provided
-        if data_buffer_days is not None:
-            self.data_buffer_days = data_buffer_days
-        else:
-            self.data_buffer_days = self.calculate_data_buffer_days()
+        self.data_buffer_days = self.calculate_data_buffer_days()
 
         self.validate_data_buffer_days()
 
@@ -107,7 +103,7 @@ class MachineSettings():
 
         rows_per_day = self.rows_per_day()
 
-        start_buffer_days = int(self.max_rows_in_test_df / rows_per_day) + 10
+        start_buffer_days = math.ceil(self.max_rows_in_test_df / rows_per_day)
 
         return start_buffer_days
 
@@ -156,3 +152,43 @@ class MachineSettings():
             case _:
                 raise ValueError("machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
                                  "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
+
+    def add_derived_columns(self, new_columns: dict[str, Callable]) -> None:
+        """DOC:"""
+        for column_title, new_column_func in new_columns.items():
+
+            if column_title in self.derived_columns.keys():
+
+                existing_func = self.derived_columns[column_title]
+
+                if (isinstance(existing_func, partial) and isinstance(new_column_func, partial) and
+                        existing_func.func == new_column_func.func and
+                        existing_func.args == new_column_func.args and
+                        existing_func.keywords == new_column_func.keywords):
+                    continue
+                elif existing_func == new_column_func:
+                    continue
+                else:
+                    raise ValueError(
+                        f"Attempted to add a new derived column with the same name as an existing column "
+                        f"but a different function. The column name is {column_title}. \n"
+                        f"Existing Function: {existing_func}\nNew Function: {new_column_func}")
+
+            else:
+                if callable(new_column_func):
+                    self.derived_columns[column_title] = new_column_func
+                else:
+                    raise ValueError("Tried to add a non-callable object as a derived column.")
+
+        # Update other attributes of machine_settings based on the new derived columns
+        self.update_max_rows_in_df()
+        self.start_buffer_days = self.calculate_start_buffer_days()
+
+    def update_max_rows_in_df(self):
+        """DOC:"""
+
+        for _, column_func in self.derived_columns.items():
+            # TODO: Stop relying on a consistent parameter name in column functions, maybe
+            # somehow use a decorator?
+            if isinstance(column_func, partial) and 'n' in column_func.keywords.keys():
+                self.max_rows_in_test_df = max(self.max_rows_in_test_df, column_func.keywords['n'])

@@ -11,17 +11,11 @@ from monte.portfolio import Portfolio
 
 class PeakDetection(Algorithm):
 
-    alpaca_api: AlpacaAPIBundle
-    machine_settings: MachineSettings
-    portfolio: Portfolio
-
     def __init__(self, alpaca_api: AlpacaAPIBundle,
-                 machine_settings: MachineSettings) -> None:
+                 machine_settings: MachineSettings, name: str, starting_cash: float) -> None:
 
-        self.alpaca_api = alpaca_api
-        self.machine_settings = machine_settings
-
-        self.portfolio = Portfolio(self.alpaca_api, self.machine_settings, starting_cash=10_000)
+        # Sets up instance variables and instantiates a Portfolio as self.portfolio
+        super().__init__(alpaca_api, machine_settings, name, starting_cash)
 
         self.symbol = "GME"
 
@@ -33,6 +27,9 @@ class PeakDetection(Algorithm):
 
         # Initial buy
         self.portfolio.place_order(self.symbol, 10, OrderType.BUY)
+
+    def train(self) -> None:
+        pass
 
     def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
 

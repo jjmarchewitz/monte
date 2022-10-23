@@ -14,20 +14,28 @@ from monte.dates import (TradingDay, get_list_of_buffer_ranges,
                          get_list_of_trading_days_in_range)
 from monte.machine_settings import MachineSettings
 
-BASE_COLUMNS = [
-    'timestamp',
-    'open',
-    'high',
-    'low',
-    'close',
-    'volume',
-    'trade_count',
-    'vwap',
-    'datetime',
-    'symbol']
+
+class BaseColumns(Enum):
+    """
+    An Enum holding the names of all of the columns in the training and testing data before derived columns
+    are added.
+    """
+    TIMESTAMP = 'timestamp'
+    OPEN = 'open'
+    HIGH = 'high'
+    LOW = 'low'
+    CLOSE = 'close'
+    VOLUME = 'volume'
+    TRADE_COUNT = 'trade_count'
+    VWAP = 'vwap'
+    DATETIME = 'datetime'
+    SYMBOL = 'symbol'
 
 
 class DataDestination(Enum):
+    """
+    An Enum holding the locations that an asset's buffer data can be moved into.
+    """
     TRAINING_DATA = 1
     TESTING_DATA = 2
 
@@ -40,31 +48,30 @@ class Asset:
 
     alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
+    base_columns: list[str]
+    buffer: pd.DataFrame
     training_df: pd.DataFrame
     testing_df: pd.DataFrame
-    buffer: pd.DataFrame
-    base_columns: list[str]
     _finished_populating_start_buffer: bool
 
     def __init__(self, alpaca_api: AlpacaAPIBundle,
                  machine_settings: MachineSettings, symbol: str) -> None:
-        """
-        Constructor for Asset
-
-        Args:
-            alpaca_api:
-                A bundle of Alpaca APIs all created and authenticated with the keys in the repo's
-                alpaca_config.json
-
-            machine_settings:
-                An instance of machine.MachineSettings that contains configuration for the current simulation.
-
-            symbol:
-                A string containing the market symbol that this Asset represents.
-        """
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
         self.symbol = symbol
+
+        self.base_columns = [
+            BaseColumns.DATETIME.value,
+            BaseColumns.VWAP.value,
+            BaseColumns.OPEN.value,
+            BaseColumns.HIGH.value,
+            BaseColumns.LOW.value,
+            BaseColumns.CLOSE.value,
+            BaseColumns.VOLUME.value,
+            BaseColumns.TRADE_COUNT.value,
+            BaseColumns.TIMESTAMP.value,
+            BaseColumns.SYMBOL.value,
+        ]
 
         # Create empty dataframes
         self.reset_main_dfs()
@@ -73,12 +80,21 @@ class Asset:
         self._finished_populating_start_buffer = False
 
     def price(self):
+        """
+        Returns the latest price contained in the testing data.
+        """
         return self.testing_df.iloc[-1].vwap
 
     def timestamp(self):
+        """
+        Returns the latest timestamp contained in the testing data.
+        """
         return self.testing_df.iloc[-1].timestamp
 
     def datetime(self):
+        """
+        Returns the latest datetime contained in the testing data.
+        """
         return self.testing_df.iloc[-1].datetime
 
     def reset_main_dfs(self) -> None:
@@ -86,7 +102,7 @@ class Asset:
         Creates a new, empty dataframe with all of the base columns and derived columns. The result is
         stored in self.df.
         """
-        columns = BASE_COLUMNS.copy()
+        columns = self.base_columns.copy()
         columns.extend(self.machine_settings.derived_columns.keys())
         self.training_df = pd.DataFrame({}, columns=columns)
         self.testing_df = pd.DataFrame({}, columns=columns)
@@ -96,10 +112,15 @@ class Asset:
         Creates a new, empty dataframe with only the base columns (NOT derived columns). The result is
         stored in self.buffer.
         """
-        self.buffer = pd.DataFrame({}, columns=BASE_COLUMNS)
+        self.buffer = pd.DataFrame({}, columns=self.base_columns)
 
     def increment_dataframe(self, data_destination: DataDestination):
-        """DOC:"""
+        """
+        Performs all of the actions needed to increment the destination dataframe (indicated by
+        ``data_destination``) forward by one time_frame. This includes moving a row from the buffer
+        to the destination dataframe, trimming down the number of rows in the destination dataframe (if
+        needed), and adding data for all of the derived columns to the new row.
+        """
 
         # Grab a copy of the latest row from the buffer
         latest_row = self.buffer.head(1)
@@ -117,8 +138,9 @@ class Asset:
         else:
             raise ValueError("Invalid data_destination. Must be a member of the DataDestination enum.")
 
-        # If the testing df is selected
-        if (data_destination is DataDestination.TESTING_DATA and
+        # Keep removing the top row (oldest data) until the dataframe has been reduced to the maximum allowed
+        # number of rows
+        while (data_destination is DataDestination.TESTING_DATA and
                 len(self.testing_df.index) > self.machine_settings.max_rows_in_test_df):
 
             # Drop the oldest row if it exceeds the configured length limit (machine_settings.max_rows_in_df)
@@ -136,21 +158,28 @@ class Asset:
 
     def _switch_to_testing_data(self) -> None:
         """DOC:"""
+        # Copy a start buffer's worth of data to the head of the testing_df
+        self.testing_df = self.training_df.tail(
+            int(self.machine_settings.rows_per_day() *
+                (self.machine_settings.start_buffer_days + 1)))
+
+        self._remove_start_buffer_data_from_training_df()
+
+    def _remove_start_buffer_data_from_training_df(self) -> None:
+        """DOC:"""
         # Remove the start buffer data from the training_df
         self.training_df = self.training_df.loc[
             self.training_df['datetime'] > self.machine_settings.start_date]
-
-        # Copy a start buffer's worth of data to the head of the testing_df
-        self.testing_df = self.training_df.iloc[
-            -(self.machine_settings.rows_per_day() * self.machine_settings.start_buffer_days):-1]
 
     def _count_unique_days_in_dataframes(self):
         """DOC:"""
         unique_days = set()
 
+        # Add all of the dates from the training df to the set of unique days
         for datetime in self.training_df.datetime:
             unique_days.add(str(datetime.date()))
 
+        # Add all of the dates from the testing df to the set of unique days
         for datetime in self.testing_df.datetime:
             unique_days.add(str(datetime.date()))
 
@@ -160,6 +189,7 @@ class Asset:
 def _get_alpaca_data(
         alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, symbols: list[str],
         start_date: date, end_date: date) -> dict[str, pd.DataFrame]:
+    """DOC:"""
 
     buffer_data = alpaca_api.async_market_data_bars.get_bulk_bars(
         symbols, machine_settings.time_frame, start_date, end_date)
@@ -198,25 +228,25 @@ def _get_alpaca_data(
 
         # Rename columns to more human-friendly names
         buffer.rename(columns={
-            "t": BASE_COLUMNS[0],  # timestamp
-            "o": BASE_COLUMNS[1],  # open
-            "h": BASE_COLUMNS[2],  # high
-            "l": BASE_COLUMNS[3],  # low
-            "c": BASE_COLUMNS[4],  # close
-            "v": BASE_COLUMNS[5],  # volume
-            "n": BASE_COLUMNS[6],  # trade_count
-            "vw": BASE_COLUMNS[7],  # vwap
+            "t": BaseColumns.TIMESTAMP.value,  # timestamp
+            "o": BaseColumns.OPEN.value,  # open
+            "h": BaseColumns.HIGH.value,  # high
+            "l": BaseColumns.LOW.value,  # low
+            "c": BaseColumns.CLOSE.value,  # close
+            "v": BaseColumns.VOLUME.value,  # volume
+            "n": BaseColumns.TRADE_COUNT.value,  # trade_count
+            "vw": BaseColumns.VWAP.value,  # vwap
         }, inplace=True)
 
         # Add datetimes as a column
-        buffer.insert(loc=8, column=BASE_COLUMNS[8], value=-1)
+        buffer.insert(loc=8, column=BaseColumns.DATETIME.value, value=-1)
 
         # Populate datetime column
-        buffer[BASE_COLUMNS[8]] = buffer.apply(
+        buffer[BaseColumns.DATETIME.value] = buffer.apply(
             lambda row: isoparse(row.timestamp).astimezone(machine_settings.time_zone), axis=1)
 
         # Add symbol as a column
-        buffer.insert(loc=9, column=BASE_COLUMNS[9], value=symbol)
+        buffer.insert(loc=9, column=BaseColumns.SYMBOL.value, value=symbol)
 
     # TODO: Verify all timestamps are the same across assets for a given row
 
@@ -227,6 +257,7 @@ def _get_alpaca_data_as_process(
         output_queue: Queue, alpaca_api: AlpacaAPIBundle,
         machine_settings: MachineSettings, symbols: list[str],
         start_date: datetime, end_date: datetime) -> None:
+    """DOC:"""
 
     buffer_ranges = get_list_of_buffer_ranges(
         alpaca_api, machine_settings.data_buffer_days, start_date, end_date)
@@ -319,22 +350,47 @@ class AssetManager:
             self.machine_settings.start_date,
             self.machine_settings.end_date)
 
-        threshold_index = int(self.machine_settings.training_data_percentage * (len(trading_days) - 1)) + 1
+        # An extra trading day must be added for off-by-one reasons
+        extra_trading_day = get_list_of_trading_days_in_range(
+            self.alpaca_api,
+            self.machine_settings.end_date,
+            self.machine_settings.end_date + timedelta(days=30)
+        )[0]
+
+        trading_days.append(extra_trading_day)
+
+        threshold_index = int(self.machine_settings.training_data_percentage * (len(trading_days) - 1))
 
         return trading_days[threshold_index]
 
     def increment_dataframes(self) -> None:
         """DOC:"""
 
-        # If any asset's data buffer is empty, populate all assets with new data
-        if any(asset.buffer.empty for asset in self.watched_assets.values()):
-            self._populate_buffers()
+        try:
+            # If any asset's data buffer is empty, populate all assets with new data
+            if any(asset.buffer.empty for asset in self.watched_assets.values()):
+                self._populate_buffers()
+
+        except StopIteration:
+
+            # If the data_destination is still TRAINING_DATA by the time the dataframes are done being
+            # incremented, then the start buffer data hasn't been removed from the training_dfs (since
+            # that's something that happens when switching to TRAINING_DATA from TESTING_DATA). It needs
+            # to be removed, so remove it here.
+            if self.data_destination is DataDestination.TRAINING_DATA:
+                for asset in self.watched_assets.values():
+                    asset._remove_start_buffer_data_from_training_df()
+
+            raise
 
         # If the top row of the reference asset's buffer has a date that matches the testing_df_threshold
         # date, switch the data destination to be testing data
-        top_row_of_reference_asset_buffer = self.watched_assets[self._reference_symbol].buffer.head(1)
+        latest_date_in_buffer = self.watched_assets[self._reference_symbol]\
+                                    .buffer.head(1).iloc[0].datetime.date()
+
         if (self.data_destination is DataDestination.TRAINING_DATA and
-                top_row_of_reference_asset_buffer.iloc[0].datetime.date() == self.testing_df_threshold.date):
+                latest_date_in_buffer >= self.testing_df_threshold.date):
+
             self._switch_to_testing_data()
 
         # Then, add the next row of buffered data to the watched assets (update the asset DFs)

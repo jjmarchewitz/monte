@@ -42,6 +42,11 @@ class TradingMachine():
         for algo in self.algo_instances:
             algo.startup()
 
+         # TODO:
+        for algo in self.algo_instances:
+            new_columns = algo.get_derived_columns()
+            self.machine_settings.add_derived_columns(new_columns)
+
         # Run startup code for asset_manager. This must happen after the algos startup code so that the algos
         # can 'watch' all of the assets they need first. When am.startup() is called, the data getter process
         # is constructed and spawned with all of the assets it needs to get data for as an argument.
@@ -53,6 +58,8 @@ class TradingMachine():
         # Run Machine startup code
         self.startup()
 
+        algos_have_been_trained = False
+
         # Run the algorithms
         while True:
 
@@ -60,25 +67,43 @@ class TradingMachine():
             try:
                 self.am.increment_dataframes()
             except StopIteration:
+
+                # If the algorithms were never trained, train them
+                if not algos_have_been_trained:
+                    self._train_algos()
+
                 break
 
             # If the asset_manager is in the testing data phase, run all of the algorithms
             if self.am.data_destination is DataDestination.TESTING_DATA:
 
+                # Runs if the trading_machine just entered the testing data phase.
+                if not algos_have_been_trained:
+                    self._train_algos()
+                    algos_have_been_trained = True
+
                 # Process any orders and run each algorithm
                 for algo in self.algo_instances:
-                    self._run_algo(algo)
+                    portfolio = algo.get_portfolio()
+
+                    # Process orders
+                    processed_orders = portfolio.process_pending_orders()
+
+                    # Clean up the portfolio
+                    portfolio.delete_empty_positions()
+
+                    # Run the algorithm
+                    current_datetime = portfolio.am._get_reference_asset().datetime()
+                    algo.run_one_time_frame(current_datetime, processed_orders)
 
         # Run Machine cleanup code
         self.cleanup()
 
-    def _run_algo(self, algo):
+    def _train_algos(self):
         """DOC:"""
-        portfolio = algo.get_portfolio()
-        processed_orders = portfolio.process_pending_orders()
-        portfolio.delete_empty_positions()
-        current_datetime = portfolio.am._get_reference_asset().datetime()
-        algo.run_one_time_frame(current_datetime, processed_orders)
+
+        for algo in self.algo_instances:
+            algo.train()
 
     def cleanup(self):
         """DOC:"""

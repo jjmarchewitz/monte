@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Protocol, runtime_checkable
+from typing import Callable
 
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
@@ -25,13 +25,23 @@ class Algorithm(ABC):
         self.portfolio = Portfolio(self.alpaca_api, self.machine_settings, starting_cash)
 
     def get_portfolio(self) -> Portfolio:
+        """Returns a reference to this algorithm's Portfolio instance"""
         return self.portfolio
 
     def get_name(self) -> str:
+        """Returns the name of this instance, used to help identify this instance in print statements."""
         return self.name
 
     @abstractmethod
+    def get_derived_columns(self) -> dict[str, Callable]:
+        ...
+
+    @abstractmethod
     def startup(self) -> None:
+        ...
+
+    @abstractmethod
+    def train(self) -> None:
         ...
 
     @abstractmethod

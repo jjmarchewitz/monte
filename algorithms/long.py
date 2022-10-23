@@ -11,17 +11,11 @@ from monte.portfolio import Portfolio
 
 class Long(Algorithm):
 
-    alpaca_api: AlpacaAPIBundle
-    machine_settings: MachineSettings
-    portfolio: Portfolio
-
     def __init__(self, alpaca_api: AlpacaAPIBundle,
-                 machine_settings: MachineSettings) -> None:
+                 machine_settings: MachineSettings, name: str, starting_cash: float) -> None:
 
-        self.alpaca_api = alpaca_api
-        self.machine_settings = machine_settings
-
-        self.portfolio = Portfolio(self.alpaca_api, self.machine_settings)
+        # Sets up instance variables and instantiates a Portfolio as self.portfolio
+        super().__init__(alpaca_api, machine_settings, name, starting_cash)
 
         # symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
         #            "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC", "ABBV",
@@ -42,10 +36,13 @@ class Long(Algorithm):
         for symbol in self.symbols:
             self.portfolio.place_order(symbol, 10, OrderType.BUY)
 
+    def train(self) -> None:
+        pass
+
     def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
 
         for symbol in self.symbols:
-            df = self.portfolio.get_symbol(symbol)
+            df = self.portfolio.get_testing_data(symbol)
 
             if (df.iloc[-1].avg_l5 - df.iloc[-1].vwap) > 0:
                 self.portfolio.place_order(symbol, 1, OrderType.BUY)
@@ -55,3 +52,6 @@ class Long(Algorithm):
 
         print(f"{current_datetime.date()} {current_datetime.hour}:{current_datetime.minute:02d} | "
               f"Total Value: ${self.portfolio.total_value():.2f}")
+
+    def cleanup(self) -> None:
+        pass

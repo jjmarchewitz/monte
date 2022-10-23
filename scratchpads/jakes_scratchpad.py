@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime
-from functools import partial
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
-import derived_columns.definitions as dcolumns
 from algorithms import test
 from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
@@ -15,10 +13,7 @@ from monte.machine_settings import MachineSettings
 def main():
     alpaca_api = AlpacaAPIBundle()
 
-    # TODO: Add optional "training data" section. Add new training_data_percentage (float between
-    # 0 and 1), where the training data is the first chunk of the date range provided by
-    # (start_date, end_date)
-    # TODO: Improve the interface of getting data
+    # TODO: Move derived_columns to the algorithms and find a way to automate max_rows_in_test_df
     # TODO: Documentation
     # TODO: Add logging
     # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
@@ -30,12 +25,6 @@ def main():
         end_date=datetime(2018, 4, 15),
         training_data_percentage=0.5,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
-        derived_columns={
-            "net_l10": partial(dcolumns.net, col="vwap", n=10),
-            "avg_l10": partial(dcolumns.mean, col="vwap", n=10),
-            "std_dev_l10": partial(dcolumns.std_dev, col="vwap", n=10)
-        },
-        max_rows_in_test_df=20,
     )
 
     trading_machine = TradingMachine(alpaca_api, ms)

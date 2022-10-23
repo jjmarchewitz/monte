@@ -29,6 +29,7 @@ def derived_column(func):
     @wraps(func)
     def inner(df: pd.DataFrame, *args, **kwargs):
 
+        # TODO: incorporate args and kwargs into identifier
         current_identifier = DFIdentifier(df.iloc[-1].symbol, df.iloc[-1].timestamp)
 
         # Purge cache if incoming identifier's timestamp is different.

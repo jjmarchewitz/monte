@@ -11,6 +11,7 @@ class MachineSettings():
     """
     start_date: datetime
     end_date: datetime
+    training_data_percentage: float
     time_frame: TimeFrame
     derived_columns: dict
     max_rows_in_test_df: int
@@ -19,18 +20,21 @@ class MachineSettings():
     time_zone: pytz.tzinfo.BaseTzInfo
 
     def __init__(
-            self, start_date: datetime, end_date: datetime, time_frame: TimeFrame, derived_columns: dict = {},
+            self, start_date: datetime, end_date: datetime, training_data_percentage: float,
+            time_frame: TimeFrame, derived_columns: dict = {},
             max_rows_in_test_df: int = 1_000, start_buffer_days: Union[int, None] = None,
             data_buffer_days: Union[int, None] = None, time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone(
                 'US/Eastern')) -> None:
         self.start_date = start_date
         self.end_date = end_date
+        self.training_data_percentage = training_data_percentage
         self.time_frame = time_frame
         self.derived_columns = derived_columns
         self.max_rows_in_test_df = max_rows_in_test_df
         self.time_zone = time_zone
 
         self.validate_dates()
+        self.validate_trading_data_percentage()
         self.validate_time_frame()
 
         # Add timezone info to start_date and end_date
@@ -59,6 +63,13 @@ class MachineSettings():
         # Validate self.end_date
         if not isinstance(self.end_date, datetime):
             raise TypeError("The end date must be an instance of datetime.datetime")
+
+    def validate_trading_data_percentage(self):
+        """DOC:"""
+        # Validate self.training_data_percentage
+        if self.training_data_percentage < 0 or self.training_data_percentage > 1:
+            raise ValueError(f"machine_settings.training_data_percentage must be a value between 0 and 1 "
+                             f"(inclusive). The current value is {self.training_data_percentage}")
 
     def validate_time_frame(self):
         """DOC:"""
@@ -94,13 +105,24 @@ class MachineSettings():
     def calculate_start_buffer_days(self) -> int:
         """DOC:"""
 
+        rows_per_day = self.rows_per_day()
+
+        start_buffer_days = int(self.max_rows_in_test_df / rows_per_day) + 10
+
+        return start_buffer_days
+
+    def rows_per_day(self) -> int:
+        """DOC:"""
+
+        rows_per_day = 0
+
         # Calculate how many self.time_frames occur in an average market day
         match self.time_frame.unit:
 
             case TimeFrameUnit.Minute:
                 # time frames per hour times 7.5 since there are 7.5 hours in a market day, on average
                 # (9:30a - 4:00p)
-                rows_per_day = int(60 / self.time_frame.amount) * 7.5
+                rows_per_day = int(int(60 / self.time_frame.amount) * 7.5)
 
             case TimeFrameUnit.Hour:
                 # There are 7 time frames that start on the hour in an average market day, so Alpaca
@@ -114,9 +136,7 @@ class MachineSettings():
                 raise ValueError("machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
                                  "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
-        start_buffer_days = int(self.max_rows_in_test_df / rows_per_day) + 10
-
-        return start_buffer_days
+        return rows_per_day
 
     def calculate_data_buffer_days(self) -> int:
         """DOC:"""

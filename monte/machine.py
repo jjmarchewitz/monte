@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
-from monte.asset_manager import AssetManager
+from monte.asset_manager import AssetManager, DataDestination
 from monte.machine_settings import MachineSettings
 from monte.portfolio import Portfolio
 
@@ -62,16 +62,23 @@ class TradingMachine():
             except StopIteration:
                 break
 
-            # Process any orders and run each algorithm
-            for algo in self.algo_instances:
-                portfolio = algo.get_portfolio()
-                processed_orders = portfolio.process_pending_orders()
-                portfolio.delete_empty_positions()
-                current_datetime = portfolio.am._get_reference_asset().datetime()
-                algo.run_one_time_frame(current_datetime, processed_orders)
+            # If the asset_manager is in the testing data phase, run all of the algorithms
+            if self.am.data_destination is DataDestination.TESTING_DATA:
+
+                # Process any orders and run each algorithm
+                for algo in self.algo_instances:
+                    self._run_algo(algo)
 
         # Run Machine cleanup code
         self.cleanup()
+
+    def _run_algo(self, algo):
+        """DOC:"""
+        portfolio = algo.get_portfolio()
+        processed_orders = portfolio.process_pending_orders()
+        portfolio.delete_empty_positions()
+        current_datetime = portfolio.am._get_reference_asset().datetime()
+        algo.run_one_time_frame(current_datetime, processed_orders)
 
     def cleanup(self):
         """DOC:"""

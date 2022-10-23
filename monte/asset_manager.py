@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
+from enum import Enum
 from multiprocessing import Process, Queue
 from typing import ItemsView
 
@@ -26,6 +27,11 @@ BASE_COLUMNS = [
     'symbol']
 
 
+class DataDestination(Enum):
+    TRAINING_DATA = 1
+    TESTING_DATA = 2
+
+
 class Asset:
     """
     Represents one single asset from the markets, this object constructs and manages dataframes for the given
@@ -34,10 +40,11 @@ class Asset:
 
     alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
-    df: pd.DataFrame
+    training_df: pd.DataFrame
+    testing_df: pd.DataFrame
     buffer: pd.DataFrame
     base_columns: list[str]
-    _df_has_start_buffer_rows: bool
+    _finished_populating_start_buffer: bool
 
     def __init__(self, alpaca_api: AlpacaAPIBundle,
                  machine_settings: MachineSettings, symbol: str) -> None:
@@ -60,28 +67,29 @@ class Asset:
         self.symbol = symbol
 
         # Create empty dataframes
-        self.reset_df()
+        self.reset_main_dfs()
         self.reset_buffer()
 
-        self._df_has_start_buffer_rows = False
+        self._finished_populating_start_buffer = False
 
     def price(self):
-        return self.df.iloc[-1].vwap
+        return self.testing_df.iloc[-1].vwap
 
     def timestamp(self):
-        return self.df.iloc[-1].timestamp
+        return self.testing_df.iloc[-1].timestamp
 
     def datetime(self):
-        return self.df.iloc[-1].datetime
+        return self.testing_df.iloc[-1].datetime
 
-    def reset_df(self) -> None:
+    def reset_main_dfs(self) -> None:
         """
         Creates a new, empty dataframe with all of the base columns and derived columns. The result is
         stored in self.df.
         """
         columns = BASE_COLUMNS.copy()
         columns.extend(self.machine_settings.derived_columns.keys())
-        self.df = pd.DataFrame({}, columns=columns)
+        self.training_df = pd.DataFrame({}, columns=columns)
+        self.testing_df = pd.DataFrame({}, columns=columns)
 
     def reset_buffer(self) -> None:
         """
@@ -90,38 +98,60 @@ class Asset:
         """
         self.buffer = pd.DataFrame({}, columns=BASE_COLUMNS)
 
-    def increment_dataframe(self):
+    def increment_dataframe(self, data_destination: DataDestination):
         """DOC:"""
 
-        # Grab the latest row from the buffer
+        # Grab a copy of the latest row from the buffer
         latest_row = self.buffer.head(1)
 
-        # Add the latest row to the bottom of the main df
-        self.df = pd.concat(objs=[self.df, latest_row], ignore_index=True)
-
-        # Drop the top row of the buffer (the row we just moved)
+        # Drop the top row of the buffer (the row we just copied)
         self.buffer.drop(self.buffer.head(1).index, inplace=True)
 
-        # Drop the oldest row in the main df if it exceeds the configured length limit
-        # (machine_settings.max_rows_in_df)
-        if len(self.df.index) > self.machine_settings.max_rows_in_test_df:
-            self.df.drop(self.df.head(1).index, inplace=True)
+        # Depending on the data destination, choose a pd.DataFrame to write to
+        if data_destination is DataDestination.TRAINING_DATA:
+            self.training_df = pd.concat(objs=[self.training_df, latest_row], ignore_index=True)
+            destination_df = self.training_df
+        elif data_destination is DataDestination.TESTING_DATA:
+            self.testing_df = pd.concat(objs=[self.testing_df, latest_row], ignore_index=True)
+            destination_df = self.testing_df
+        else:
+            raise ValueError("Invalid data_destination. Must be a member of the DataDestination enum.")
 
-        # If the main dataframe has at least "start_buffer" amount of rows
-        if (self._df_has_start_buffer_rows or
-                self._count_unique_days_in_dataframe() > self.machine_settings.start_buffer_days):
+        # If the testing df is selected
+        if (data_destination is DataDestination.TESTING_DATA and
+                len(self.testing_df.index) > self.machine_settings.max_rows_in_test_df):
 
-            self._df_has_start_buffer_rows = True
+            # Drop the oldest row if it exceeds the configured length limit (machine_settings.max_rows_in_df)
+            self.testing_df.drop(self.testing_df.head(1).index, inplace=True)
+
+        # If the dataframes have at least "start_buffer" amount of rows
+        if (self._finished_populating_start_buffer or self._count_unique_days_in_dataframes()
+                > self.machine_settings.start_buffer_days):
+
+            self._finished_populating_start_buffer = True
 
             # Calculate and add the values of all derived columns
             for column_title, column_func in self.machine_settings.derived_columns.items():
-                self.df.at[self.df.index[-1], column_title] = column_func(self.df)
+                destination_df.at[destination_df.index[-1], column_title] = column_func(destination_df)
 
-    def _count_unique_days_in_dataframe(self):
+    def _switch_to_testing_data(self) -> None:
+        """DOC:"""
+        # Remove the start buffer data from the training_df
+        self.training_df = self.training_df.loc[
+            self.training_df['datetime'] > self.machine_settings.start_date]
+
+        # Copy a start buffer's worth of data to the head of the testing_df
+        self.testing_df = self.training_df.iloc[
+            -(self.machine_settings.rows_per_day() * self.machine_settings.start_buffer_days):-1]
+
+    def _count_unique_days_in_dataframes(self):
         """DOC:"""
         unique_days = set()
 
-        for datetime in self.df.datetime:
+        for datetime in self.training_df.datetime:
+            unique_days.add(str(datetime.date()))
+
+        for datetime in self.testing_df.datetime:
             unique_days.add(str(datetime.date()))
 
         return len(unique_days)
@@ -223,12 +253,11 @@ class AssetManager:
     alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
     watched_assets: dict[str, Asset]
-    trading_days: list[TradingDay]
-    most_recent_buffer_start_date: str
-    most_recent_buffer_end_date: str
-    _buffer_ranges: list[tuple[TradingDay, TradingDay]]
     data_getter_process: Process
     buffered_df_queue: Queue
+    simulation_running: bool
+    data_destination: DataDestination
+    testing_df_threshold: TradingDay
 
     def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings) -> None:
         self.alpaca_api = alpaca_api
@@ -241,17 +270,13 @@ class AssetManager:
 
         self.buffered_df_queue = Queue()
 
-    def __setitem__(self, key: str, value) -> None:
-        raise AttributeError(
-            f"All keys of the AssetManager (such as \"{key}\") are read-only, and cannot be written to.")
-
-    def __getitem__(self, key: str) -> pd.DataFrame:
-        if not isinstance(key, str):
-            raise KeyError("Only strings are accepted as keys for this object.")
-
-        return self.watched_assets[key].df
+        self.testing_df_threshold = self.threshold_to_start_using_testing_df()
 
     def startup(self) -> None:
+        """DOC:"""
+
+        # Must happen before add_start_buffer_data() so that the start buffer data has a destination
+        self.data_destination = DataDestination.TRAINING_DATA
 
         self.add_start_buffer_data()
 
@@ -268,27 +293,55 @@ class AssetManager:
                 self.machine_settings.start_date,
                 self.machine_settings.end_date),
             daemon=True)
+
         self.data_getter_process.start()
 
     def cleanup(self) -> None:
+        """DOC:"""
         self.data_getter_process.join()
+
+    def get_training_data(self, symbol) -> pd.DataFrame:
+        """DOC:"""
+        return self.watched_assets[symbol].training_df
+
+    def get_testing_data(self, symbol) -> pd.DataFrame:
+        """DOC:"""
+        return self.watched_assets[symbol].testing_df
 
     def items(self) -> ItemsView[str, Asset]:
         """DOC:"""
         return self.watched_assets.items()
 
-    def increment_dataframes(self):
+    def threshold_to_start_using_testing_df(self) -> TradingDay:
+        """DOC:"""
+        trading_days = get_list_of_trading_days_in_range(
+            self.alpaca_api,
+            self.machine_settings.start_date,
+            self.machine_settings.end_date)
+
+        threshold_index = int(self.machine_settings.training_data_percentage * (len(trading_days) - 1)) + 1
+
+        return trading_days[threshold_index]
+
+    def increment_dataframes(self) -> None:
         """DOC:"""
 
         # If any asset's data buffer is empty, populate all assets with new data
         if any(asset.buffer.empty for asset in self.watched_assets.values()):
             self._populate_buffers()
 
+        # If the top row of the reference asset's buffer has a date that matches the testing_df_threshold
+        # date, switch the data destination to be testing data
+        top_row_of_reference_asset_buffer = self.watched_assets[self._reference_symbol].buffer.head(1)
+        if (self.data_destination is DataDestination.TRAINING_DATA and
+                top_row_of_reference_asset_buffer.iloc[0].datetime.date() == self.testing_df_threshold.date):
+            self._switch_to_testing_data()
+
         # Then, add the next row of buffered data to the watched assets (update the asset DFs)
         for asset in self.watched_assets.values():
-            asset.increment_dataframe()
+            asset.increment_dataframe(self.data_destination)
 
-    def _populate_buffers(self):
+    def _populate_buffers(self) -> None:
         """DOC:"""
 
         new_data = self.buffered_df_queue.get()
@@ -301,7 +354,14 @@ class AssetManager:
         else:
             raise TypeError("Received invalid data from the buffered_df_queue")
 
-    def add_start_buffer_data(self):
+    def _switch_to_testing_data(self) -> None:
+        """DOC:"""
+        self.data_destination = DataDestination.TESTING_DATA
+
+        for asset in self.watched_assets.values():
+            asset._switch_to_testing_data()
+
+    def add_start_buffer_data(self) -> None:
         """DOC:"""
 
         trading_days_before_current = get_list_of_trading_days_in_range(
@@ -331,7 +391,7 @@ class AssetManager:
             self.watched_assets[symbol].buffer = buffer_df
 
             while not self.watched_assets[symbol].buffer.empty:
-                self.watched_assets[symbol].increment_dataframe()
+                self.watched_assets[symbol].increment_dataframe(self.data_destination)
 
     def watch_asset(self, symbol: str) -> None:
         """DOC:"""

@@ -36,7 +36,7 @@ class TestAlg(Algorithm):
     def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
 
         for symbol in self.symbols:
-            df = self.portfolio.get_data(symbol)
+            df = self.portfolio.get_testing_data(symbol)
 
             # TODO: make "if df is not None" unnecessary. Probably raise an error in get_data if symbol
             # doesn't exist instead of returning None

@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from typing import Union
+from typing import ItemsView, Union
 
 import pandas as pd
 
@@ -60,16 +60,17 @@ class Portfolio():
     def __getitem__(self, key: str) -> Position:
         return self.positions[key]
 
-    def items(self):
+    def items(self) -> ItemsView:
+        """DOC:"""
         return self.positions.items()
 
-    def get_data(self, symbol) -> Union[pd.DataFrame, None]:
-        result = None
+    def get_training_data(self, symbol) -> pd.DataFrame:
+        """DOC:"""
+        return self.am.get_training_data(symbol)
 
-        if self.am.is_watching_asset(symbol):
-            result = self.am[symbol]
-
-        return result
+    def get_testing_data(self, symbol) -> pd.DataFrame:
+        """DOC:"""
+        return self.am.get_testing_data(symbol)
 
     def delete_empty_positions(self) -> None:
         """DOC:"""
@@ -132,6 +133,8 @@ class Portfolio():
 
     def cancel_order(self, order_id: int) -> tuple[bool, Union[Order, None]]:
         """DOC:"""
+
+        # TODO: call this from process_pending_orders
         was_order_successfully_cancelled = False
         cancelled_order = None
 
@@ -178,7 +181,7 @@ class Portfolio():
 
     def _execute_buy_order(self, order: Order) -> None:
         """DOC:"""
-        order_cost = self.am[order.symbol].iloc[-1].vwap * order.quantity
+        order_cost = self.am.get_testing_data(order.symbol).iloc[-1].vwap * order.quantity
 
         # If the portfolio has insufficient funds to make the purchase, the order fails
         if self.cash < order_cost:
@@ -215,7 +218,7 @@ class Portfolio():
             # Otherwise, execute the order
             else:
                 self.positions[order.symbol].quantity -= order.quantity
-                self.cash += self.am[order.symbol].iloc[-1].vwap * order.quantity
+                self.cash += self.am.get_testing_data(order.symbol).iloc[-1].vwap * order.quantity
                 order.status = OrderStatus.COMPLETED
 
     def latest_datetime(self):

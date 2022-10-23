@@ -26,13 +26,18 @@ class Position():
         self.quantity = initial_quantity
 
     @property
-    def df(self) -> pd.DataFrame:
+    def testing_df(self) -> pd.DataFrame:
         """DOC:"""
-        return self.am[self.symbol]
+        return self.am.get_testing_data(self.symbol)
+
+    @property
+    def training_df(self) -> pd.DataFrame:
+        """DOC:"""
+        return self.am.get_training_data(self.symbol)
 
     def price(self) -> float:
         """DOC:"""
-        return self.am[self.symbol].iloc[-1].vwap
+        return self.am.get_testing_data(self.symbol).iloc[-1].vwap
 
     def total_value(self) -> float:
         """DOC:"""

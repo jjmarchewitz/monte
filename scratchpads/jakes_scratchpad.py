@@ -13,16 +13,17 @@ from monte.machine_settings import MachineSettings
 def main():
     alpaca_api = AlpacaAPIBundle()
 
-    # TODO: Documentation
     # TODO: Add logging
     # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
     # TODO: Move algos and scratchpads to a separate repo, publish monte on pypi
     # TODO: Move datetime to left and timestamp to right before derived columns
+    # TODO: Markdown documentation explaining the high-level concepts of this repo and some implementation
+    # details.
 
     ms = MachineSettings(
-        start_date=datetime(2018, 3, 8),
-        end_date=datetime(2018, 5, 15),
-        training_data_percentage=0.5,
+        start_date=datetime(2016, 3, 8),
+        end_date=datetime(2022, 10, 23),
+        training_data_percentage=0.1,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )
 

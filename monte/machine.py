@@ -8,7 +8,10 @@ from monte.portfolio import Portfolio
 
 
 class TradingMachine():
-    """DOC:"""
+    """
+    The virtual embodiment of a trading simulation. It's an enigma... except for all the documentation
+    explaining exactly how it works.
+    """
 
     alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
@@ -23,9 +26,12 @@ class TradingMachine():
         self.algo_instances = []
 
     def add_algo_instance(self, algorithm_with_portfolio: Algorithm) -> None:
-        """DOC:"""
+        """
+        Add a new algorithm to the trading machine. The algorithm must be an instance of a subclass of
+        Algorithm.
+        """
 
-        if not isinstance(algorithm_with_portfolio, Algorithm):
+        if not issubclass(type(algorithm_with_portfolio), Algorithm):
             raise TypeError("You must pass an instance of a subclass of Algorithm into add_algo_instance().")
 
         if not isinstance(algorithm_with_portfolio.get_portfolio(), Portfolio):
@@ -36,13 +42,16 @@ class TradingMachine():
         self.algo_instances.append(algorithm_with_portfolio)
 
     def startup(self) -> None:
-        """DOC:"""
+        """
+        Pre-simulation startup behaviors.
+        """
 
         # Run startup code for algorithms
         for algo in self.algo_instances:
             algo.startup()
 
-         # TODO:
+        # Add all of the derived columns from each algo to the main derived column dict in
+        # self.machine_settings
         for algo in self.algo_instances:
             new_columns = algo.get_derived_columns()
             self.machine_settings.add_derived_columns(new_columns)
@@ -53,7 +62,9 @@ class TradingMachine():
         self.am.startup()
 
     def run(self) -> None:
-        """DOC:"""
+        """
+        Runs the trading machine, start to finish.
+        """
 
         # Run Machine startup code
         self.startup()
@@ -90,7 +101,7 @@ class TradingMachine():
                     processed_orders = portfolio.process_pending_orders()
 
                     # Clean up the portfolio
-                    portfolio.delete_empty_positions()
+                    portfolio._delete_empty_positions()
 
                     # Run the algorithm
                     current_datetime = portfolio.am._get_reference_asset().datetime()
@@ -100,13 +111,16 @@ class TradingMachine():
         self.cleanup()
 
     def _train_algos(self) -> None:
-        """DOC:"""
-
+        """
+        Calls the train() function on all algorithms
+        """
         for algo in self.algo_instances:
             algo.train()
 
     def cleanup(self) -> None:
-        """DOC:"""
+        """
+        Post-simulation cleanup behaviors.
+        """
 
         # Run cleanup code for algorithms
         for algo in self.algo_instances:

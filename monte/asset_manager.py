@@ -379,7 +379,7 @@ class AssetManager:
 
     def items(self) -> ItemsView[str, Asset]:
         """
-        Returns an ItemsView instance for all of the assets being watched by the asset_manager
+        Returns an ItemsView instance for all of the assets being watched by the asset_manager.
         """
         return self.watched_assets.items()
 

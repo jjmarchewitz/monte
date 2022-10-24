@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Callable
 
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
@@ -19,8 +20,10 @@ class PeakDetection(Algorithm):
 
         self.symbol = "GME"
 
-    def get_portfolio(self) -> Portfolio:
-        return self.portfolio
+    def get_derived_columns(self) -> dict[str, Callable]:
+        derived_columns = {}
+
+        return derived_columns
 
     def startup(self) -> None:
         self.portfolio.watch(self.symbol)

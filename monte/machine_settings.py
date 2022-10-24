@@ -24,7 +24,7 @@ class MachineSettings():
 
     def __init__(
             self, start_date: datetime, end_date: datetime, training_data_percentage: float,
-            time_frame: TimeFrame, derived_columns: dict = {},
+            time_frame: TimeFrame, derived_columns: dict[str, Callable] = {},
             max_rows_in_test_df: int = 10, time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone(
                 'US/Eastern')) -> None:
         self.start_date = start_date

@@ -44,50 +44,94 @@ class Portfolio():
         return self.positions[key]
 
     def items(self) -> ItemsView:
-        """DOC:"""
+        """
+        Returns an ItemsView instance for all of the Positions in the Portfolio.
+        """
         return self.positions.items()
 
     def get_training_data(self, symbol) -> pd.DataFrame:
-        """DOC:"""
+        """
+        Returns the training dataframe for the given symbol.
+        """
         return self.am.get_training_data(symbol)
 
     def get_testing_data(self, symbol) -> pd.DataFrame:
-        """DOC:"""
+        """
+        Returns the testing dataframe for the given symbol.
+        """
         return self.am.get_testing_data(symbol)
 
-    def delete_empty_positions(self) -> None:
-        """DOC:"""
+    def latest_datetime(self) -> datetime:
+        """
+        Returns the most recent datetime in the simulation.
+        """
+        return self.am.latest_datetime()
+
+    def latest_timestamp(self) -> str:
+        """
+        Returns the most recent timestamp in the simulation.
+        """
+        return self.am.latest_timestamp()
+
+    def total_value(self) -> float:
+        """
+        Returns the total value of this Portfolio, including any unused cash and the value of all Positions.
+        """
+        total = self.cash
+        total += sum(position.total_value() for position in self.positions.values())
+        return total
+
+    def current_return(self) -> float:
+        """
+        Returns the percent difference between the current total value of the Portfolio and the amount of
+        starting cash.
+        """
+        return ((self.total_value() - self.starting_cash) / self.starting_cash) * 100
+
+    def watch(self, symbol: str) -> None:
+        """
+        Start watching a new asset. Can only be called before the simulation runs.
+        """
+        self.am.watch_asset(symbol)
+
+    def is_watching(self, symbol: str) -> bool:
+        """
+        Returns True if a symbol is already being watched, False otherwise.
+        """
+        return self.am.is_watching_asset(symbol)
+
+    def unwatch(self, symbol: str) -> bool:
+        """
+        Removes a given asset from the AssetManager.
+        """
+        return self.am.unwatch_asset(symbol)
+
+    def _delete_empty_positions(self) -> None:
+        """
+        Removes all Positions with a quantity of 0 from the Portfolio.
+        """
         for symbol in list(self.positions.keys()):
             if self.positions[symbol].quantity == 0:
                 self.positions.pop(symbol)
 
     def contains_position(self, symbol: str) -> bool:
-        """DOC:"""
+        """
+        Returns True if the given symbol corresponds to a Position in this Portfolio, False otherwise.
+        """
         return symbol in self.positions.keys()
 
     def _create_position(self, symbol: str, initial_quantity: float) -> Position:
-        """DOC:"""
+        """
+        Helper function that creates new Positions with this Portfolio's AlpacaAPIBundle, MachineSettings,
+        and AssetManager instances.
+        """
         return Position(self.alpaca_api, self.machine_settings, self.am, symbol, initial_quantity)
 
-    def total_value(self) -> float:
-        """DOC:"""
-        total = self.cash
-
-        for position in self.positions.values():
-            total += position.total_value()
-
-        return total
-
-    def current_return(self) -> float:
-        """DOC:"""
-        return ((self.total_value() - self.starting_cash) / self.starting_cash) * 100
-
-    def watch(self, symbol: str) -> None:
-        """DOC:"""
-        self.am.watch_asset(symbol)
-
     def place_order(self, symbol: str, quantity: int, order_type: OrderType = OrderType.BUY) -> Order:
-        """DOC:"""
+        """
+        Place a buy or sell order on this Portfolio. The order will try to be executed in one or more
+        TimeFrames relative to the current one.
+        """
         # Check that the order type passed in is a valid order type from the enum
         # OrderType
         if order_type not in OrderType:
@@ -105,7 +149,9 @@ class Portfolio():
         return new_order
 
     def get_order(self, order_id: int) -> Union[Order, None]:
-        """DOC:"""
+        """
+        Returns an order that is currently in the order queue, given that order's ID.
+        """
         result = None
 
         for order in self._order_queue:
@@ -115,9 +161,9 @@ class Portfolio():
         return result
 
     def cancel_order(self, order_id: int) -> tuple[bool, Union[Order, None]]:
-        """DOC:"""
-
-        # TODO: call this from process_pending_orders
+        """
+        Cancel an order that is currently on the order queue.
+        """
         was_order_successfully_cancelled = False
         cancelled_order = None
 
@@ -132,7 +178,10 @@ class Portfolio():
         return (was_order_successfully_cancelled, cancelled_order)
 
     def process_pending_orders(self) -> list[Order]:
-        """DOC:"""
+        """
+        Process orders that are currently in the order queue. Returns any orders that were attempted and
+        updates each order's status based on whether or not it was executed successfully.
+        """
         list_of_processed_orders = []
         new_order_queue = []
 
@@ -163,7 +212,9 @@ class Portfolio():
         return list_of_processed_orders
 
     def _execute_buy_order(self, order: Order) -> None:
-        """DOC:"""
+        """
+        Attempts to execute a buy order.
+        """
         order_cost = self.am.get_testing_data(order.symbol).iloc[-1].vwap * order.quantity
 
         # If the portfolio has insufficient funds to make the purchase, the order fails
@@ -187,8 +238,9 @@ class Portfolio():
             order.status = OrderStatus.COMPLETED
 
     def _execute_sell_order(self, order: Order) -> None:
-        """DOC:"""
-
+        """
+        Attempts to execute a sell order.
+        """
         # If the portfolio doesn't contain the symbol being sold, the order fails
         if not self.contains_position(order.symbol):
             order.status = OrderStatus.FAILED
@@ -203,11 +255,3 @@ class Portfolio():
                 self.positions[order.symbol].quantity -= order.quantity
                 self.cash += self.am.get_testing_data(order.symbol).iloc[-1].vwap * order.quantity
                 order.status = OrderStatus.COMPLETED
-
-    def latest_datetime(self) -> datetime:
-        """DOC:"""
-        return self.am.latest_datetime()
-
-    def latest_timestamp(self) -> str:
-        """DOC:"""
-        return self.am.latest_timestamp()

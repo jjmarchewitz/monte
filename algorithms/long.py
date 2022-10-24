@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime
+from functools import partial
+from typing import Callable
 
+import derived_columns.definitions as dcolumns
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
-from monte.portfolio import Portfolio
 
 
 class Long(Algorithm):
@@ -26,8 +28,10 @@ class Long(Algorithm):
 
         # symbols = ["AAPL"]
 
-    def get_portfolio(self) -> Portfolio:
-        return self.portfolio
+    def get_derived_columns(self) -> dict[str, Callable]:
+        derived_columns = {}
+
+        return derived_columns
 
     def startup(self) -> None:
         for symbol in self.symbols:

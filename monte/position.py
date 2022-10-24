@@ -8,6 +8,11 @@ from monte.machine_settings import MachineSettings
 
 
 class Position():
+    """
+    A Position represents an Asset that is held in a Portfolio. It is an Asset that has a concrete quantity
+    associated with it. This class also acts as a shorthand interface with the AssetManager, as it can return
+    the training_df and testing_df associated with the Asset an instance of Position is pointing to.
+    """
 
     alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
@@ -17,7 +22,6 @@ class Position():
 
     def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings,
                  am: AssetManager, symbol: str, initial_quantity: float) -> None:
-        """DOC:"""
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
         self.am = am
@@ -25,19 +29,27 @@ class Position():
         self.quantity = initial_quantity
 
     @property
-    def testing_df(self) -> pd.DataFrame:
-        """DOC:"""
-        return self.am.get_testing_data(self.symbol)
-
-    @property
     def training_df(self) -> pd.DataFrame:
-        """DOC:"""
+        """
+        Returns the training dataframe for the Asset this Position represents.
+        """
         return self.am.get_training_data(self.symbol)
 
+    @property
+    def testing_df(self) -> pd.DataFrame:
+        """
+        Returns the testing dataframe for the Asset this Position represents.
+        """
+        return self.am.get_testing_data(self.symbol)
+
     def price(self) -> float:
-        """DOC:"""
+        """
+        Returns the most recent volume-weighted average price (vwap) of the underlying Asset.
+        """
         return self.am.get_testing_data(self.symbol).iloc[-1].vwap
 
     def total_value(self) -> float:
-        """DOC:"""
+        """
+        Returns the total value of this Position (i.e. current price * quantity held).
+        """
         return self.price() * self.quantity

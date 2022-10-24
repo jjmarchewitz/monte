@@ -1,7 +1,7 @@
 import math
 from datetime import datetime
 from functools import partial
-from typing import Callable, Union
+from typing import Callable
 
 import pytz
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
@@ -9,7 +9,8 @@ from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 class MachineSettings():
     """
-    DOC:
+    A class to store important settings for the trading machine. Can automatically derive many of these
+    settings.
     """
     start_date: datetime
     end_date: datetime
@@ -50,8 +51,11 @@ class MachineSettings():
 
         self.validate_data_buffer_days()
 
-    def validate_dates(self):
-        """DOC:"""
+    def validate_dates(self) -> None:
+        """
+        Checks that ``self.start_date`` and ``self.end_date`` are valid and can be used in the trading
+        machine.
+        """
         # Validate self.start_date
         if not isinstance(self.start_date, datetime):
             raise TypeError("The start date must be an instance of datetime.datetime")
@@ -60,16 +64,22 @@ class MachineSettings():
         if not isinstance(self.end_date, datetime):
             raise TypeError("The end date must be an instance of datetime.datetime")
 
-    def validate_trading_data_percentage(self):
-        """DOC:"""
-        # Validate self.training_data_percentage
+        # Raise an error if the start date is after the end date
+        if self.start_date > self.end_date:
+            raise ValueError("The end date must come after the start date.")
+
+    def validate_trading_data_percentage(self) -> None:
+        """
+        Checks that ``self.training_data_percentage`` is valid and can be used in the trading machine.
+        """
         if self.training_data_percentage < 0 or self.training_data_percentage > 1:
             raise ValueError(f"machine_settings.training_data_percentage must be a value between 0 and 1 "
                              f"(inclusive). The current value is {self.training_data_percentage}")
 
-    def validate_time_frame(self):
-        """DOC:"""
-        # Validate self.time_frame
+    def validate_time_frame(self) -> None:
+        """
+        Checks that ``self.time_frame`` is valid and can be used in the trading machine.
+        """
         if self.time_frame.unit == TimeFrameUnit.Minute and self.time_frame.amount > 59:
             raise ValueError(
                 f"TimeFrames with a unit of Minutes must have a value less than or equal to 59. "
@@ -85,22 +95,27 @@ class MachineSettings():
         elif self.time_frame.unit in (TimeFrameUnit.Week, TimeFrameUnit.Month):
             raise ValueError(f"Cannot have a TimeFrameUnit of {self.time_frame.unit}")
 
-    def validate_data_buffer_days(self):
-        """DOC:"""
+    def validate_data_buffer_days(self) -> None:
+        """
+        Checks that ``self.data_buffer_days`` is valid and can be used in the trading machine.
+        """
         if self.data_buffer_days < 7:
             raise ValueError(
                 f"Data buffers need to be greater than or equal to 7 days. The current data buffer is "
                 f"{self.data_buffer_days} days")
 
-    def add_tz_info_to_dates(self):
-        """DOC:"""
-
+    def add_tz_info_to_dates(self) -> None:
+        """
+        Adds timezone info to ``self.start_date`` and ``self.end_date``.
+        """
         self.start_date = self.start_date.replace(tzinfo=self.time_zone)
         self.end_date = self.end_date.replace(tzinfo=self.time_zone)
 
     def calculate_start_buffer_days(self) -> int:
-        """DOC:"""
-
+        """
+        Calculates the number of start buffer days needed based on ``self.max_rows_in_test_df`` and
+        ``self.rows_per_day()``.
+        """
         rows_per_day = self.rows_per_day()
 
         start_buffer_days = math.ceil(self.max_rows_in_test_df / rows_per_day)
@@ -108,8 +123,9 @@ class MachineSettings():
         return start_buffer_days
 
     def rows_per_day(self) -> int:
-        """DOC:"""
-
+        """
+        Calculates the number of rows in a typical day of trading based on ``self.time_frame``.
+        """
         rows_per_day = 0
 
         # Calculate how many self.time_frames occur in an average market day
@@ -135,8 +151,9 @@ class MachineSettings():
         return rows_per_day
 
     def calculate_data_buffer_days(self) -> int:
-        """DOC:"""
-
+        """
+        Calculates a close-to-optimal number of data buffer days based on ``self.time_frame``
+        """
         match self.time_frame.unit:
 
             # These multipliers were determined experimentally with a range of time_frames
@@ -154,7 +171,11 @@ class MachineSettings():
                                  "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
     def add_derived_columns(self, new_columns: dict[str, Callable]) -> None:
-        """DOC:"""
+        """
+        Adds derived columns contained in ``new_columns`` to ``self.derived_columns`` if the column names
+        have no clashes. Also updates ``self.max_rows_in_test_df`` and ``self.start_buffer_days`` based on
+        the new columns.
+        """
         for column_title, new_column_func in new_columns.items():
 
             if column_title in self.derived_columns.keys():
@@ -184,9 +205,10 @@ class MachineSettings():
         self.update_max_rows_in_df()
         self.start_buffer_days = self.calculate_start_buffer_days()
 
-    def update_max_rows_in_df(self):
-        """DOC:"""
-
+    def update_max_rows_in_df(self) -> None:
+        """
+        Sets ``self.max_rows_in_test_df`` to the maximum number of rows needed by any single derived column.
+        """
         for _, column_func in self.derived_columns.items():
             # TODO: Stop relying on a consistent parameter name in column functions, maybe
             # somehow use a decorator?

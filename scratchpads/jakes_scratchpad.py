@@ -13,7 +13,6 @@ from monte.machine_settings import MachineSettings
 def main():
     alpaca_api = AlpacaAPIBundle()
 
-    # TODO: Move derived_columns to the algorithms and find a way to automate max_rows_in_test_df
     # TODO: Documentation
     # TODO: Add logging
     # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
@@ -22,7 +21,7 @@ def main():
 
     ms = MachineSettings(
         start_date=datetime(2018, 3, 8),
-        end_date=datetime(2018, 4, 15),
+        end_date=datetime(2018, 5, 15),
         training_data_percentage=0.5,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )

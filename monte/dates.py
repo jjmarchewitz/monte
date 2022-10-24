@@ -1,13 +1,8 @@
-##################
-# DATE UTILITIES #
-##################
-
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import no_type_check
 
 from alpaca_trade_api import entity
-from dateutil.parser import isoparse
 from pytz import timezone
 
 from monte.api import AlpacaAPIBundle
@@ -30,21 +25,6 @@ def get_list_of_trading_days_in_range(alpaca_api: AlpacaAPIBundle,
     """
     Returns a list of days (as TradingDay instances) that U.S. markets are open between the start and end
     dates provided. The result is inclusive of both the start and end dates.
-
-    Args:
-        alpaca_api:
-            A valid, authenticated util.AlpacaAPIBundle instance.
-
-        start_date:
-            The beginning of the range of trading days. The date is represented as YYYY-MM-DD. This follows
-            the ISO-8601 date standard.
-
-        end_date:
-            The end of the range of trading days. The date is represented as YYYY-MM-DD. This follows the
-            ISO-8601 date standard.
-
-    Returns:
-        A list of TradingDay instances that represents all of the days that U.S. markets were open.
     """
     raw_market_days = _get_raw_trading_dates_in_range(alpaca_api, start_date, end_date)
     return _get_trading_day_obj_list_from_date_list(raw_market_days)
@@ -57,22 +37,6 @@ def _get_raw_trading_dates_in_range(alpaca_api: AlpacaAPIBundle,
 
     Returns a list of days (as alpaca_trade_api.Calendar instances) that U.S. markets are open between the
     start and end dates provided. The result is inclusive of both the start and end dates.
-
-    Args:
-        alpaca_api:
-            A valid, authenticated util.AlpacaAPIBundle instance.
-
-        start_date:
-            The beginning of the range of trading days. The date is represented as YYYY-MM-DD. This follows
-            the ISO-8601 date standard.
-
-        end_date:
-            The end of the range of trading days. The date is represented as YYYY-MM-DD. This follows the
-            ISO-8601 date standard.
-
-    Returns:
-        A list of alpaca_trade_api.Calendar instances that represents all of the days that U.S. markets were
-        open.
     """
     return alpaca_api.trading.get_calendar(start_date.isoformat(), end_date.isoformat())
 
@@ -82,16 +46,7 @@ def _get_trading_day_obj_list_from_date_list(
         calendar_instance_list: list[entity.Calendar]) -> list[TradingDay]:
     """
     Converts a list of alpaca_trade_api.Calendar instances into a list of TradingDay instances.
-
-    Args:
-        calendar_instance_list:
-            A list of alpaca_trade_api.Calendar instances that represents a range of days the market was
-            open.
-
-    Returns:
-        A list of TradingDay instances that represents a range of days the market was open.
     """
-
     trading_days = []
 
     for day in calendar_instance_list:
@@ -142,8 +97,10 @@ def _get_trading_day_obj_list_from_date_list(
 
 def get_list_of_buffer_ranges(alpaca_api: AlpacaAPIBundle, buffer_length: int, start_date: date,
                               end_date: date) -> list[tuple[date, date]]:
-    """DOC:"""
-
+    """
+    Returns a list of date ranges with length ``buffer_length`` that all add up to span from ``start_date``
+    to ``end_date``.
+    """
     trading_days = get_list_of_trading_days_in_range(alpaca_api, start_date, end_date)
 
     start_index = 0

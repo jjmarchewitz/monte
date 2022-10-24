@@ -28,10 +28,10 @@ class TestAlg(Algorithm):
 
     def get_derived_columns(self) -> dict[str, Callable]:
         derived_columns = {
-            "net_l10": partial(dcolumns.net, col="vwap", n=10),
-            "avg_l20": partial(dcolumns.mean, col="vwap", n=20),
-            "std_dev_l10": partial(dcolumns.std_dev, col="vwap", n=10),
-            "pct_chg_l10": partial(dcolumns.percent_change, col="vwap", n=10)
+            "net_l10": partial(dcolumns.net, n=10, col="vwap"),
+            "avg_l20": partial(dcolumns.mean, n=20, col="vwap"),
+            "std_dev_l10": partial(dcolumns.std_dev, n=10, col="vwap"),
+            "pct_chg_l10": partial(dcolumns.percent_change, n=10, col="vwap")
         }
 
         return derived_columns
@@ -46,8 +46,7 @@ class TestAlg(Algorithm):
     def train(self) -> None:
         pass
 
-    def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
-
+    def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]) -> None:
         for symbol in self.symbols:
             df = self.portfolio.get_testing_data(symbol)
 

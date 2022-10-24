@@ -22,7 +22,7 @@ class TradingMachine():
         self.am = AssetManager(alpaca_api, machine_settings)
         self.algo_instances = []
 
-    def add_algo_instance(self, algorithm_with_portfolio: Algorithm):
+    def add_algo_instance(self, algorithm_with_portfolio: Algorithm) -> None:
         """DOC:"""
 
         if not isinstance(algorithm_with_portfolio, Algorithm):
@@ -35,7 +35,7 @@ class TradingMachine():
 
         self.algo_instances.append(algorithm_with_portfolio)
 
-    def startup(self):
+    def startup(self) -> None:
         """DOC:"""
 
         # Run startup code for algorithms
@@ -52,7 +52,7 @@ class TradingMachine():
         # is constructed and spawned with all of the assets it needs to get data for as an argument.
         self.am.startup()
 
-    def run(self):
+    def run(self) -> None:
         """DOC:"""
 
         # Run Machine startup code
@@ -99,13 +99,13 @@ class TradingMachine():
         # Run Machine cleanup code
         self.cleanup()
 
-    def _train_algos(self):
+    def _train_algos(self) -> None:
         """DOC:"""
 
         for algo in self.algo_instances:
             algo.train()
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """DOC:"""
 
         # Run cleanup code for algorithms

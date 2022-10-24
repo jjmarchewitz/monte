@@ -1,5 +1,3 @@
-"""DOC:"""
-
 import gzip
 import json
 import os
@@ -52,7 +50,6 @@ class AsyncAlpacaBars():
         """
         Asynchronously performs one requests for historical bars from the Alpaca API.
         """
-
         # Create an empty list to store all of the bars received from Alpaca
         list_of_bars = []
 
@@ -126,7 +123,6 @@ class AsyncAlpacaBars():
         Gets bar data for all of the ``symbols`` using the provided arguments such as``time_frame`` and
         ``start_date``.
         """
-
         output_dict = {}
 
         trio.run(
@@ -148,7 +144,6 @@ class AsyncAlpacaBars():
         High-level coroutine that manages getting bar data for all symbols provided. Spawns one coroutine
         per symbol.
         """
-
         async with trio.open_nursery() as n:
             for symbol in symbols:
                 n.start_soon(
@@ -290,7 +285,6 @@ class AlpacaAPIBundle():
         """
         Returns a string containing the path to the root directory of the repository.
         """
-
         current_file_path = pathlib.Path(__file__)
 
         while True:

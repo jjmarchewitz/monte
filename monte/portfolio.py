@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import ItemsView, Union
 
 import pandas as pd
@@ -14,7 +15,8 @@ from monte.position import Position
 
 class Portfolio():
     """
-    A portfolio is simply a collection of individual positions.
+    A portfolio is simply a collection of individual positions. This portfolio class acts as an algorithm's
+    interface with all of its positions and all of their training/testing data.
     """
 
     alpaca_api: AlpacaAPIBundle
@@ -29,25 +31,6 @@ class Portfolio():
 
     def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings,
                  starting_cash: float = 10000, name: str = "") -> None:
-        """
-        Constructor for the Portfolio class.
-
-        Args:
-            alpaca_api:
-                A bundle of Alpaca APIs all created and authenticated with the keys in the repo's
-                alpaca_config.json
-
-            machine_settings:
-                An instance of machine.MachineSettings that contains configuration for the current simulation.
-
-            starting_cash:
-                The starting cash that the portfolio will have before any orders are placed or any positions
-                are held. Defaults to 10000.
-
-            name:
-                A string name to give the portfolio, purely for aesthetic/debugging purposes. Defaults to None.
-        """
-
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
         self.starting_cash = starting_cash
@@ -221,13 +204,10 @@ class Portfolio():
                 self.cash += self.am.get_testing_data(order.symbol).iloc[-1].vwap * order.quantity
                 order.status = OrderStatus.COMPLETED
 
-    def latest_datetime(self):
+    def latest_datetime(self) -> datetime:
         """DOC:"""
         return self.am.latest_datetime()
 
-    def latest_timestamp(self):
+    def latest_timestamp(self) -> str:
         """DOC:"""
         return self.am.latest_timestamp()
-
-    def copy(self):
-        raise NotImplementedError

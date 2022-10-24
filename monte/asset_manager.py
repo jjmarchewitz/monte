@@ -79,19 +79,19 @@ class Asset:
 
         self._finished_populating_start_buffer = False
 
-    def price(self):
+    def price(self) -> float:
         """
         Returns the latest price contained in the testing data.
         """
         return self.testing_df.iloc[-1].vwap
 
-    def timestamp(self):
+    def timestamp(self) -> str:
         """
         Returns the latest timestamp contained in the testing data.
         """
         return self.testing_df.iloc[-1].timestamp
 
-    def datetime(self):
+    def datetime(self) -> datetime:
         """
         Returns the latest datetime contained in the testing data.
         """
@@ -114,14 +114,13 @@ class Asset:
         """
         self.buffer = pd.DataFrame({}, columns=self.base_columns)
 
-    def increment_dataframe(self, data_destination: DataDestination):
+    def increment_dataframe(self, data_destination: DataDestination) -> None:
         """
         Performs all of the actions needed to increment the destination dataframe (indicated by
         ``data_destination``) forward by one time_frame. This includes moving a row from the buffer
         to the destination dataframe, trimming down the number of rows in the destination dataframe (if
         needed), and adding data for all of the derived columns to the new row.
         """
-
         # Grab a copy of the latest row from the buffer
         latest_row = self.buffer.head(1)
 
@@ -157,7 +156,11 @@ class Asset:
                 destination_df.at[destination_df.index[-1], column_title] = column_func(destination_df)
 
     def _switch_to_testing_data(self) -> None:
-        """DOC:"""
+        """
+        Performs any actions needed to tansition to the testing phase of the data from the training phase.
+        This includes copying over a start buffer of data to the testing dataframe, as well as removing
+        start buffer data from the training dataframe.
+        """
         # Copy a start buffer's worth of data to the head of the testing_df
         self.testing_df = self.training_df.tail(
             int(self.machine_settings.rows_per_day() *
@@ -166,13 +169,19 @@ class Asset:
         self._remove_start_buffer_data_from_training_df()
 
     def _remove_start_buffer_data_from_training_df(self) -> None:
-        """DOC:"""
+        """
+        Removes data with timestamps before the simulation start date.
+        """
         # Remove the start buffer data from the training_df
         self.training_df = self.training_df.loc[
             self.training_df['datetime'] > self.machine_settings.start_date]
 
-    def _count_unique_days_in_dataframes(self):
-        """DOC:"""
+    def _count_unique_days_in_dataframes(self) -> int:
+        """
+        Counts the number of unique dates that occur between ``self.training_df`` and ``self.testing_df``.
+        This is used to determine how many unique days of data the dataframes contain compared to
+        ``self.machine_settings.start_buffer_days``.
+        """
         unique_days = set()
 
         # Add all of the dates from the training df to the set of unique days
@@ -189,13 +198,18 @@ class Asset:
 def _get_alpaca_data(
         alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, symbols: list[str],
         start_date: date, end_date: date) -> dict[str, pd.DataFrame]:
-    """DOC:"""
-
+    """
+    Download Alpaca bars for all ``symbols`` between ``start_date`` and ``end_date``. Clean up the downloaded
+    data.
+    """
+    # Get one buffer's worth of data
     buffer_data = alpaca_api.async_market_data_bars.get_bulk_bars(
         symbols, machine_settings.time_frame, start_date, end_date)
 
+    # Get a list of all the trading days during this date range
     trading_days = get_list_of_trading_days_in_range(alpaca_api, start_date, end_date)
 
+    # For each symbol and associated buffer that the Alpaca API returned
     for symbol, buffer in buffer_data.items():
 
         # Iterate over the rows
@@ -257,11 +271,20 @@ def _get_alpaca_data_as_process(
         output_queue: Queue, alpaca_api: AlpacaAPIBundle,
         machine_settings: MachineSettings, symbols: list[str],
         start_date: datetime, end_date: datetime) -> None:
-    """DOC:"""
+    """
+    This function is meant to be run as a mp.Process. Downloads and cleans all of the Alpaca bars data for
+    ``symbols`` between ``start_date`` and ``end_date``. This function requests the data for a large date
+    range in smaller chunks/buffers.
+    """
+    # Since the range between start_date and end_date might be bigger than the maximum amount of data Alpaca
+    # can return at once, the large date range will be broken into smaller ranges that the Alpaca API can
+    # return.
 
+    # Get a list of start and end dates pairs that can be used in separate data requests.
     buffer_ranges = get_list_of_buffer_ranges(
         alpaca_api, machine_settings.data_buffer_days, start_date, end_date)
 
+    # Request each buffer's worth of data in a row
     for buffer_range in buffer_ranges:
         buffer_start_date = buffer_range[0]
         buffer_end_date = buffer_range[1]
@@ -271,14 +294,20 @@ def _get_alpaca_data_as_process(
             symbols,
             buffer_start_date,
             buffer_end_date)
+
+        # Put the current buffer data on the queue that connects to the main process with all of the
+        # algorithms and the asset_manager.
         output_queue.put(buffer_data)
 
+    # Put a flag/marker onto the end of the queue to let the asset_manager know that this process has
+    # finished getting the bar data.
     output_queue.put("DONE")
 
 
 class AssetManager:
     """
-    DOC:
+    Manages all Assets while the simulation is running. Handles getting the data, cleaning it, and moving it
+    between the buffer dataframe and the training and testing dataframes.
     """
 
     alpaca_api: AlpacaAPIBundle
@@ -293,6 +322,7 @@ class AssetManager:
     def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings) -> None:
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
+
         self.watched_assets = {}  # Dict of Assets
         self.simulation_running = False
 
@@ -304,8 +334,10 @@ class AssetManager:
         self.testing_df_threshold = self.threshold_to_start_using_testing_df()
 
     def startup(self) -> None:
-        """DOC:"""
-
+        """
+        Runs at simulation startup. Adds the start buffer data to the Assets being watched and kicks off
+        the data getter process.
+        """
         # Must happen before add_start_buffer_data() so that the start buffer data has a destination
         self.data_destination = DataDestination.TRAINING_DATA
 
@@ -328,23 +360,34 @@ class AssetManager:
         self.data_getter_process.start()
 
     def cleanup(self) -> None:
-        """DOC:"""
+        """
+        Runs at the end of the simulation and performs cleanup tasks.
+        """
         self.data_getter_process.join()
 
-    def get_training_data(self, symbol) -> pd.DataFrame:
-        """DOC:"""
+    def get_training_data(self, symbol: str) -> pd.DataFrame:
+        """
+        Returns the training dataframe for the provided symbol.
+        """
         return self.watched_assets[symbol].training_df
 
-    def get_testing_data(self, symbol) -> pd.DataFrame:
-        """DOC:"""
+    def get_testing_data(self, symbol: str) -> pd.DataFrame:
+        """
+        Returns the testing dataframe for the provided symbol.
+        """
         return self.watched_assets[symbol].testing_df
 
     def items(self) -> ItemsView[str, Asset]:
-        """DOC:"""
+        """
+        Returns an ItemsView instance for all of the assets being watched by the asset_manager
+        """
         return self.watched_assets.items()
 
     def threshold_to_start_using_testing_df(self) -> TradingDay:
-        """DOC:"""
+        """
+        Returns the TradingDay where the AssetManager should switch to the test data phase from the training
+        data phase.
+        """
         trading_days = get_list_of_trading_days_in_range(
             self.alpaca_api,
             self.machine_settings.start_date,
@@ -364,8 +407,10 @@ class AssetManager:
         return trading_days[threshold_index]
 
     def increment_dataframes(self) -> None:
-        """DOC:"""
-
+        """
+        Increments the dataframes of all assets forward by one row/time_frame. Raises a StopIteration
+        exception when complete.
+        """
         try:
             # If any asset's data buffer is empty, populate all assets with new data
             if any(asset.buffer.empty for asset in self.watched_assets.values()):
@@ -381,6 +426,7 @@ class AssetManager:
                 for asset in self.watched_assets.values():
                     asset._remove_start_buffer_data_from_training_df()
 
+            # Re-raise the StopItertion exception
             raise
 
         # If the top row of the reference asset's buffer has a date that matches the testing_df_threshold
@@ -398,8 +444,10 @@ class AssetManager:
             asset.increment_dataframe(self.data_destination)
 
     def _populate_buffers(self) -> None:
-        """DOC:"""
-
+        """
+        Populates the buffer of all watched assets with the next set of buffer data from the data getter
+        process. Raises a StopIteration exception when there is no more data to get.
+        """
         new_data = self.buffered_df_queue.get()
 
         if isinstance(new_data, dict):
@@ -411,15 +459,19 @@ class AssetManager:
             raise TypeError("Received invalid data from the buffered_df_queue")
 
     def _switch_to_testing_data(self) -> None:
-        """DOC:"""
+        """
+        Switches to the testing phase of the data.
+        """
         self.data_destination = DataDestination.TESTING_DATA
 
         for asset in self.watched_assets.values():
             asset._switch_to_testing_data()
 
     def add_start_buffer_data(self) -> None:
-        """DOC:"""
-
+        """
+        Adds a start buffer's worth of data to the currently watched Assets at the current data_destination.
+        """
+        # Go back and get a lot of trading days from before the start_date
         trading_days_before_current = get_list_of_trading_days_in_range(
             self.alpaca_api,
             (
@@ -432,9 +484,11 @@ class AssetManager:
                 timedelta(days=1)
             ))
 
+        # Get a start and end date for the buffer that makes the buffer the correct size
         buffer_start_date = trading_days_before_current[-self.machine_settings.start_buffer_days].date
         buffer_end_date = trading_days_before_current[-1].date
 
+        # Get the start buffer data
         start_buffer_data = _get_alpaca_data(
             self.alpaca_api,
             self.machine_settings,
@@ -442,6 +496,8 @@ class AssetManager:
             buffer_start_date,
             buffer_end_date)
 
+        # Add the start buffer data to the buffers of each asset and increment the asset's dataframes
+        # until its buffers are empty
         for symbol, buffer_df in start_buffer_data.items():
 
             self.watched_assets[symbol].buffer = buffer_df
@@ -450,8 +506,9 @@ class AssetManager:
                 self.watched_assets[symbol].increment_dataframe(self.data_destination)
 
     def watch_asset(self, symbol: str) -> None:
-        """DOC:"""
-
+        """
+        Start watching a new asset. Can only be called before the simulation runs.
+        """
         if self.simulation_running:
             raise RuntimeError("Cannot watch assets while a simulation is running.")
 
@@ -459,11 +516,15 @@ class AssetManager:
             self.watched_assets[symbol] = Asset(self.alpaca_api, self.machine_settings, symbol)
 
     def is_watching_asset(self, symbol: str) -> bool:
-        """DOC:"""
+        """
+        Returns True if a symbol is already being watched by the AssetManager, False otherwise.
+        """
         return symbol in self.watched_assets.keys()
 
     def unwatch_asset(self, symbol: str) -> bool:
-        """DOC:"""
+        """
+        Removes a given asset from the AssetManager.
+        """
         if self.is_watching_asset(symbol):
             if symbol != self._reference_symbol:
                 self.watched_assets.pop(symbol)
@@ -473,14 +534,21 @@ class AssetManager:
         else:
             return False
 
-    def _get_reference_asset(self):
-        """DOC:"""
+    def _get_reference_asset(self) -> Asset:
+        """
+        Returns the reference asset, used to keep the AssetManager running even when there are no assets.
+        Also used to return the current timestamp and datetime.
+        """
         return self.watched_assets[self._reference_symbol]
 
-    def latest_timestamp(self):
-        """DOC:"""
+    def latest_timestamp(self) -> str:
+        """
+        Returns the timestamp of the most recent time_frame.
+        """
         return self._get_reference_asset().timestamp()
 
-    def latest_datetime(self):
-        """DOC:"""
+    def latest_datetime(self) -> datetime:
+        """
+        Returns the datetime of the most recent time_frame.
+        """
         return self._get_reference_asset().datetime()

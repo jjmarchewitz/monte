@@ -36,7 +36,7 @@ class PeakDetection(Algorithm):
 
     def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
 
-        df = self.portfolio.get_testing_data(self.symbol)
+        df = self.portfolio.get_testing_df(self.symbol)
 
         # Rules go here
 

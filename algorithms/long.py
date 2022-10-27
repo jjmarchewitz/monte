@@ -46,7 +46,7 @@ class Long(Algorithm):
     def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
 
         for symbol in self.symbols:
-            df = self.portfolio.get_testing_data(symbol)
+            df = self.portfolio.get_testing_df(symbol)
 
             if (df.iloc[-1].avg_l5 - df.iloc[-1].vwap) > 0:
                 self.portfolio.place_order(symbol, 1, OrderType.BUY)

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import time
+from datetime import timedelta
+
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.asset_manager import AssetManager, DataDestination
@@ -17,6 +20,7 @@ class TradingMachine():
     machine_settings: MachineSettings
     am: AssetManager
     algo_instances: list[Algorithm]
+    epoch_start_time: float
 
     def __init__(self, alpaca_api: AlpacaAPIBundle,
                  machine_settings: MachineSettings) -> None:
@@ -45,6 +49,8 @@ class TradingMachine():
         """
         Pre-simulation startup behaviors.
         """
+        # Note the start time of the trading machine
+        self.epoch_start_time = time.time()
 
         # Run startup code for algorithms
         for algo in self.algo_instances:
@@ -121,6 +127,8 @@ class TradingMachine():
         """
         Post-simulation cleanup behaviors.
         """
+        # Note the end time for the trading machine
+        end_time = time.time()
 
         # Run cleanup code for algorithms
         for algo in self.algo_instances:
@@ -134,4 +142,19 @@ class TradingMachine():
         for algo in self.algo_instances:
             print(f"{algo.name} | ${round(algo.get_portfolio().total_value(), 2):,} | "
                   f"{round(algo.get_portfolio().current_return(), 3):+}%")
-        print("\n")
+        print("\n\n")
+
+        # Print out the total runtime
+        print(" -- RUNTIME -- \n")
+        total_runtime = int(end_time - self.epoch_start_time)
+        hours, remainder = divmod(total_runtime, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        if hours != 0:
+            print(f"{hours}h {minutes}m {seconds}s")
+        elif minutes != 0:
+            print(f"{minutes}m {seconds}s")
+        else:
+            print(f"{seconds}s")
+
+        print("\n\n")

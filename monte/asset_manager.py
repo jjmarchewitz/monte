@@ -331,7 +331,7 @@ class AssetManager:
 
         self.buffered_df_queue = Queue()
 
-        self.testing_df_threshold = self.threshold_to_start_using_testing_df()
+        self.testing_df_threshold = self.threshold_date_to_start_using_testing_df()
 
     def startup(self) -> None:
         """
@@ -365,13 +365,13 @@ class AssetManager:
         """
         self.data_getter_process.join()
 
-    def get_training_data(self, symbol: str) -> pd.DataFrame:
+    def get_training_df(self, symbol: str) -> pd.DataFrame:
         """
         Returns the training dataframe for the provided symbol.
         """
         return self.watched_assets[symbol].training_df
 
-    def get_testing_data(self, symbol: str) -> pd.DataFrame:
+    def get_testing_df(self, symbol: str) -> pd.DataFrame:
         """
         Returns the testing dataframe for the provided symbol.
         """
@@ -383,7 +383,7 @@ class AssetManager:
         """
         return self.watched_assets.items()
 
-    def threshold_to_start_using_testing_df(self) -> TradingDay:
+    def threshold_date_to_start_using_testing_df(self) -> TradingDay:
         """
         Returns the TradingDay where the AssetManager should switch to the test data phase from the training
         data phase.

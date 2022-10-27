@@ -26,10 +26,12 @@ class TestAlg(Algorithm):
 
         self.symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA"]
 
+        # self.symbols = ["AAPL"]
+
     def get_derived_columns(self) -> dict[str, Callable]:
         derived_columns = {
             "net_l10": partial(dcolumns.net, n=10, col="vwap"),
-            "avg_l20": partial(dcolumns.mean, n=20, col="vwap"),
+            "avg_l10": partial(dcolumns.mean, n=10, col="vwap"),
             "std_dev_l10": partial(dcolumns.std_dev, n=10, col="vwap"),
             "pct_chg_l10": partial(dcolumns.percent_change, n=10, col="vwap")
         }
@@ -48,7 +50,7 @@ class TestAlg(Algorithm):
 
     def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]) -> None:
         for symbol in self.symbols:
-            df = self.portfolio.get_testing_data(symbol)
+            df = self.portfolio.get_testing_df(symbol)
 
             if df.iloc[-1].pct_chg_l10 < -1:
                 self.portfolio.place_order(symbol, 1, OrderType.BUY)

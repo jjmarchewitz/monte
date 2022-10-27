@@ -12,6 +12,7 @@ class MachineSettings():
     A class to store important settings for the trading machine. Can automatically derive many of these
     settings.
     """
+    # TODO: Make alpaca_api one of the MachineSettings??
     start_date: datetime
     end_date: datetime
     training_data_percentage: float
@@ -210,7 +211,11 @@ class MachineSettings():
         Sets ``self.max_rows_in_test_df`` to the maximum number of rows needed by any single derived column.
         """
         for _, column_func in self.derived_columns.items():
-            # TODO: Stop relying on a consistent parameter name in column functions, maybe
-            # somehow use a decorator?
-            if isinstance(column_func, partial) and 'n' in column_func.keywords.keys():
-                self.max_rows_in_test_df = max(self.max_rows_in_test_df, column_func.keywords['n'])
+            # If the function is a partial function and it has a variable designated as storing the number
+            # of rows used
+            if isinstance(column_func, partial) and column_func.func.num_rows_arg_name is not None:
+                # Update the maximum number of rows in the df to be the maximum between its current value
+                # and the value from the current column_func
+                num_rows_arg_name = column_func.func.num_rows_arg_name
+                self.max_rows_in_test_df = max(self.max_rows_in_test_df,
+                                               column_func.keywords[num_rows_arg_name])

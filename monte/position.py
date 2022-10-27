@@ -28,25 +28,23 @@ class Position():
         self.symbol = symbol
         self.quantity = initial_quantity
 
-    @property
-    def training_df(self) -> pd.DataFrame:
+    def get_training_df(self) -> pd.DataFrame:
         """
         Returns the training dataframe for the Asset this Position represents.
         """
-        return self.am.get_training_data(self.symbol)
+        return self.am.get_training_df(self.symbol)
 
-    @property
-    def testing_df(self) -> pd.DataFrame:
+    def get_testing_df(self) -> pd.DataFrame:
         """
         Returns the testing dataframe for the Asset this Position represents.
         """
-        return self.am.get_testing_data(self.symbol)
+        return self.am.get_testing_df(self.symbol)
 
     def price(self) -> float:
         """
         Returns the most recent volume-weighted average price (vwap) of the underlying Asset.
         """
-        return self.am.get_testing_data(self.symbol).iloc[-1].vwap
+        return self.am.get_testing_df(self.symbol).iloc[-1].vwap
 
     def total_value(self) -> float:
         """

@@ -49,17 +49,17 @@ class Portfolio():
         """
         return self.positions.items()
 
-    def get_training_data(self, symbol) -> pd.DataFrame:
+    def get_training_df(self, symbol) -> pd.DataFrame:
         """
         Returns the training dataframe for the given symbol.
         """
-        return self.am.get_training_data(symbol)
+        return self.am.get_training_df(symbol)
 
-    def get_testing_data(self, symbol) -> pd.DataFrame:
+    def get_testing_df(self, symbol) -> pd.DataFrame:
         """
         Returns the testing dataframe for the given symbol.
         """
-        return self.am.get_testing_data(symbol)
+        return self.am.get_testing_df(symbol)
 
     def latest_datetime(self) -> datetime:
         """
@@ -215,7 +215,7 @@ class Portfolio():
         """
         Attempts to execute a buy order.
         """
-        order_cost = self.am.get_testing_data(order.symbol).iloc[-1].vwap * order.quantity
+        order_cost = self.am.get_testing_df(order.symbol).iloc[-1].vwap * order.quantity
 
         # If the portfolio has insufficient funds to make the purchase, the order fails
         if self.cash < order_cost:
@@ -253,5 +253,5 @@ class Portfolio():
             # Otherwise, execute the order
             else:
                 self.positions[order.symbol].quantity -= order.quantity
-                self.cash += self.am.get_testing_data(order.symbol).iloc[-1].vwap * order.quantity
+                self.cash += self.am.get_testing_df(order.symbol).iloc[-1].vwap * order.quantity
                 order.status = OrderStatus.COMPLETED

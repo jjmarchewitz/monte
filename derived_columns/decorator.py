@@ -1,6 +1,8 @@
 import inspect
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import wraps
+from typing import Any
 
 import pandas as pd
 
@@ -17,12 +19,12 @@ class DFIdentifier():
     kwargs: tuple
 
 
-def derived_column(num_rows_arg_name: str | None = None):
+def derived_column(num_rows_arg_name: str | None = None) -> Callable:
     """
     Wraps around a derived column function to add caching and other important behaviors.
     """
 
-    def derived_column_inner(func):
+    def derived_column_inner(func: Callable) -> Callable:
         """
         Bruh wtf is this decorator nest.
         """
@@ -40,7 +42,7 @@ def derived_column(num_rows_arg_name: str | None = None):
             func.num_rows_arg_name = num_rows_arg_name
 
         @wraps(func)
-        def inner(df: pd.DataFrame, *args, **kwargs):
+        def inner(df: pd.DataFrame, *args, **kwargs) -> Any:
 
             current_identifier = DFIdentifier(
                 df.iloc[-1].symbol, df.iloc[-1].timestamp, args, tuple(sorted(kwargs.items())))

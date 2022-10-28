@@ -24,7 +24,7 @@ def main():
 
     ms = MachineSettings(
         start_date=datetime(2016, 3, 8),
-        end_date=datetime(2016, 10, 23),
+        end_date=datetime(2020, 10, 23),
         training_data_percentage=0.1,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )

@@ -1,8 +1,9 @@
 
 from __future__ import annotations
 
+from collections.abc import ItemsView
 from datetime import datetime
-from typing import ItemsView, Union
+from typing import Union
 
 import pandas as pd
 

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import ItemsView
 from datetime import date, datetime, timedelta
 from enum import Enum
 from multiprocessing import Process, Queue
-from typing import ItemsView
 
 import pandas as pd
 from alpaca_trade_api import TimeFrameUnit

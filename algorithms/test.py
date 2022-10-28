@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime
 from functools import partial
-from typing import Callable
 
 import derived_columns.definitions as dcolumns
 from monte.algorithm import Algorithm

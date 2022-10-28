@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from datetime import datetime
-from typing import Callable
 
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings

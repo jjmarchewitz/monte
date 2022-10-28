@@ -1,7 +1,7 @@
 import math
+from collections.abc import Callable
 from datetime import datetime
 from functools import partial
-from typing import Callable
 
 import pytz
 from alpaca_trade_api import TimeFrame, TimeFrameUnit

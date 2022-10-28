@@ -26,8 +26,8 @@ class MachineSettings():
     def __init__(
             self, start_date: datetime, end_date: datetime, training_data_percentage: float,
             time_frame: TimeFrame, derived_columns: dict[str, Callable] = {},
-            max_rows_in_test_df: int = 10, time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone(
-                'US/Eastern')) -> None:
+            max_rows_in_test_df: int = 10,
+            time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone('US/Eastern')) -> None:
         self.start_date = start_date
         self.end_date = end_date
         self.training_data_percentage = training_data_percentage
@@ -74,8 +74,9 @@ class MachineSettings():
         Checks that ``self.training_data_percentage`` is valid and can be used in the trading machine.
         """
         if self.training_data_percentage < 0 or self.training_data_percentage > 1:
-            raise ValueError(f"machine_settings.training_data_percentage must be a value between 0 and 1 "
-                             f"(inclusive). The current value is {self.training_data_percentage}")
+            raise ValueError(
+                f"machine_settings.training_data_percentage must be a value between 0 and 1 "
+                f"(inclusive). The current value is {self.training_data_percentage}")
 
     def validate_time_frame(self) -> None:
         """
@@ -146,8 +147,9 @@ class MachineSettings():
                 rows_per_day = 1
 
             case _:
-                raise ValueError("machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
-                                 "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
+                raise ValueError(
+                    "machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
+                    "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
         return rows_per_day
 
@@ -168,8 +170,9 @@ class MachineSettings():
                 return self.time_frame.amount * 7000
 
             case _:
-                raise ValueError("machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
-                                 "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
+                raise ValueError(
+                    "machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
+                    "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
     def add_derived_columns(self, new_columns: dict[str, Callable]) -> None:
         """

@@ -36,10 +36,12 @@ class TradingMachine():
         """
 
         if not issubclass(type(algorithm_with_portfolio), Algorithm):
-            raise TypeError("You must pass an instance of a subclass of Algorithm into add_algo_instance().")
+            raise TypeError(
+                "You must pass an instance of a subclass of Algorithm into add_algo_instance().")
 
         if not isinstance(algorithm_with_portfolio.get_portfolio(), Portfolio):
-            raise TypeError("The get_portfolio() method of the algorithm must be an instance of Portfolio.")
+            raise TypeError(
+                "The get_portfolio() method of the algorithm must be an instance of Portfolio.")
 
         algorithm_with_portfolio.get_portfolio().am = self.am
 

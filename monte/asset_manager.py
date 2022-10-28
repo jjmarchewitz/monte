@@ -135,7 +135,8 @@ class Asset:
             self.testing_df = pd.concat(objs=[self.testing_df, latest_row], ignore_index=True)
             destination_df = self.testing_df
         else:
-            raise ValueError("Invalid data_destination. Must be a member of the DataDestination enum.")
+            raise ValueError(
+                "Invalid data_destination. Must be a member of the DataDestination enum.")
 
         # Keep removing the top row (oldest data) until the dataframe has been reduced to the maximum allowed
         # number of rows
@@ -153,7 +154,8 @@ class Asset:
 
             # Calculate and add the values of all derived columns
             for column_title, column_func in self.machine_settings.derived_columns.items():
-                destination_df.at[destination_df.index[-1], column_title] = column_func(destination_df)
+                destination_df.at[destination_df.index[-1],
+                                  column_title] = column_func(destination_df)
 
     def _switch_to_testing_data(self) -> None:
         """
@@ -402,7 +404,8 @@ class AssetManager:
 
         trading_days.append(extra_trading_day)
 
-        threshold_index = int(self.machine_settings.training_data_percentage * (len(trading_days) - 1))
+        threshold_index = int(self.machine_settings.training_data_percentage *
+                              (len(trading_days) - 1))
 
         return trading_days[threshold_index]
 

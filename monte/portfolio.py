@@ -20,6 +20,8 @@ class Portfolio():
     interface with all of its positions and all of their training/testing data.
     """
 
+    # TODO: Dataframe that stores the returns at each time delta, with timestamps.
+
     alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
     starting_cash: float

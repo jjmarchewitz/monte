@@ -28,13 +28,15 @@ class Position():
         self.symbol = symbol
         self.quantity = initial_quantity
 
-    def get_training_df(self) -> pd.DataFrame:
+    @property
+    def training_df(self) -> pd.DataFrame:
         """
         Returns the training dataframe for the Asset this Position represents.
         """
         return self.am.get_training_df(self.symbol)
 
-    def get_testing_df(self) -> pd.DataFrame:
+    @property
+    def testing_df(self) -> pd.DataFrame:
         """
         Returns the testing dataframe for the Asset this Position represents.
         """

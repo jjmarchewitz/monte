@@ -72,8 +72,6 @@ def cache_derived_column(func: Callable) -> Callable:
         # If the current identifier is not in the cache, add it to the cache
         if current_identifier not in func.cache_:
             func.cache_[current_identifier] = func(df, *args, **kwargs)
-        else:
-            breakpoint()
 
         return func.cache_[current_identifier]
 

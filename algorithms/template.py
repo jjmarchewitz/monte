@@ -19,25 +19,41 @@ class Template(Algorithm):
         super().__init__(alpaca_api, machine_settings, name, starting_cash)
 
     def get_derived_columns(self) -> dict[str, DerivedColumn]:
+        """
+        Returns a dictionary containing the derived columns this algorithm needs to run.
+        """
         # Add any derived columns to the dictionary.
         derived_columns = {}
 
         return derived_columns
 
     def startup(self) -> None:
+        """
+        Runs before the simulation starts (and before any training data is acquired).
+        """
         # Watch all of your symbols from here
         # self.portfolio.watch("SYMBOL")
         ...
 
     def train(self) -> None:
-        # Run any training code here. This function gets called after all of the training data is assembled
-        # into the training_df of every Position.
+        """
+        Runs right before the end of the training phase of the simulation (after the training data is
+        acquired). Train any models here.
+        """
+        # Training code, called once
         ...
 
     def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]) -> None:
-        # Runs on every time frame (time step). This is the main body of your algorithm
+        """
+        Runs on every time frame during the testing phase of the simulation. This is the main body of the
+        algorithm.
+        """
+        # Testing code, called on every time frame
         ...
 
     def cleanup(self) -> None:
+        """
+        Runs after the end of the testing phase of the simulation. Run any needed post-simulation code here.
+        """
         # Runs once the simulation is over and the last TimeFrame has been run.
         ...

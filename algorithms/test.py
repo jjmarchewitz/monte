@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import datetime
-from functools import partial
 
 import derived_columns.definitions as dcolumns
+from derived_columns import DerivedColumn
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
@@ -30,10 +30,10 @@ class TestAlg(Algorithm):
 
     def get_derived_columns(self) -> dict[str, Callable]:
         derived_columns = {
-            "net_l10": partial(dcolumns.net, n=10, col="vwap"),
-            "avg_l10": partial(dcolumns.mean, n=10, col="vwap"),
-            "std_dev_l10": partial(dcolumns.std_dev, n=10, col="vwap"),
-            "pct_chg_l10": partial(dcolumns.percent_change, n=10, col="vwap")
+            "net_l10": DerivedColumn(dcolumns.net, 10, "vwap"),
+            "avg_l10": DerivedColumn(dcolumns.mean, 10, "vwap"),
+            "std_dev_l10": DerivedColumn(dcolumns.std_dev, 10, "vwap"),
+            "pct_chg_l10": DerivedColumn(dcolumns.percent_change, 10, "vwap")
         }
 
         return derived_columns
@@ -58,9 +58,10 @@ class TestAlg(Algorithm):
             elif df.iloc[-1].pct_chg_l10 > 1:
                 self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
-        print(f"{current_datetime.date()} {current_datetime.hour:02d}:{current_datetime.minute:02d} | "
-              f"${round(self.portfolio.total_value(), 2):,.2f} | "
-              f"{round(self.portfolio.current_return(), 3):+.3f}%")
+        print(
+            f"{current_datetime.date()} {current_datetime.hour:02d}:{current_datetime.minute:02d} | "
+            f"${round(self.portfolio.total_value, 2):,.2f} | "
+            f"{round(self.portfolio.current_return, 3):+.3f}%")
 
     def cleanup(self) -> None:
         pass

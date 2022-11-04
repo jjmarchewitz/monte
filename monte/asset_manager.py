@@ -544,12 +544,14 @@ class AssetManager:
         """
         return self.watched_assets[self._reference_symbol]
 
+    @property
     def latest_timestamp(self) -> str:
         """
         Returns the timestamp of the most recent time_frame.
         """
         return self._get_reference_asset().timestamp()
 
+    @property
     def latest_datetime(self) -> datetime:
         """
         Returns the datetime of the most recent time_frame.

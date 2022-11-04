@@ -39,11 +39,11 @@ class TradingMachine():
             raise TypeError(
                 "You must pass an instance of a subclass of Algorithm into add_algo_instance().")
 
-        if not isinstance(algorithm_with_portfolio.get_portfolio(), Portfolio):
+        if not isinstance(algorithm_with_portfolio.portfolio, Portfolio):
             raise TypeError(
-                "The get_portfolio() method of the algorithm must be an instance of Portfolio.")
+                "The portfolio attribute of the algorithm must be an instance of Portfolio.")
 
-        algorithm_with_portfolio.get_portfolio().am = self.am
+        algorithm_with_portfolio.portfolio.am = self.am
 
         self.algo_instances.append(algorithm_with_portfolio)
 
@@ -103,7 +103,7 @@ class TradingMachine():
 
                 # Process any orders and run each algorithm
                 for algo in self.algo_instances:
-                    portfolio = algo.get_portfolio()
+                    portfolio = algo.portfolio
 
                     # Process orders
                     processed_orders = portfolio.process_pending_orders()
@@ -142,8 +142,8 @@ class TradingMachine():
         # Print out final returns for all algos tested
         print("\n\n -- RESULTS -- \n")
         for algo in self.algo_instances:
-            print(f"{algo.name} | ${round(algo.get_portfolio().total_value(), 2):,} | "
-                  f"{round(algo.get_portfolio().current_return(), 3):+}%")
+            print(f"{algo.name} | ${round(algo.portfolio.total_value, 2):,} | "
+                  f"{round(algo.portfolio.current_return, 3):+}%")
         print("\n\n")
 
         # Print out the total runtime

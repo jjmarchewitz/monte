@@ -55,7 +55,7 @@ class Long(Algorithm):
                 self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
         print(f"{current_datetime.date()} {current_datetime.hour}:{current_datetime.minute:02d} | "
-              f"Total Value: ${self.portfolio.total_value():.2f}")
+              f"Total Value: ${self.portfolio.total_value:.2f}")
 
     def cleanup(self) -> None:
         pass

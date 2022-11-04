@@ -42,14 +42,16 @@ class Position():
         """
         return self.am.get_testing_df(self.symbol)
 
+    @property
     def price(self) -> float:
         """
         Returns the most recent volume-weighted average price (vwap) of the underlying Asset.
         """
         return self.am.get_testing_df(self.symbol).iloc[-1].vwap
 
+    @property
     def total_value(self) -> float:
         """
         Returns the total value of this Position (i.e. current price * quantity held).
         """
-        return self.price() * self.quantity
+        return self.price * self.quantity

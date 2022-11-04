@@ -27,12 +27,6 @@ class Algorithm(ABC):
         self.name = name
         self.portfolio = Portfolio(self.alpaca_api, self.machine_settings, starting_cash)
 
-    def get_portfolio(self) -> Portfolio:
-        """
-        Returns a reference to this algorithm's Portfolio instance.
-        """
-        return self.portfolio
-
     def get_name(self) -> str:
         """
         Returns the name of this instance, used to help identify this instance in print statements.

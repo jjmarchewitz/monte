@@ -64,32 +64,36 @@ class Portfolio():
         """
         return self.am.get_testing_df(symbol)
 
+    @property
     def latest_datetime(self) -> datetime:
         """
         Returns the most recent datetime in the simulation.
         """
-        return self.am.latest_datetime()
+        return self.am.latest_datetime
 
+    @property
     def latest_timestamp(self) -> str:
         """
         Returns the most recent timestamp in the simulation.
         """
-        return self.am.latest_timestamp()
+        return self.am.latest_timestamp
 
+    @property
     def total_value(self) -> float:
         """
         Returns the total value of this Portfolio, including any unused cash and the value of all Positions.
         """
         total = self.cash
-        total += sum(position.total_value() for position in self.positions.values())
+        total += sum(position.total_value for position in self.positions.values())
         return total
 
+    @property
     def current_return(self) -> float:
         """
         Returns the percent difference between the current total value of the Portfolio and the amount of
         starting cash.
         """
-        return ((self.total_value() - self.starting_cash) / self.starting_cash) * 100
+        return ((self.total_value - self.starting_cash) / self.starting_cash) * 100
 
     def watch(self, symbol: str) -> None:
         """

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from datetime import datetime
 
 import derived_columns.definitions as dcolumns
@@ -28,7 +27,7 @@ class TestAlg(Algorithm):
 
         # self.symbols = ["AAPL"]
 
-    def get_derived_columns(self) -> dict[str, Callable]:
+    def get_derived_columns(self) -> dict[str, DerivedColumn]:
         derived_columns = {
             "net_l10": DerivedColumn(dcolumns.net, 10, "vwap"),
             "avg_l10": DerivedColumn(dcolumns.mean, 10, "vwap"),

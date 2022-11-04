@@ -1,10 +1,11 @@
 import math
-from collections.abc import Callable
 from datetime import datetime
 from functools import partial
 
 import pytz
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
+
+from derived_columns import DerivedColumn
 
 
 class MachineSettings():
@@ -17,7 +18,7 @@ class MachineSettings():
     end_date: datetime
     training_data_percentage: float
     time_frame: TimeFrame
-    derived_columns: dict
+    derived_columns: dict[str, DerivedColumn]
     max_rows_in_test_df: int
     start_buffer_days: int
     data_buffer_days: int
@@ -25,7 +26,7 @@ class MachineSettings():
 
     def __init__(
             self, start_date: datetime, end_date: datetime, training_data_percentage: float,
-            time_frame: TimeFrame, derived_columns: dict[str, Callable] = {},
+            time_frame: TimeFrame, derived_columns: dict[str, DerivedColumn] = {},
             max_rows_in_test_df: int = 10,
             time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone('US/Eastern')) -> None:
         self.start_date = start_date
@@ -174,34 +175,32 @@ class MachineSettings():
                     "machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
                     "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
-    def add_derived_columns(self, new_columns: dict[str, Callable]) -> None:
+    def add_derived_columns(self, new_columns: dict[str, DerivedColumn]) -> None:
         """
         Adds derived columns contained in ``new_columns`` to ``self.derived_columns`` if the column names
         have no clashes. Also updates ``self.max_rows_in_test_df`` and ``self.start_buffer_days`` based on
         the new columns.
         """
-        for column_title, new_column_func in new_columns.items():
+        for column_title, new_derived_column in new_columns.items():
 
             if column_title in self.derived_columns.keys():
 
-                existing_func = self.derived_columns[column_title]
+                existing_derived_column = self.derived_columns[column_title]
 
-                if (isinstance(existing_func, partial) and isinstance(new_column_func, partial) and
-                        existing_func.func == new_column_func.func and
-                        existing_func.args == new_column_func.args and
-                        existing_func.keywords == new_column_func.keywords):
-                    continue
-                elif existing_func == new_column_func:
+                if (isinstance(existing_derived_column, DerivedColumn) and
+                    isinstance(new_derived_column, DerivedColumn) and
+                        existing_derived_column == new_derived_column):
                     continue
                 else:
                     raise ValueError(
                         f"Attempted to add a new derived column with the same name as an existing column "
-                        f"but a different function. The column name is {column_title}. \n"
-                        f"Existing Function: {existing_func}\nNew Function: {new_column_func}")
+                        f"but a different function or arguments. The column name is {column_title}. \n"
+                        f"Existing Derived Column: {existing_derived_column}\n"
+                        f"New Derived Column: {new_derived_column}")
 
             else:
-                if callable(new_column_func):
-                    self.derived_columns[column_title] = new_column_func
+                if callable(new_derived_column):
+                    self.derived_columns[column_title] = new_derived_column
                 else:
                     raise ValueError("Tried to add a non-callable object as a derived column.")
 

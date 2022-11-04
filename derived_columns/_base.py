@@ -19,7 +19,10 @@ class DFIdentifier():
 
 
 class DerivedColumn():
-    """DOC:"""
+    """
+    Turns a function written to be a derived column into an instance of this class so it can be used in
+    the trading machine.
+    """
 
     func: Callable
     num_rows: int

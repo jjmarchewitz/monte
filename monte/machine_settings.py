@@ -183,41 +183,33 @@ class MachineSettings():
         """
         for column_title, new_derived_column in new_columns.items():
 
+            # Check that the new derivec column is an instance of Derived Column
+            if not isinstance(new_derived_column, DerivedColumn):
+                raise ValueError(
+                    "Only instances of DerivedColumn can be added as a derived column.")
+
+            # If a derived column with the same name exists
             if column_title in self.derived_columns.keys():
 
                 existing_derived_column = self.derived_columns[column_title]
 
-                if (isinstance(existing_derived_column, DerivedColumn) and
-                    isinstance(new_derived_column, DerivedColumn) and
-                        existing_derived_column == new_derived_column):
-                    continue
-                else:
+                # If the two derived columns with the same name are different, raise an error
+                if existing_derived_column != new_derived_column:
                     raise ValueError(
                         f"Attempted to add a new derived column with the same name as an existing column "
                         f"but a different function or arguments. The column name is {column_title}. \n"
                         f"Existing Derived Column: {existing_derived_column}\n"
                         f"New Derived Column: {new_derived_column}")
 
+            # Else, add the new derived column to self.derived_columns
             else:
-                if callable(new_derived_column):
-                    self.derived_columns[column_title] = new_derived_column
-                else:
-                    raise ValueError("Tried to add a non-callable object as a derived column.")
+                self.derived_columns[column_title] = new_derived_column
 
-        # Update other attributes of machine_settings based on the new derived columns
-        self.update_max_rows_in_df()
+        # Update the maximum number of rows in the testing dataframe to be the maximum of the number of rows
+        # each derived column uses.
+        for derived_column in self.derived_columns.values():
+            self.max_rows_in_test_df = max(self.max_rows_in_test_df, derived_column.num_rows)
+
+        # Re-calculate the number of start buffer days needed since it is calculated based on
+        # self.max_rows_in_test_df.
         self.start_buffer_days = self.calculate_start_buffer_days()
-
-    def update_max_rows_in_df(self) -> None:
-        """
-        Sets ``self.max_rows_in_test_df`` to the maximum number of rows needed by any single derived column.
-        """
-        for _, column_func in self.derived_columns.items():
-            # If the function is a partial function and it has a variable designated as storing the number
-            # of rows used
-            if isinstance(column_func, partial) and column_func.func.num_rows_arg_name is not None:
-                # Update the maximum number of rows in the df to be the maximum between its current value
-                # and the value from the current column_func
-                num_rows_arg_name = column_func.func.num_rows_arg_name
-                self.max_rows_in_test_df = max(self.max_rows_in_test_df,
-                                               column_func.keywords[num_rows_arg_name])

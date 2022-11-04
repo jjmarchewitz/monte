@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from datetime import datetime
-from functools import partial
 
 import derived_columns.definitions as dcolumns
+from derived_columns import DerivedColumn
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
@@ -19,7 +18,7 @@ class Template(Algorithm):
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
         super().__init__(alpaca_api, machine_settings, name, starting_cash)
 
-    def get_derived_columns(self) -> dict[str, Callable]:
+    def get_derived_columns(self) -> dict[str, DerivedColumn]:
         derived_columns = {}
 
         return derived_columns

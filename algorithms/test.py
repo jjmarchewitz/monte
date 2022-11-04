@@ -15,6 +15,9 @@ class TestAlg(Algorithm):
     def __init__(self, alpaca_api: AlpacaAPIBundle,
                  machine_settings: MachineSettings, name: str, starting_cash: float) -> None:
 
+        # TODO: Make the declaration of Portfolio more explicit. Somehow force the user to do it themselves,
+        # but in a standard way
+
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
         super().__init__(alpaca_api, machine_settings, name, starting_cash)
 

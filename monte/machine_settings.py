@@ -1,6 +1,5 @@
 import math
 from datetime import datetime
-from functools import partial
 
 import pytz
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
@@ -119,13 +118,55 @@ class MachineSettings():
         Calculates the number of start buffer days needed based on ``self.max_rows_in_test_df`` and
         ``self.rows_per_day()``.
         """
-        rows_per_day = self.rows_per_day()
+        # Get the number of start buffer days needed to make the derived columns in the test df run correctly.
+        # During the testing phase, all of the derived columns already have data to use and
+        rows_per_day = self.get_rows_per_day()
+        days_needed_for_test_df = math.ceil(self.max_rows_in_test_df / rows_per_day)
 
-        start_buffer_days = math.ceil(self.max_rows_in_test_df / rows_per_day)
+        max_days_needed_by_derived_columns = 0
+        for derived_column in self.derived_columns.values():
+            # Get the number of days needed by the current derived column
+            days_needed_by_derived_column = self.get_start_buffer_days_needed_by_derived_column(
+                derived_column, rows_per_day)
+
+            # Update the maximum number of days needed by any derived column
+            max_days_needed_by_derived_columns = max(
+                max_days_needed_by_derived_columns, days_needed_by_derived_column)
+
+        # Set the start buffer days to the maximum of the days needed by the testing df and the days needed
+        # by the derived columns
+        start_buffer_days = max(days_needed_for_test_df, max_days_needed_by_derived_columns)
 
         return start_buffer_days
 
-    def rows_per_day(self) -> int:
+    def get_start_buffer_days_needed_by_derived_column(self, dcol: DerivedColumn, rows_per_day: int) -> int:
+        """
+        Returns the number of start buffer days needed by a derived column and its entire dependency tree.
+
+        If a derived column needs 10 days and it depends on a column that needs 20 days, this will return 30
+        days.
+        """
+        parent_column_days_needed = 0
+
+        # If the derived column has dependencies
+        if dcol.column_dependencies:
+            # For each column it depends on
+            for column_title in dcol.column_dependencies:
+
+                # Calculate how many start buffer days the depended column needs
+                column_obj = self.derived_columns[column_title]
+                dependent_column_days_needed = self.get_start_buffer_days_needed_by_derived_column(
+                    column_obj, rows_per_day)
+
+                # Update the parent column days needed to be the max of all of the depended columns days
+                parent_column_days_needed = max(parent_column_days_needed, dependent_column_days_needed)
+
+        # Add the days needed by the parent derived column itself to the total
+        parent_column_days_needed += math.ceil(dcol.num_rows_needed / rows_per_day)
+
+        return parent_column_days_needed
+
+    def get_rows_per_day(self) -> int:
         """
         Calculates the number of rows in a typical day of trading based on ``self.time_frame``.
         """
@@ -205,11 +246,10 @@ class MachineSettings():
             else:
                 self.derived_columns[column_title] = new_derived_column
 
-        # TODO: Make this work with the new derived column dependencies
         # Update the maximum number of rows in the testing dataframe to be the maximum of the number of rows
         # each derived column uses.
         for derived_column in self.derived_columns.values():
-            self.max_rows_in_test_df = max(self.max_rows_in_test_df, derived_column.num_rows)
+            self.max_rows_in_test_df = max(self.max_rows_in_test_df, derived_column.num_rows_needed)
 
         # Re-calculate the number of start buffer days needed since it is calculated based on
         # self.max_rows_in_test_df.

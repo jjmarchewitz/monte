@@ -138,25 +138,28 @@ class Asset:
             raise ValueError(
                 "Invalid data_destination. Must be a member of the DataDestination enum.")
 
+        # If the dataframes have at least "start_buffer" amount of rows
+        if (self._finished_populating_start_buffer or self._count_unique_days_in_dataframes()
+                > self.machine_settings.start_buffer_days):
+            self._finished_populating_start_buffer = True
+
         # Keep removing the top row (oldest data) until the dataframe has been reduced to the maximum allowed
         # number of rows
         while (data_destination is DataDestination.TESTING_DATA and
-                len(self.testing_df.index) > self.machine_settings.max_rows_in_test_df):
+                len(self.testing_df.index) > self.machine_settings.max_rows_in_test_df and
+                self._finished_populating_start_buffer):
 
             # Drop the oldest row if it exceeds the configured length limit (machine_settings.max_rows_in_df)
             self.testing_df.drop(self.testing_df.head(1).index, inplace=True)
 
-        # If the dataframes have at least "start_buffer" amount of rows
-        if (self._finished_populating_start_buffer or self._count_unique_days_in_dataframes()
-                > self.machine_settings.start_buffer_days):
+        # TODO: Make this work with derived column dependencies
+        # Calculate and add the values of all derived columns
+        for column_title, column_obj in self.machine_settings.derived_columns.items():
 
-            self._finished_populating_start_buffer = True
+            if column_obj.dependencies_are_fulfilled(destination_df, self.machine_settings.derived_columns):
 
-            # TODO: Make this work with derived column dependencies
-            # Calculate and add the values of all derived columns
-            for column_title, column_func in self.machine_settings.derived_columns.items():
                 destination_df.at[destination_df.index[-1],
-                                  column_title] = column_func(destination_df)
+                                  column_title] = column_obj(destination_df)
 
     def _switch_to_testing_data(self) -> None:
         """
@@ -166,7 +169,7 @@ class Asset:
         """
         # Copy a start buffer's worth of data to the head of the testing_df
         self.testing_df = self.training_df.tail(
-            int(self.machine_settings.rows_per_day() *
+            int(self.machine_settings.get_rows_per_day() *
                 (self.machine_settings.start_buffer_days + 1)))
 
         self._remove_start_buffer_data_from_training_df()
@@ -343,6 +346,10 @@ class AssetManager:
         """
         # Must happen before add_start_buffer_data() so that the start buffer data has a destination
         self.data_destination = DataDestination.TRAINING_DATA
+
+        # Reset the main dfs to update their columns to include the derived columns
+        for asset in self.watched_assets.values():
+            asset.reset_main_dfs()
 
         self.add_start_buffer_data()
 

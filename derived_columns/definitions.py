@@ -21,10 +21,11 @@ def mean(df: pd.DataFrame, n: int, col: str) -> float:
     Returns the mean value of the bottom n-rows of the given column.
     """
     total = sum(df.iloc[-i][col] for i in range(1, n + 1))
+
     return total / n
 
 
-@derived_column(dependencies=[mean])
+@derived_column()
 def std_dev(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the standard deviation of the bottom n-rows of the given column.
@@ -47,7 +48,7 @@ def percent_change(df: pd.DataFrame, n: int, col: str) -> float:
 @dataclass
 class FFTResult:
     """
-    DOC:
+    Dataclass to store the result of an FFT of data.
     """
     fft: tuple
     fftfreq: ArrayLike

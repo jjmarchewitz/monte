@@ -32,7 +32,7 @@ class TestAlg(Algorithm):
             "avg_l10": DerivedColumn(dcolumns.mean, 10, "vwap"),
             "avg_l30": DerivedColumn(dcolumns.mean, 30, "vwap"),
             "std_dev_l10": DerivedColumn(dcolumns.std_dev, 10, "vwap"),
-            "pct_chg_l10": DerivedColumn(dcolumns.percent_change, 10, "vwap"),
+            "pct_chg_l10": DerivedColumn(dcolumns.returns, 10, "vwap"),
             "fft_l20": DerivedColumn(dcolumns.fourier_transform, 20, "vwap"),
         }
 

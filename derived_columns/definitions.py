@@ -4,10 +4,10 @@ import pandas as pd
 from numpy.typing import ArrayLike
 from scipy.fft import fft, fftfreq
 
-from derived_columns._base import cache_derived_column
+from derived_columns._base import derived_column
 
 
-@cache_derived_column
+@derived_column()
 def net(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the difference in value between the bottom-most row and the nth-to-last row of the given column.
@@ -15,7 +15,7 @@ def net(df: pd.DataFrame, n: int, col: str) -> float:
     return df.iloc[-n][col] - df.iloc[-1][col]
 
 
-@cache_derived_column
+@derived_column()
 def mean(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the mean value of the bottom n-rows of the given column.
@@ -24,7 +24,7 @@ def mean(df: pd.DataFrame, n: int, col: str) -> float:
     return total / n
 
 
-@cache_derived_column
+@derived_column(dependencies=[mean])
 def std_dev(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the standard deviation of the bottom n-rows of the given column.
@@ -34,7 +34,7 @@ def std_dev(df: pd.DataFrame, n: int, col: str) -> float:
     return (sum_of_squared_differences / n) ** 0.5
 
 
-@cache_derived_column
+@derived_column()
 def percent_change(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the percent change over the bottom n-rows of the given column.
@@ -53,7 +53,7 @@ class FFTResult:
     fftfreq: ArrayLike
 
 
-@cache_derived_column
+@derived_column()
 def fourier_transform(df: pd.DataFrame, n: int, col: str):
     """
     Returns the Fast Fourier Transform of the bottom n-rows of a given column.

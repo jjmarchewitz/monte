@@ -24,6 +24,8 @@ class DerivedColumn():
     the trading machine.
     """
 
+    # TODO: Handle dependencies in this class
+
     func: Callable
     num_rows: int
     args: tuple
@@ -53,29 +55,33 @@ class DerivedColumn():
             return False
 
 
-def cache_derived_column(func: Callable) -> Callable:
+def derived_column(dependencies: list[Callable] = []):
     """
-    Wraps around a derived column function to add caching.
+    Wraps around a derived column function to add caching and dependency management.
     """
 
-    func.cache_ = {}
+    def derived_column_inner(func: Callable) -> Callable:
+        func.cache_ = {}
+        func.dependencies = dependencies
 
-    @wraps(func)
-    def inner(df: pd.DataFrame, *args, **kwargs) -> Any:
+        @wraps(func)
+        def inner(df: pd.DataFrame, *args, **kwargs) -> Any:
 
-        # TODO: Make this identifier work properly if users pass an argument in either as arg or as kwarg
-        current_identifier = DFIdentifier(
-            df.iloc[-1].symbol, df.iloc[-1].timestamp, args, tuple(sorted(kwargs.items())))
+            # TODO: Make this identifier work properly if users pass an argument in either as arg or as kwarg
+            current_identifier = DFIdentifier(
+                df.iloc[-1].symbol, df.iloc[-1].timestamp, args, tuple(sorted(kwargs.items())))
 
-        # Purge cache if incoming identifier's timestamp is different.
-        if any(existing_identifier.timestamp != current_identifier.timestamp
-                for existing_identifier in func.cache_.keys()):
-            func.cache_ = {}
+            # Purge cache if incoming identifier's timestamp is different.
+            if any(existing_identifier.timestamp != current_identifier.timestamp
+                    for existing_identifier in func.cache_.keys()):
+                func.cache_ = {}
 
-        # If the current identifier is not in the cache, add it to the cache
-        if current_identifier not in func.cache_:
-            func.cache_[current_identifier] = func(df, *args, **kwargs)
+            # If the current identifier is not in the cache, add it to the cache
+            if current_identifier not in func.cache_:
+                func.cache_[current_identifier] = func(df, *args, **kwargs)
 
-        return func.cache_[current_identifier]
+            return func.cache_[current_identifier]
 
-    return inner
+        return inner
+
+    return derived_column_inner

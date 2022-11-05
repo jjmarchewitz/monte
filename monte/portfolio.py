@@ -13,6 +13,8 @@ from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderStatus, OrderType
 from monte.position import Position
 
+# TODO: Don't remove Positions with 0 quantity, instead use them as a primary interface for dataframes
+
 
 class Portfolio():
     """

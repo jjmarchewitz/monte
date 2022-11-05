@@ -205,6 +205,7 @@ class MachineSettings():
             else:
                 self.derived_columns[column_title] = new_derived_column
 
+        # TODO: Make this work with the new derived column dependencies
         # Update the maximum number of rows in the testing dataframe to be the maximum of the number of rows
         # each derived column uses.
         for derived_column in self.derived_columns.values():

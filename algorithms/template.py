@@ -33,8 +33,8 @@ class Template(Algorithm):
         Runs before the simulation starts (and before any training data is acquired).
         """
         # Watch all of your symbols from here
-        # self.portfolio.watch("SYMBOL")
-        ...
+        for symbol in self.symbols:
+            self.portfolio.watch(symbol)
 
     def train(self) -> None:
         """

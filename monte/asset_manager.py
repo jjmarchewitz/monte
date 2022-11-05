@@ -152,6 +152,7 @@ class Asset:
 
             self._finished_populating_start_buffer = True
 
+            # TODO: Make this work with derived column dependencies
             # Calculate and add the values of all derived columns
             for column_title, column_func in self.machine_settings.derived_columns.items():
                 destination_df.at[destination_df.index[-1],
@@ -515,6 +516,7 @@ class AssetManager:
         if self.simulation_running:
             raise RuntimeError("Cannot watch assets while a simulation is running.")
 
+        # Cannot watch a symbol already being watched
         elif not self.is_watching_asset(symbol):
             self.watched_assets[symbol] = Asset(self.alpaca_api, self.machine_settings, symbol)
 

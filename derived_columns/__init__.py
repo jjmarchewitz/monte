@@ -1,1 +1,1 @@
-from derived_columns._base import DerivedColumn, cache_derived_column
+from derived_columns._base import DerivedColumn, derived_column

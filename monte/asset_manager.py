@@ -152,7 +152,6 @@ class Asset:
             # Drop the oldest row if it exceeds the configured length limit (machine_settings.max_rows_in_df)
             self.testing_df.drop(self.testing_df.head(1).index, inplace=True)
 
-        # TODO: Make this work with derived column dependencies
         # Calculate and add the values of all derived columns
         for column_title, column_obj in self.machine_settings.derived_columns.items():
 

@@ -19,13 +19,15 @@ class Algorithm(ABC):
     machine_settings: MachineSettings
     portfolio: Portfolio
     name: str
+    symbols: list[str]
 
     def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, name: str,
-                 starting_cash: float) -> None:
+                 starting_cash: float, symbols: list[str]) -> None:
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
         self.name = name
         self.portfolio = Portfolio(self.alpaca_api, self.machine_settings, starting_cash)
+        self.symbols = symbols
 
     def get_name(self) -> str:
         """

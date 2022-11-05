@@ -12,11 +12,12 @@ from monte.orders import Order
 
 class Template(Algorithm):
 
-    def __init__(self, alpaca_api: AlpacaAPIBundle,
-                 machine_settings: MachineSettings, name: str, starting_cash: float) -> None:
+    def __init__(
+            self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, name: str,
+            starting_cash: float, symbols: list[str]) -> None:
 
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
-        super().__init__(alpaca_api, machine_settings, name, starting_cash)
+        super().__init__(alpaca_api, machine_settings, name, starting_cash, symbols)
 
     def get_derived_columns(self) -> dict[str, DerivedColumn]:
         """

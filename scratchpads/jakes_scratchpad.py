@@ -24,14 +24,23 @@ def main():
 
     ms = MachineSettings(
         start_date=datetime(2016, 3, 8),
-        end_date=datetime(2020, 10, 23),
+        end_date=datetime(2022, 10, 23),
         training_data_percentage=0.1,
         time_frame=TimeFrame(1, TimeFrameUnit.Day),
     )
 
     trading_machine = TradingMachine(alpaca_api, ms)
 
-    algo1 = test.TestAlg(alpaca_api, ms, "Test Alg", 10_000)
+    # symbols = [
+    #     "AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
+    #     "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC",
+    #     "ABBV", "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS",
+    #     "ABT", "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE",
+    #     "ROK"]
+
+    symbols = ["GME"]
+
+    algo1 = test.TestAlg(alpaca_api, ms, "Test Alg", 10_000, symbols)
 
     trading_machine.add_algo_instance(algo1)
 

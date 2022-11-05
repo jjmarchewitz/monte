@@ -12,23 +12,15 @@ from monte.orders import Order, OrderType
 
 class TestAlg(Algorithm):
 
-    def __init__(self, alpaca_api: AlpacaAPIBundle,
-                 machine_settings: MachineSettings, name: str, starting_cash: float) -> None:
+    def __init__(
+            self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, name: str,
+            starting_cash: float, symbols: list[str]) -> None:
 
         # TODO: Make the declaration of Portfolio more explicit. Somehow force the user to do it themselves,
         # but in a standard way
 
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
-        super().__init__(alpaca_api, machine_settings, name, starting_cash)
-
-        # self.symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
-        #            "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC", "ABBV",
-        #            "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS", "ABT",
-        #            "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE", "ROK"]
-
-        self.symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA"]
-
-        # self.symbols = ["AAPL"]
+        super().__init__(alpaca_api, machine_settings, name, starting_cash, symbols)
 
     def get_derived_columns(self) -> dict[str, DerivedColumn]:
         """
@@ -38,8 +30,10 @@ class TestAlg(Algorithm):
         derived_columns = {
             "net_l10": DerivedColumn(dcolumns.net, 10, "vwap"),
             "avg_l10": DerivedColumn(dcolumns.mean, 10, "vwap"),
+            "avg_l30": DerivedColumn(dcolumns.mean, 30, "vwap"),
             "std_dev_l10": DerivedColumn(dcolumns.std_dev, 10, "vwap"),
-            "pct_chg_l10": DerivedColumn(dcolumns.percent_change, 10, "vwap")
+            "pct_chg_l10": DerivedColumn(dcolumns.percent_change, 10, "vwap"),
+            "fft_l20": DerivedColumn(dcolumns.fourier_transform, 20, "vwap"),
         }
 
         return derived_columns

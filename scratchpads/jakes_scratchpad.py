@@ -25,7 +25,7 @@ def main():
         start_date=datetime(2016, 3, 8),
         end_date=datetime(2022, 10, 23),
         training_data_percentage=0.1,
-        time_frame=TimeFrame(1, TimeFrameUnit.Day),
+        time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )
 
     trading_machine = TradingMachine(alpaca_api, ms)

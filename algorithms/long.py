@@ -28,12 +28,11 @@ class TestAlg(Algorithm):
 
         self.symbols = ["AAPL", "GOOG", "IVV", "AMD", "NVDA"]
 
-        # symbols = ["AAPL"]
-
     def get_portfolio(self) -> Portfolio:
         return self.portfolio
 
     def startup(self) -> None:
+
         for symbol in self.symbols:
             self.portfolio.watch(symbol)
 

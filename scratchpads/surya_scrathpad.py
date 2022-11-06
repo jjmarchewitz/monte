@@ -19,7 +19,7 @@ def main():
     # TODO: Add logging
 
     ms = MachineSettings(
-        start_date="2020-09-09",
+        start_date="2022-09-09",
         end_date="2022-10-04",
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
         derived_columns={

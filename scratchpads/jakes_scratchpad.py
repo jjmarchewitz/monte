@@ -1,38 +1,45 @@
 from __future__ import annotations
 
-from functools import partial
+from datetime import datetime
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 from algorithms import test
-from derived_columns import general
+from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
 from monte.machine_settings import MachineSettings
-from monte.util import AlpacaAPIBundle
 
 
 def main():
     alpaca_api = AlpacaAPIBundle()
 
-    # TODO: Create pre-defined "configs" for the most commonly used TimeFrames that auto-sets the TimeFrame
-    # and data_buffer_days.
-    # TODO: Add logging
+    # TODO: Add logging (print statements).
+    # TODO: Portfolios store executed order history
+    # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
+    # TODO: Move algos and scratchpads to a separate repo, publish monte on pypi
+    # TODO: Markdown documentation explaining the high-level concepts of this repo and some implementation
+    # details.
+    # TODO: Options trading
 
     ms = MachineSettings(
-        start_date="2016-09-09",
-        end_date="2022-10-04",
-        time_frame=TimeFrame(1, TimeFrameUnit.Hour),
-        derived_columns={
-            "avg_l5": partial(general.avg_last_n, n=5)
-        },
-        max_rows_in_df=500,
-        start_buffer_days=5,  # TradingDays
-        data_buffer_days=500,  # TradingDays
+        start_date=datetime(2016, 3, 8),
+        end_date=datetime(2022, 10, 23),
+        training_data_percentage=0.1,
+        time_frame=TimeFrame(1, TimeFrameUnit.Day),
     )
 
     trading_machine = TradingMachine(alpaca_api, ms)
 
-    algo1 = test.TestAlg(alpaca_api, ms)
+    # symbols = [
+    #     "AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
+    #     "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC",
+    #     "ABBV", "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS",
+    #     "ABT", "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE",
+    #     "ROK"]
+
+    symbols = ["GME"]
+
+    algo1 = test.TestAlg(alpaca_api, ms, "Test Alg", 10_000, symbols)
 
     trading_machine.add_algo_instance(algo1)
 

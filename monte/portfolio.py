@@ -1,25 +1,33 @@
 
 from __future__ import annotations
 
+from collections.abc import ItemsView
+from datetime import datetime
 from typing import Union
 
 import pandas as pd
 
+from monte.api import AlpacaAPIBundle
 from monte.asset_manager import AssetManager
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderStatus, OrderType
 from monte.position import Position
-from monte.util import AlpacaAPIBundle
+
+# TODO: Don't remove Positions with 0 quantity, instead use them as a primary interface for dataframes
 
 
 class Portfolio():
     """
-    A portfolio is simply a collection of individual positions.
+    A portfolio is simply a collection of individual positions. This portfolio class acts as an algorithm's
+    interface with all of its positions and all of their training/testing data.
     """
+
+    # TODO: Dataframe that stores the returns at each time delta, with timestamps.
 
     alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
-    cash: int
+    starting_cash: float
+    cash: float
     name: str
     positions: dict[str, Position]
     am: AssetManager
@@ -27,78 +35,112 @@ class Portfolio():
     _current_order_id_number: int
 
     def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings,
-                 starting_cash: int = 10000, name: str = None) -> None:
-        """
-        Constructor for the Portfolio class.
-
-        Args:
-            alpaca_api:
-                A bundle of Alpaca APIs all created and authenticated with the keys in the repo's
-                alpaca_config.json
-
-            machine_settings:
-                An instance of machine.MachineSettings that contains configuration for the current simulation.
-
-            starting_cash:
-                The starting cash that the portfolio will have before any orders are placed or any positions
-                are held. Defaults to 10000.
-
-            name:
-                A string name to give the portfolio, purely for aesthetic/debugging purposes. Defaults to None.
-        """
-
+                 starting_cash: float = 10000, name: str = "") -> None:
         self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
+        self.starting_cash = starting_cash
         self.cash = starting_cash
         self.name = name
         self.positions = {}
-        self.am = None
         self._order_queue = []
         self._current_order_id_number = 0
 
     def __getitem__(self, key: str) -> Position:
         return self.positions[key]
 
-    def items(self):
+    def items(self) -> ItemsView:
+        """
+        Returns an ItemsView instance for all of the Positions in the Portfolio.
+        """
         return self.positions.items()
 
-    def get_data(self, symbol) -> Union[pd.DataFrame, None]:
-        result = None
+    def get_training_df(self, symbol) -> pd.DataFrame:
+        """
+        Returns the training dataframe for the given symbol.
+        """
+        return self.am.get_training_df(symbol)
 
-        if self.am.is_watching_asset(symbol):
-            result = self.am[symbol]
+    def get_testing_df(self, symbol) -> pd.DataFrame:
+        """
+        Returns the testing dataframe for the given symbol.
+        """
+        return self.am.get_testing_df(symbol)
 
-        return result
+    @property
+    def latest_datetime(self) -> datetime:
+        """
+        Returns the most recent datetime in the simulation.
+        """
+        return self.am.latest_datetime
 
-    def delete_empty_positions(self) -> None:
-        """DOC:"""
+    @property
+    def latest_timestamp(self) -> str:
+        """
+        Returns the most recent timestamp in the simulation.
+        """
+        return self.am.latest_timestamp
+
+    @property
+    def total_value(self) -> float:
+        """
+        Returns the total value of this Portfolio, including any unused cash and the value of all Positions.
+        """
+        total = self.cash
+        total += sum(position.total_value for position in self.positions.values())
+        return total
+
+    @property
+    def current_return(self) -> float:
+        """
+        Returns the percent difference between the current total value of the Portfolio and the amount of
+        starting cash.
+        """
+        return ((self.total_value - self.starting_cash) / self.starting_cash) * 100
+
+    def watch(self, symbol: str) -> None:
+        """
+        Start watching a new asset. Can only be called before the simulation runs.
+        """
+        self.am.watch_asset(symbol)
+
+    def is_watching(self, symbol: str) -> bool:
+        """
+        Returns True if a symbol is already being watched, False otherwise.
+        """
+        return self.am.is_watching_asset(symbol)
+
+    def unwatch(self, symbol: str) -> bool:
+        """
+        Removes a given asset from the AssetManager.
+        """
+        return self.am.unwatch_asset(symbol)
+
+    def _delete_empty_positions(self) -> None:
+        """
+        Removes all Positions with a quantity of 0 from the Portfolio.
+        """
         for symbol in list(self.positions.keys()):
             if self.positions[symbol].quantity == 0:
                 self.positions.pop(symbol)
 
     def contains_position(self, symbol: str) -> bool:
-        """DOC:"""
+        """
+        Returns True if the given symbol corresponds to a Position in this Portfolio, False otherwise.
+        """
         return symbol in self.positions.keys()
 
-    def _create_position(self, symbol: str, initial_quantity: int) -> Position:
-        """DOC:"""
+    def _create_position(self, symbol: str, initial_quantity: float) -> Position:
+        """
+        Helper function that creates new Positions with this Portfolio's AlpacaAPIBundle, MachineSettings,
+        and AssetManager instances.
+        """
         return Position(self.alpaca_api, self.machine_settings, self.am, symbol, initial_quantity)
 
-    def total_value(self) -> float:
-        """DOC:"""
-        total = self.cash
-
-        for position in self.positions.values():
-            total += position.total_value()
-
-        return total
-
-    def watch(self, symbol) -> None:
-        """DOC:"""
-        self.am.watch_asset(symbol)
-
     def place_order(self, symbol: str, quantity: int, order_type: OrderType = OrderType.BUY) -> Order:
-        """DOC:"""
+        """
+        Place a buy or sell order on this Portfolio. The order will try to be executed in one or more
+        TimeFrames relative to the current one.
+        """
         # Check that the order type passed in is a valid order type from the enum
         # OrderType
         if order_type not in OrderType:
@@ -116,7 +158,9 @@ class Portfolio():
         return new_order
 
     def get_order(self, order_id: int) -> Union[Order, None]:
-        """DOC:"""
+        """
+        Returns an order that is currently in the order queue, given that order's ID.
+        """
         result = None
 
         for order in self._order_queue:
@@ -126,7 +170,9 @@ class Portfolio():
         return result
 
     def cancel_order(self, order_id: int) -> tuple[bool, Union[Order, None]]:
-        """DOC:"""
+        """
+        Cancel an order that is currently on the order queue.
+        """
         was_order_successfully_cancelled = False
         cancelled_order = None
 
@@ -141,7 +187,10 @@ class Portfolio():
         return (was_order_successfully_cancelled, cancelled_order)
 
     def process_pending_orders(self) -> list[Order]:
-        """DOC:"""
+        """
+        Process orders that are currently in the order queue. Returns any orders that were attempted and
+        updates each order's status based on whether or not it was executed successfully.
+        """
         list_of_processed_orders = []
         new_order_queue = []
 
@@ -172,8 +221,10 @@ class Portfolio():
         return list_of_processed_orders
 
     def _execute_buy_order(self, order: Order) -> None:
-        """DOC:"""
-        order_cost = self.am[order.symbol].iloc[-1].vwap * order.quantity
+        """
+        Attempts to execute a buy order.
+        """
+        order_cost = self.am.get_testing_df(order.symbol).iloc[-1].vwap * order.quantity
 
         # If the portfolio has insufficient funds to make the purchase, the order fails
         if self.cash < order_cost:
@@ -196,8 +247,9 @@ class Portfolio():
             order.status = OrderStatus.COMPLETED
 
     def _execute_sell_order(self, order: Order) -> None:
-        """DOC:"""
-
+        """
+        Attempts to execute a sell order.
+        """
         # If the portfolio doesn't contain the symbol being sold, the order fails
         if not self.contains_position(order.symbol):
             order.status = OrderStatus.FAILED
@@ -210,8 +262,5 @@ class Portfolio():
             # Otherwise, execute the order
             else:
                 self.positions[order.symbol].quantity -= order.quantity
-                self.cash += self.am[order.symbol].iloc[-1].vwap * order.quantity
+                self.cash += self.am.get_testing_df(order.symbol).iloc[-1].vwap * order.quantity
                 order.status = OrderStatus.COMPLETED
-
-    def copy(self):
-        raise NotImplementedError

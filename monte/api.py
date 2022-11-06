@@ -1,11 +1,9 @@
-"""DOC:"""
-
 import gzip
 import json
 import os
 import pathlib
-import re
-from typing import TypeVar
+from datetime import date, datetime
+from typing import Type, TypeVar
 
 import asks
 import pandas as pd
@@ -26,13 +24,18 @@ CRYPTO_BASE_URL = "https://data.alpaca.markets/v1beta1/crypto"
 ##############
 
 class AsyncAlpacaBars():
-    """DOC:"""
+    """
+    A custom Alpaca API client that supports asynchronous requests for getting historical market data bars.
+    """
 
     headers: dict[str, str]
     base_url: str
 
+    # TODO: Rewrite this to use asyncio and aiohttp when Python 3.11 comes out with the new asyncio.TaskGroup
+    # class
+    # TODO: Move to using the newer Alpaca API (alpaca-py)
+
     def __init__(self, key_id: str, secret_id: str, base_url: str) -> None:
-        """DOC:"""
         # HTTPS header, this contains the API key info to authenticate with Alpaca
         self.headers = {
             "APCA-API-KEY-ID": key_id,
@@ -42,24 +45,25 @@ class AsyncAlpacaBars():
         # The base url is something like "https://data.alpaca.markets"
         self.base_url = base_url
 
-    async def get_bars(self, symbol: str, time_frame: TimeFrame, start_date: str, end_date: str,
+    async def get_bars(self, symbol: str, time_frame: TimeFrame, start_date: datetime, end_date: datetime,
                        output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
-        """DOC:"""
-
+        """
+        Asynchronously performs one requests for historical bars from the Alpaca API.
+        """
         # Create an empty list to store all of the bars received from Alpaca
         list_of_bars = []
 
         # HTTPS GET request parameters
         params = {
             "adjustment": adjustment,
-            "start": start_date,
-            "end": end_date,
+            "start": start_date.isoformat(),
+            "end": end_date.isoformat(),
             "timeframe": str(time_frame),
             "limit": limit
         }
 
         # Alpaca does not let us request all the data at once, and instead forces us to request it in
-        # "pages". This loop goes through all the pages until there is no more data to get and returns.
+        # "pages". This loop goes through all the pages until there is no more data to get.
         while True:
 
             # Get the data from Alpaca asynchronously
@@ -110,11 +114,15 @@ class AsyncAlpacaBars():
         # Put the data into a dataframe
         df = pd.DataFrame(list_of_bars)
 
+        # Add the dataframe to the output_dict
         output_dict[symbol] = df
 
-    def get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: str, end_date: str,
+    def get_bulk_bars(self, symbols: list[str], time_frame: TimeFrame, start_date: date, end_date: date,
                       adjustment: str = 'all', limit: int = 10000) -> dict[str, pd.DataFrame]:
-
+        """
+        Gets bar data for all of the ``symbols`` using the provided arguments such as``time_frame`` and
+        ``start_date``.
+        """
         output_dict = {}
 
         trio.run(
@@ -129,7 +137,13 @@ class AsyncAlpacaBars():
 
         return output_dict
 
-    async def _async_get_bulk_bars(self, symbols: str, time_frame: TimeFrame, start_date: str, end_date: str, output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
+    async def _async_get_bulk_bars(self, symbols: list[str], time_frame: TimeFrame, start_date: datetime,
+                                   end_date: datetime, output_dict: dict[str, pd.DataFrame],
+                                   adjustment: str = 'all', limit: int = 10000) -> None:
+        """
+        High-level coroutine that manages getting bar data for all symbols provided. Spawns one coroutine
+        per symbol.
+        """
         async with trio.open_nursery() as n:
             for symbol in symbols:
                 n.start_soon(
@@ -144,7 +158,10 @@ class AsyncAlpacaBars():
 
 
 class AlpacaAPIBundle():
-    """DOC:"""
+    """
+    A group of Alpaca APIs that are all instantiated with the API key(s) provided in the repo's
+    alpaca_config.json
+    """
 
     _trading_instances: list[REST]
     _market_data_instances: list[REST]
@@ -154,7 +171,7 @@ class AlpacaAPIBundle():
 
     def __init__(self) -> None:
         # Get the repo dir as a string
-        repo_dir = self._get_repo_dir()
+        repo_dir = self._get_repo_root_dir()
 
         with open(f"{repo_dir}{os.sep}alpaca_config.json", "r") as alpaca_config_file:
             try:
@@ -182,7 +199,9 @@ class AlpacaAPIBundle():
 
     @property
     def trading(self) -> REST:
-        """DOC:"""
+        """
+        Returns the least-recently used instance of the Alpaca Trading API.
+        """
         # The least recently-used instance should be located at self._api_instance_index, since the instances
         # are stored in a circular queue. The next instance is always the least-recently used one.
         lru_instance = self._trading_instances[self._api_instance_index]
@@ -196,7 +215,9 @@ class AlpacaAPIBundle():
 
     @property
     def market_data(self) -> REST:
-        """DOC:"""
+        """
+        Returns the least-recently used instance of the Alpaca Market Data API.
+        """
         # The least recently-used instance should be located at self._api_instance_index, since the instances
         # are stored in a circular queue. The next instance is always the least-recently used one.
         lru_instance = self._market_data_instances[self._api_instance_index]
@@ -210,7 +231,9 @@ class AlpacaAPIBundle():
 
     @property
     def crypto(self) -> REST:
-        """DOC:"""
+        """
+        Returns the least-recently used instance of the Alpaca Crypto API.
+        """
         # The least recently-used instance should be located at self._api_instance_index, since the instances
         # are stored in a circular queue. The next instance is always the least-recently used one.
         lru_instance = self._crypto_instances[self._api_instance_index]
@@ -224,6 +247,9 @@ class AlpacaAPIBundle():
 
     @property
     def async_market_data_bars(self) -> AsyncAlpacaBars:
+        """
+        Returns the least-recently used instance of the custom asynchronous bars API.
+        """
         # The least recently-used instance should be located at self._api_instance_index, since the instances
         # are stored in a circular queue. The next instance is always the least-recently used one.
         lru_instance = self._async_market_data_instances[self._api_instance_index]
@@ -235,8 +261,11 @@ class AlpacaAPIBundle():
 
         return lru_instance
 
-    def _create_api_instances(self, api_class: T, endpoint: str) -> list[T]:
-        """DOC:"""
+    def _create_api_instances(self, api_class: Type[T], endpoint: str) -> list[T]:
+        """
+        Create a list of instances of ``api_class``, where each instance is authenticated using a different
+        API key from the ones provided in the repo's alpaca_config.json
+        """
         api_instance_list = []
 
         # For every loaded API key-secret key pair, create an instance of the REST API using the "endpoint"
@@ -252,9 +281,10 @@ class AlpacaAPIBundle():
 
         return api_instance_list
 
-    def _get_repo_dir(self) -> str:
-        """DOC:"""
-
+    def _get_repo_root_dir(self) -> str:
+        """
+        Returns a string containing the path to the root directory of the repository.
+        """
         current_file_path = pathlib.Path(__file__)
 
         while True:

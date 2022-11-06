@@ -36,7 +36,7 @@ def std_dev(df: pd.DataFrame, n: int, col: str) -> float:
 
 
 @derived_column()
-def percent_change(df: pd.DataFrame, n: int, col: str) -> float:
+def returns(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the percent change over the bottom n-rows of the given column.
     """

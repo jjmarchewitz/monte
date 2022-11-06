@@ -32,9 +32,9 @@ class TestAlg(Algorithm):
             "avg_l10": DerivedColumn(dcolumns.mean, 10, "vwap"),
             # "avg_l30": DerivedColumn(dcolumns.mean, 30, "vwap"),
             # "std_dev_l10": DerivedColumn(dcolumns.std_dev, 10, "vwap"),
-            "pct_chg_l10": DerivedColumn(dcolumns.percent_change, 10, "vwap"),
+            "returns_l10": DerivedColumn(dcolumns.returns, 10, "vwap"),
             # "fft_l20": DerivedColumn(dcolumns.fourier_transform, 20, "vwap"),
-            "avg_pct_chg": DerivedColumn(dcolumns.mean, 10, "pct_chg_l10", column_dependencies=["pct_chg_l10"]),
+            "avg_returns_l10": DerivedColumn(dcolumns.mean, 10, "returns_l10", column_dependencies=["returns_l10"]),
         }
 
         return derived_columns
@@ -69,11 +69,11 @@ class TestAlg(Algorithm):
             df = self.portfolio.get_testing_df(symbol)
 
             # If the percent change over the last 10 rows is less than -1%, buy a share.
-            if df.iloc[-1].pct_chg_l10 < -1:
+            if df.iloc[-1].returns_l10 < -1:
                 self.portfolio.place_order(symbol, 1, OrderType.BUY)
 
             # If the percent change over the last 10 rows is more than 1%, sell a share.
-            elif df.iloc[-1].pct_chg_l10 > 1:
+            elif df.iloc[-1].returns_l10 > 1:
                 self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
         # Print the current datetime with the portfolio's current total value and current return

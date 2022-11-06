@@ -31,7 +31,8 @@ def std_dev(df: pd.DataFrame, n: int, col: str) -> float:
     Returns the standard deviation of the bottom n-rows of the given column.
     """
     avg = mean(df, n, col)
-    sum_of_squared_differences = sum((df.iloc[-i][col] - avg) ** 2 for i in range(1, n + 1))
+    sum_of_squared_differences = sum(
+        (df.iloc[-i][col] - avg) ** 2 for i in range(1, n + 1))
     return (sum_of_squared_differences / n) ** 0.5
 
 
@@ -67,3 +68,13 @@ def fourier_transform(df: pd.DataFrame, n: int, col: str):
     )
 
     return result
+
+
+@derived_column()
+def naive_sharpe(df: pd.DataFrame, n: int, col: str) -> float:
+    """
+    Returns the Percent Change of a series divided by the std dev of a series
+    """
+    curr_returns = returns(df, n, col)
+    curr_std_dev = std_dev(df, n, col)
+    return curr_returns/curr_std_dev

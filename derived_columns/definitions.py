@@ -152,3 +152,13 @@ def fourier_transform(df: pd.DataFrame, n: int, col: str):
     )
 
     return result
+
+
+@derived_column()
+def naive_sharpe(df: pd.DataFrame, n: int, col: str) -> float:
+    """
+    Returns the Percent Change of a series divided by the std dev of a series
+    """
+    curr_returns = returns(df, n, col)
+    curr_std_dev = std_dev(df, n, col)
+    return curr_returns/curr_std_dev

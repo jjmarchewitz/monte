@@ -26,8 +26,6 @@ class DerivedColumn():
     the trading machine.
     """
 
-    # TODO: Handle dependencies in this class
-
     func: Callable
     num_rows_needed: int
     args: tuple

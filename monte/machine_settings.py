@@ -173,25 +173,23 @@ class MachineSettings():
         rows_per_day = 0
 
         # Calculate how many self.time_frames occur in an average market day
-        match self.time_frame.unit:
+        if self.time_frame.unit == TimeFrameUnit.Minute:
+            # time frames per hour times 7.5 since there are 7.5 hours in a market day, on average
+            # (9:30a - 4:00p)
+            rows_per_day = int(int(60 / self.time_frame.amount) * 7.5)
 
-            case TimeFrameUnit.Minute:
-                # time frames per hour times 7.5 since there are 7.5 hours in a market day, on average
-                # (9:30a - 4:00p)
-                rows_per_day = int(int(60 / self.time_frame.amount) * 7.5)
+        elif self.time_frame.unit == TimeFrameUnit.Hour:
+            # There are 7 time frames that start on the hour in an average market day, so Alpaca
+            # only returns 7 time frames per day if the TimeFrameUnit is hours
+            rows_per_day = int(7 / self.time_frame.amount)
 
-            case TimeFrameUnit.Hour:
-                # There are 7 time frames that start on the hour in an average market day, so Alpaca
-                # only returns 7 time frames per day if the TimeFrameUnit is hours
-                rows_per_day = int(7 / self.time_frame.amount)
+        elif self.time_frame.unit == TimeFrameUnit.Day:
+            rows_per_day = 1
 
-            case TimeFrameUnit.Day:
-                rows_per_day = 1
-
-            case _:
-                raise ValueError(
-                    "machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
-                    "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
+        else:
+            raise ValueError(
+                "machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
+                "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
         return rows_per_day
 
@@ -199,22 +197,21 @@ class MachineSettings():
         """
         Calculates a close-to-optimal number of data buffer days based on ``self.time_frame``
         """
-        match self.time_frame.unit:
 
-            # These multipliers were determined experimentally with a range of time_frames
-            case TimeFrameUnit.Minute:
-                return self.time_frame.amount * 8
+        # These multipliers were determined experimentally with a range of time_frames
+        if self.time_frame.unit == TimeFrameUnit.Minute:
+            return self.time_frame.amount * 8
 
-            case TimeFrameUnit.Hour:
-                return self.time_frame.amount * 500
+        elif self.time_frame.unit == TimeFrameUnit.Hour:
+            return self.time_frame.amount * 500
 
-            case TimeFrameUnit.Day:
-                return self.time_frame.amount * 7000
+        elif self.time_frame.unit == TimeFrameUnit.Day:
+            return self.time_frame.amount * 7000
 
-            case _:
-                raise ValueError(
-                    "machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
-                    "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
+        else:
+            raise ValueError(
+                "machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
+                "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
     def add_derived_columns(self, new_columns: dict[str, DerivedColumn]) -> None:
         """

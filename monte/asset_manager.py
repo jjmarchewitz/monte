@@ -350,8 +350,6 @@ class AssetManager:
         for asset in self.watched_assets.values():
             asset.reset_main_dfs()
 
-        # Before: 22, 22, 21
-
         self.simulation_running = True
 
         self.data_getter_process = Process(

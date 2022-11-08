@@ -68,7 +68,7 @@ class LinearRegressionAlgo(Algorithm):
 
             # breakpoint()
             df = self.portfolio.get_testing_df(symbol)
-
+    # hw
             X = df.norm_last_2.values
             y = df.returns_last_2.values
 

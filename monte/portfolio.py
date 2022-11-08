@@ -151,7 +151,8 @@ class Portfolio():
 
         # Create a new order object with the correct attributes and append it to the
         # order queue
-        new_order = Order(order_num, symbol, quantity, order_type, OrderStatus.PENDING)
+        new_order = Order(order_num, symbol, quantity,
+                          order_type, OrderStatus.PENDING)
         self._order_queue.append(new_order)
 
         return new_order
@@ -223,7 +224,8 @@ class Portfolio():
         """
         Attempts to execute a buy order.
         """
-        order_cost = self.am.get_testing_df(order.symbol).iloc[-1].vwap * order.quantity
+        order_cost = self.am.get_testing_df(
+            order.symbol).iloc[-1].vwap * order.quantity
 
         # If the portfolio has insufficient funds to make the purchase, the order fails
         if self.cash < order_cost:
@@ -240,7 +242,8 @@ class Portfolio():
 
             # If no position exists for this symbol, create a new one
             else:
-                self.positions[order.symbol] = self._create_position(order.symbol, order.quantity)
+                self.positions[order.symbol] = self._create_position(
+                    order.symbol, order.quantity)
 
             # Update the order status
             order.status = OrderStatus.COMPLETED
@@ -261,5 +264,6 @@ class Portfolio():
             # Otherwise, execute the order
             else:
                 self.positions[order.symbol].quantity -= order.quantity
-                self.cash += self.am.get_testing_df(order.symbol).iloc[-1].vwap * order.quantity
+                self.cash += self.am.get_testing_df(
+                    order.symbol).iloc[-1].vwap * order.quantity
                 order.status = OrderStatus.COMPLETED

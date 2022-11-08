@@ -4,6 +4,7 @@ from datetime import datetime
 
 import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
+from monte import display
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
@@ -61,23 +62,22 @@ class NaiveSharpe(Algorithm):
                 symbol, position.quantity, OrderType.SELL)
         # Sorts all Symbols in terms of Sharpe Ratio
         sharpe_ratio_list = []
-        for symbol in self.symbols:
-            sharpe_ratio = self.portfolio.get_testing_df(
-                symbol).iloc[-1].naivesharpe
+
+        for symbol, position in self.portfolio.positions.items():
+            sharpe_ratio = position.testing_df.iloc[-1].naivesharpe
             sharpe_ratio_list.append((symbol, sharpe_ratio))
-        sharpe_ratio_list = sorted(
-            sharpe_ratio_list, key=lambda x: x[1], reverse=True)
+
+        sharpe_ratio_list = sorted(sharpe_ratio_list, key=lambda x: x[1], reverse=True)
+
         top_ten = sharpe_ratio_list[0:9]
         # Buys 10 Shares of the Top 10
         for symbol, _ in top_ten:
             self.portfolio.place_order(symbol, 10, OrderType.BUY)
         # THIS ALGO KINDA WORKS
+        # WOOOOO FUCK YEAH WOOOOO
 
-        # # Print the current datetime with the portfolio's current total value and current return
-        print(
-            f"{current_datetime.date()} {current_datetime.hour:02d}:{current_datetime.minute:02d} | "
-            f"${round(self.portfolio.total_value, 2):,.2f} | "
-            f"{round(self.portfolio.current_return, 3):+.3f}%")
+        # Print the current datetime with the portfolio's current total value and current return
+        display.print_total_value(self.portfolio, current_datetime)
 
     def cleanup(self) -> None:
         """

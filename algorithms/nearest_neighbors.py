@@ -4,11 +4,11 @@ from datetime import datetime
 
 import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
+from monte import display
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
-from derived_columns import DerivedColumn
 
 
 class NearestNeighbors(Algorithm):
@@ -61,9 +61,9 @@ class NearestNeighbors(Algorithm):
         algorithm.
         """
 
-        for symbol in self.symbols:
+        for symbol, position in self.portfolio.positions.items():
 
-            df = self.portfolio.get_testing_df(symbol)
+            df = position.testing_df
 
             # breakpoint()
             if df.iloc[-1].nearest_neighbor_last_5 < self.lower_bound:
@@ -72,10 +72,7 @@ class NearestNeighbors(Algorithm):
             elif df.iloc[-1].nearest_neighbor_last_5 > self.upper_bound:
                 self.portfolio.place_order(symbol, 20, OrderType.SELL)
 
-        print(
-            f"{current_datetime.date()} {current_datetime.hour:02d}:{current_datetime.minute:02d} | "
-            f"${round(self.portfolio.total_value, 2):,.2f} | "
-            f"{round(self.portfolio.current_return, 3):+.3f}%")
+        display.print_total_value(self.portfolio, current_datetime)
         # Testing code, called on every time frame
 
     def cleanup(self) -> None:

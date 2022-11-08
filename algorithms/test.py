@@ -4,6 +4,7 @@ from datetime import datetime
 
 import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
+from monte import display
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
@@ -78,10 +79,7 @@ class TestAlg(Algorithm):
                 self.portfolio.place_order(symbol, 1, OrderType.SELL)
 
         # Print the current datetime with the portfolio's current total value and current return
-        print(
-            f"{current_datetime.date()} {current_datetime.hour:02d}:{current_datetime.minute:02d} | "
-            f"${round(self.portfolio.total_value, 2):,.2f} | "
-            f"{round(self.portfolio.current_return, 3):+.3f}%")
+        display.print_total_value(self.portfolio, current_datetime)
 
     def cleanup(self) -> None:
         """

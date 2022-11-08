@@ -48,8 +48,9 @@ class TestAlg(Algorithm):
             self.portfolio.watch(symbol)
 
         # Buy 10 shares of all symbols
-        for symbol in self.symbols:
-            self.portfolio.place_order(symbol, 10, OrderType.BUY)
+        for _ in range(1, 10):
+            for symbol in self.symbols:
+                self.portfolio.place_order(symbol, 1, OrderType.BUY)
 
     def train(self) -> None:
         """
@@ -65,8 +66,8 @@ class TestAlg(Algorithm):
         algorithm.
         """
         # Testing code, called on every time frame
-        for symbol in self.symbols:
-            df = self.portfolio.get_testing_df(symbol)
+        for symbol, position in self.portfolio.positions.items():
+            df = position.testing_df
 
             # If the percent change over the last 10 rows is less than -1%, buy a share.
             if df.iloc[-1].returns_l10 < -1:

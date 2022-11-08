@@ -26,6 +26,8 @@ class DerivedColumn():
     the trading machine.
     """
 
+    # TODO: Derived columns that are called periodically, once every n-TimeFrames
+
     func: Callable
     num_rows_needed: int
     args: tuple

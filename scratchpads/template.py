@@ -24,11 +24,14 @@ def main():
     # Create an instance of the trading machine
     trading_machine = TradingMachine(alpaca_api, ms)
 
+    # Define a list of symbols to trade on
+    symbols = ["GME"]  # to the moon!
+
     # Create an instance of a trading algorithm
-    algo1 = test.TestAlg(alpaca_api, ms, "Test Alg", 10_000)
+    algo1 = test.TestAlg(alpaca_api, ms, "Test Alg", 10_000, symbols)
 
     # Add the trading algorithm to the trading machine
-    trading_machine.add_algo_instance(algo1)
+    trading_machine.add_algo(algo1)
 
     # Run the trading machine
     trading_machine.run()

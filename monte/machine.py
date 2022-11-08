@@ -29,23 +29,25 @@ class TradingMachine():
         self.am = AssetManager(alpaca_api, machine_settings)
         self.algo_instances = []
 
-    def add_algo_instance(self, algorithm_with_portfolio: Algorithm) -> None:
+    def add_algos(self, *args: Algorithm) -> None:
         """
-        Add a new algorithm to the trading machine. The algorithm must be an instance of a subclass of
-        Algorithm.
+        Add new algorithms to the trading machine. The algorithms must be instances of a subclass of
+        monte.Algorithm.
         """
 
-        if not issubclass(type(algorithm_with_portfolio), Algorithm):
-            raise TypeError(
-                "You must pass an instance of a subclass of Algorithm into add_algo_instance().")
+        for algo in args:
 
-        if not isinstance(algorithm_with_portfolio.portfolio, Portfolio):
-            raise TypeError(
-                "The portfolio attribute of the algorithm must be an instance of Portfolio.")
+            if not issubclass(type(algo), Algorithm):
+                raise TypeError(
+                    "You must pass an instance of a subclass of Algorithm into add_algos().")
 
-        algorithm_with_portfolio.portfolio.am = self.am
+            if not isinstance(algo.portfolio, Portfolio):
+                raise TypeError(
+                    "The portfolio attribute of the algorithm must be an instance of Portfolio.")
 
-        self.algo_instances.append(algorithm_with_portfolio)
+            algo.portfolio.am = self.am
+
+            self.algo_instances.append(algo)
 
     def startup(self) -> None:
         """
@@ -107,9 +109,6 @@ class TradingMachine():
 
                     # Process orders
                     processed_orders = portfolio.process_pending_orders()
-
-                    # Clean up the portfolio
-                    portfolio._delete_empty_positions()
 
                     # Run the algorithm
                     current_datetime = portfolio.am._get_reference_asset().datetime()

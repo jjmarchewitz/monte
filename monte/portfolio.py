@@ -13,8 +13,6 @@ from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderStatus, OrderType
 from monte.position import Position
 
-# TODO: Don't remove Positions with 0 quantity, instead use them as a primary interface for dataframes
-
 
 class Portfolio():
     """
@@ -102,6 +100,7 @@ class Portfolio():
         Start watching a new asset. Can only be called before the simulation runs.
         """
         self.am.watch_asset(symbol)
+        self.positions[symbol] = self._create_position(symbol, 0)
 
     def is_watching(self, symbol: str) -> bool:
         """

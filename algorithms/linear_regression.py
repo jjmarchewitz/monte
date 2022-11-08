@@ -2,16 +2,16 @@ from __future__ import annotations
 
 from datetime import datetime
 
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
 import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
-from derived_columns import DerivedColumn
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-import numpy as np
 
 
 class LinearRegressionAlgo(Algorithm):

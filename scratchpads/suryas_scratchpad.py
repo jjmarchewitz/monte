@@ -36,7 +36,7 @@ def main():
         alpaca_api, ms, "Naive Sharpe... did I do it??", 10_000, symbols)
 
     # Add the trading algorithm to the trading machine
-    trading_machine.add_algo_instance(algo1)
+    trading_machine.add_algo(algo1)
 
     # Run the trading machine
     trading_machine.run()

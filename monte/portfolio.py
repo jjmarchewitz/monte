@@ -135,7 +135,7 @@ class Portfolio():
         """
         return Position(self.alpaca_api, self.machine_settings, self.am, symbol, initial_quantity)
 
-    def place_order(self, symbol: str, quantity: int, order_type: OrderType = OrderType.BUY) -> Order:
+    def place_order(self, symbol: str, quantity: float, order_type: OrderType = OrderType.BUY) -> Order:
         """
         Place a buy or sell order on this Portfolio. The order will try to be executed in one or more
         TimeFrames relative to the current one.

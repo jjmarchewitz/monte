@@ -29,9 +29,9 @@ class TradingMachine():
         self.am = AssetManager(alpaca_api, machine_settings)
         self.algo_instances = []
 
-    def add_algos(self, *args: Algorithm) -> None:
+    def add_algo(self, *args: Algorithm) -> None:
         """
-        Add new algorithms to the trading machine. The algorithms must be instances of a subclass of
+        Add one or more algorithms to the trading machine. The algorithms must be instances of a subclass of
         monte.Algorithm.
         """
 

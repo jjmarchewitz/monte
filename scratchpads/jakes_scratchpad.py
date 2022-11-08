@@ -43,7 +43,7 @@ def main():
     algo1 = test.TestAlg(alpaca_api, ms, "Test Alg", 10_000, symbols)
     algo2 = test.TestAlg(alpaca_api, ms, "Test Alg2", 10_000, symbols)
 
-    trading_machine.add_algos(algo1, algo2)
+    trading_machine.add_algo(algo1, algo2)
 
     trading_machine.run()
 

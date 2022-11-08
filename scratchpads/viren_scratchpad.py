@@ -4,11 +4,11 @@ from datetime import datetime
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
+from algorithms.linear_regression import LinearRegressionAlgo
 from algorithms.nearest_neighbors import NearestNeighbors
 from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
 from monte.machine_settings import MachineSettings
-from algorithms.linear_regression import LinearRegressionAlgo
 
 
 def main():
@@ -35,7 +35,7 @@ def main():
                                  ['GME'], (-epsilon, epsilon), k)
 
     # Add the trading algorithm to the trading machine
-    trading_machine.add_algo_instance(algo2)
+    trading_machine.add_algo(algo1, algo2)
 
     # Run the trading machine
     trading_machine.run()

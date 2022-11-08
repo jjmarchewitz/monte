@@ -6,6 +6,10 @@ from monte.api import AlpacaAPIBundle
 from monte.asset_manager import AssetManager
 from monte.machine_settings import MachineSettings
 
+# TODO: Calculate returns for positions
+# TODO: Calculate cost-basis for positions
+# TODO: Orderbook/history of orders
+
 
 class Position():
     """

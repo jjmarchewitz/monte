@@ -15,12 +15,14 @@ class NearestNeighbors(Algorithm):
 
     def __init__(
             self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, name: str,
-            starting_cash: float, symbols: list[str], decision_interval: tuple[float, float]) -> None:
+            starting_cash: float, symbols: list[str], decision_interval: tuple[float, float],
+            variability_constant: float) -> None:
 
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
         super().__init__(alpaca_api, machine_settings, name, starting_cash, symbols)
 
         self.lower_bound, self.upper_bound = decision_interval
+        self.variability_constant = variability_constant
 
     def get_derived_columns(self) -> dict[str, DerivedColumn]:
         """
@@ -29,9 +31,9 @@ class NearestNeighbors(Algorithm):
         # Add any derived columns to the dictionary.
         derived_columns = {
             'returns_last_2': DerivedColumn(dcolumns.returns, 2, "vwap"),
-            'infimum_last_5': DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', 1.5),
+            'infimum_last_5': DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
             'nearest_neighbor_last_5': DerivedColumn(dcolumns.nearest_neighbor, 5, 'infimum_last_5',
-                                                     'returns_last_2')
+                                                     'returns_last_2', column_dependencies=['returns_last_2', 'infimum_last_5'])
 
 
         }
@@ -63,11 +65,12 @@ class NearestNeighbors(Algorithm):
 
             df = self.portfolio.get_testing_df(symbol)
 
+            # breakpoint()
             if df.iloc[-1].nearest_neighbor_last_5 < self.lower_bound:
-                self.portfolio.place_order(symbol, 1, OrderType.BUY)
+                self.portfolio.place_order(symbol, 20, OrderType.BUY)
 
             elif df.iloc[-1].nearest_neighbor_last_5 > self.upper_bound:
-                self.portfolio.place_order(symbol, 1, OrderType.SELL)
+                self.portfolio.place_order(symbol, 20, OrderType.SELL)
 
         print(
             f"{current_datetime.date()} {current_datetime.hour:02d}:{current_datetime.minute:02d} | "

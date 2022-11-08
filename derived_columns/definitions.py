@@ -4,10 +4,12 @@ import pandas as pd
 from numpy.typing import ArrayLike
 from scipy.fft import fft, fftfreq
 
-from derived_columns._base import cache_derived_column
+from derived_columns._base import derived_column
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 
 
-@cache_derived_column
+@derived_column()
 def net(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the difference in value between the bottom-most row and the nth-to-last row of the given column.
@@ -15,7 +17,7 @@ def net(df: pd.DataFrame, n: int, col: str) -> float:
     return df.iloc[-n][col] - df.iloc[-1][col]
 
 
-@cache_derived_column
+@derived_column()
 def mean(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the mean value of the bottom n-rows of the given column.
@@ -26,7 +28,7 @@ def mean(df: pd.DataFrame, n: int, col: str) -> float:
     return total / n
 
 
-@cache_derived_column
+@derived_column()
 def std_dev(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the standard deviation of the bottom n-rows of the given column.
@@ -37,7 +39,7 @@ def std_dev(df: pd.DataFrame, n: int, col: str) -> float:
     return (sum_of_squared_differences / n) ** 0.5
 
 
-@cache_derived_column
+@derived_column()
 def returns(df: pd.DataFrame, n: int, col: str) -> float:
     """
     Returns the percent change over the bottom n-rows of the given column.
@@ -47,7 +49,7 @@ def returns(df: pd.DataFrame, n: int, col: str) -> float:
     return ((final - initial) / initial)
 
 
-@cache_derived_column
+@derived_column()
 def infimum(df: pd.DataFrame, n: int, col: str, k: float) -> float:
     """
 
@@ -64,7 +66,31 @@ def infimum(df: pd.DataFrame, n: int, col: str, k: float) -> float:
     return lower_bound
 
 
-@cache_derived_column
+@derived_column()
+def infimum_norm(df: pd.DataFrame, n: int, infimum_column: str, returns_column: str) -> float:
+   # breakpoint()
+    rolling_avg = mean(df, n, returns_column)
+    bottom_rows = df.tail(n)
+    norm = (rolling_avg - bottom_rows[infimum_column])**2
+    value = norm.values[0]
+
+    return value
+
+
+@derived_column()
+def linear_regression_prediction(df: pd.DataFrame, n: int, returns_column: str, inf_norm_column: str) -> float:
+
+   # breakpoint()
+    x_train_norm, x_test_norm, y_train_returns, y_test_returns = train_test_split(
+        inf_norm_column, returns_column, test_size=0.30)
+    model = LinearRegression()
+    model_fit = model.fit(x_train_norm, y_train_returns)
+    prediction = model_fit.predict(x_test_norm)
+
+    return prediction
+
+
+@derived_column()
 def nearest_neighbor(df: pd.DataFrame, n: int, infimum_column: str, returns_column: str) -> float:
     """
 
@@ -81,9 +107,10 @@ def nearest_neighbor(df: pd.DataFrame, n: int, infimum_column: str, returns_colu
     recent_rolling_avg = mean(df, n, returns_column)
     bottom_rows = df.tail(n)
 
-    for row in bottom_rows.iterrows():
-        breakpoint()
-        distance = (recent_rolling_avg - row[infimum_column]) ^ 2
+    for _, row in bottom_rows.iterrows():
+        # breakpoint()
+        distance = (recent_rolling_avg - row[infimum_column])**2
+        #distance = abs(recent_rolling_avg - row[infimum_column])
         distances.append(distance)
 
     # goal: find nearest neighbor
@@ -95,7 +122,7 @@ def nearest_neighbor(df: pd.DataFrame, n: int, infimum_column: str, returns_colu
     # and then getting the returns at that row
     lowest_distance = distances[0]
     nearest_neighbor = bottom_rows.iloc[0][returns_column]
-    for row, distance in zip(bottom_rows.iterrows(), distances):
+    for (_, row), distance in zip(bottom_rows.iterrows(), distances):
         if distance < lowest_distance:
             lowest_distance = distance
             nearest_neighbor = row[returns_column]
@@ -106,13 +133,13 @@ def nearest_neighbor(df: pd.DataFrame, n: int, infimum_column: str, returns_colu
 @dataclass
 class FFTResult:
     """
-    DOC:
+    Dataclass to store the result of an FFT of data.
     """
     fft: tuple
     fftfreq: ArrayLike
 
 
-@cache_derived_column
+@derived_column()
 def fourier_transform(df: pd.DataFrame, n: int, col: str):
     """
     Returns the Fast Fourier Transform of the bottom n-rows of a given column.

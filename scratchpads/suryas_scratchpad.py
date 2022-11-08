@@ -16,8 +16,8 @@ def main():
 
     # Configure settings for the simulation
     ms = MachineSettings(
-        start_date=datetime(2016, 3, 8),
-        end_date=datetime(2016, 5, 8),
+        start_date=datetime(2021, 3, 8),
+        end_date=datetime(2022, 3, 8),
         training_data_percentage=0.0,
         time_frame=TimeFrame(1, TimeFrameUnit.Day))
 

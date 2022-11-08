@@ -24,7 +24,7 @@ class NaiveSharpe(Algorithm):
         Returns a dictionary containing the derived columns this algorithm needs to run.
         """
         # Add any derived columns to the dictionary.
-        n = 5
+        n = 30
         derived_columns = {
             "returns_n_hr": DerivedColumn(dcolumns.returns, n, "vwap"),
             "std_n_hr": DerivedColumn(dcolumns.std_dev, n, "vwap"),

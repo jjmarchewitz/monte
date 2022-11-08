@@ -350,7 +350,7 @@ class AssetManager:
         for asset in self.watched_assets.values():
             asset.reset_main_dfs()
 
-        self.add_start_buffer_data()
+        # Before: 22, 22, 21
 
         self.simulation_running = True
 
@@ -367,6 +367,8 @@ class AssetManager:
             daemon=True)
 
         self.data_getter_process.start()
+
+        self.add_start_buffer_data()
 
     def cleanup(self) -> None:
         """

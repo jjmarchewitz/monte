@@ -30,12 +30,12 @@ class TestAlg(Algorithm):
         # Add any derived columns to the dictionary.
         derived_columns = {
             # "net_l10": DerivedColumn(dcolumns.net, 10, "vwap"),
-            "avg_l10": DerivedColumn(dcolumns.mean, 10, "vwap"),
+            "avg_l10": DerivedColumn(dcolumns.mean, 100, "vwap"),
             # "avg_l30": DerivedColumn(dcolumns.mean, 30, "vwap"),
             # "std_dev_l10": DerivedColumn(dcolumns.std_dev, 10, "vwap"),
-            "returns_l10": DerivedColumn(dcolumns.returns, 10, "vwap"),
+            "returns_l10": DerivedColumn(dcolumns.returns, 100, "vwap"),
             # "fft_l20": DerivedColumn(dcolumns.fourier_transform, 20, "vwap"),
-            "avg_returns_l10": DerivedColumn(dcolumns.mean, 10, "returns_l10", column_dependencies=["returns_l10"]),
+            "avg_returns_l10": DerivedColumn(dcolumns.mean, 100, "returns_l10", column_dependencies=["returns_l10"]),
         }
 
         return derived_columns

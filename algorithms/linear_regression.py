@@ -10,7 +10,6 @@ import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
 from monte import display
 from monte.algorithm import Algorithm
-from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
 
@@ -18,12 +17,12 @@ from monte.orders import Order, OrderType
 class LinearRegressionAlgo(Algorithm):
 
     def __init__(
-            self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, name: str,
+            self, machine_settings: MachineSettings, name: str,
             starting_cash: float, symbols: list[str], decision_interval: tuple[float, float],
             variability_constant: float) -> None:
 
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
-        super().__init__(alpaca_api, machine_settings, name, starting_cash, symbols)
+        super().__init__(machine_settings, name, starting_cash, symbols)
 
         self.lower_bound, self.upper_bound = decision_interval
         self.variability_constant = variability_constant
@@ -33,13 +32,14 @@ class LinearRegressionAlgo(Algorithm):
         Returns a dictionary containing the derived columns this algorithm needs to run.
         """
         # Add any derived columns to the dictionary.
-        derived_columns = {'returns_last_2': DerivedColumn(dcolumns.returns, 2, "vwap"),
-                           'infimum_last_5': DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
-                           'norm_last_2': DerivedColumn(dcolumns.infimum_norm, 1, 'infimum_last_5', 'returns_last_2',
-                                                        column_dependencies=['returns_last_2', 'infimum_last_5']),
-                           # 'prediction_returns': DerivedColumn(dcolumns.linear_regression_prediction, 2,
-                           # 'returns_last_2', 'norm_last_2')
-                           }
+        derived_columns = {
+            'returns_last_2': DerivedColumn(dcolumns.returns, 2, "vwap"),
+            'infimum_last_5': DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
+            'norm_last_2': DerivedColumn(dcolumns.infimum_norm, 1, 'infimum_last_5', 'returns_last_2',
+                                         column_dependencies=['returns_last_2', 'infimum_last_5']),
+            # 'prediction_returns': DerivedColumn(dcolumns.linear_regression_prediction, 2,
+            # 'returns_last_2', 'norm_last_2')
+        }
 
         return derived_columns
 
@@ -65,10 +65,10 @@ class LinearRegressionAlgo(Algorithm):
         algorithm.
         """
         # Testing code, called on every time frame
-        for symbol in self.symbols:
+        for symbol, position in self.portfolio.positions.items():
 
             # breakpoint()
-            df = self.portfolio.get_testing_df(symbol)
+            df = position.testing_df
     # hw
             X = df.norm_last_2.values
             y = df.returns_last_2.values
@@ -91,7 +91,7 @@ class LinearRegressionAlgo(Algorithm):
             elif returns_pred > self.upper_bound:
                 self.portfolio.place_order(symbol, 20, OrderType.SELL)
 
-        display.print_total_value(self.portfolio, current_datetime)
+        display.print_total_value(self.name, self.portfolio, current_datetime)
 
     def cleanup(self) -> None:
         """

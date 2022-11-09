@@ -12,26 +12,25 @@ from monte.machine_settings import MachineSettings
 
 
 def main():
-    # Create an instance of the Alpaca API bundle
-    alpaca_api = AlpacaAPIBundle()
-
     # Configure settings for the simulation
     ms = MachineSettings(
-        start_date=datetime(2021, 10, 16),
-        end_date=datetime(2021, 10, 30),
-        training_data_percentage=0.0,
-        time_frame=TimeFrame(1, TimeFrameUnit.Minute))
+        alpaca_api=AlpacaAPIBundle(),
+        start_date=datetime(2016, 3, 8),
+        end_date=datetime(2016, 10, 23),
+        training_data_percentage=0,
+        time_frame=TimeFrame(1, TimeFrameUnit.Hour),
+    )
 
     # Create an instance of the trading machine
-    trading_machine = TradingMachine(alpaca_api, ms)
+    trading_machine = TradingMachine(ms)
 
     epsilon = 0.000001
     k = 1.5
     # Create an instance of a trading algorithm
-    algo1 = NearestNeighbors(alpaca_api, ms, "Nearest Neighbors Alg",
+    algo1 = NearestNeighbors(ms, "Nearest Neighbors Alg",
                              10_000, ['GME'], (-epsilon, epsilon), k)
 
-    algo2 = LinearRegressionAlgo(alpaca_api, ms, "Linear Regression Alg", 10_000,
+    algo2 = LinearRegressionAlgo(ms, "Linear Regression Alg", 10_000,
                                  ['GME'], (-epsilon, epsilon), k)
 
     # Add the trading algorithm to the trading machine

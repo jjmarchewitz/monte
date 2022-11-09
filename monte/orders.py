@@ -1,23 +1,23 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, auto
 
 
 class OrderType(Enum):
     """
     An Enum holding a value for an order either being a buy or a sell order.
     """
-    BUY = 1
-    SELL = 2
+    BUY = auto()
+    SELL = auto()
 
 
 class OrderStatus(Enum):
     """
     An Enum holding a value for the status of an order (pending, completed, failed).
     """
-    PENDING = 1
-    COMPLETED = 2
-    FAILED = 3
-    CANCELLED = 4
+    PENDING = auto()
+    COMPLETED = auto()
+    FAILED = auto()
+    CANCELLED = auto()
 
 
 @dataclass

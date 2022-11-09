@@ -16,17 +16,14 @@ class TradingMachine():
     explaining exactly how it works.
     """
 
-    alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
     am: AssetManager
     algo_instances: list[Algorithm]
     epoch_start_time: float
 
-    def __init__(self, alpaca_api: AlpacaAPIBundle,
-                 machine_settings: MachineSettings) -> None:
-        self.alpaca_api = alpaca_api
+    def __init__(self, machine_settings: MachineSettings) -> None:
         self.machine_settings = machine_settings
-        self.am = AssetManager(alpaca_api, machine_settings)
+        self.am = AssetManager(machine_settings)
         self.algo_instances = []
 
     def add_algo(self, *args: Algorithm) -> None:
@@ -141,21 +138,22 @@ class TradingMachine():
         # Print out final returns for all algos tested
         print("\n\n -- RESULTS -- \n")
         for algo in self.algo_instances:
+            # TODO: Tabulate
             print(f"{algo.name} | ${round(algo.portfolio.total_value, 2):,} | "
                   f"{round(algo.portfolio.current_return, 3):+}%")
         print("\n\n")
 
         # Print out the total runtime
-        print(" -- RUNTIME -- \n")
+        print("Total runtime was")
         total_runtime = int(end_time - self.epoch_start_time)
         hours, remainder = divmod(total_runtime, 3600)
         minutes, seconds = divmod(remainder, 60)
 
         if hours != 0:
-            print(f"{hours}h {minutes}m {seconds}s")
+            print(f"{hours}h {minutes}m {seconds}s.")
         elif minutes != 0:
-            print(f"{minutes}m {seconds}s")
+            print(f"{minutes}m {seconds}s.")
         else:
-            print(f"{seconds}s")
+            print(f"{seconds}s.")
 
         print("\n\n")

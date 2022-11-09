@@ -4,20 +4,24 @@ from datetime import datetime
 
 import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
+from monte import display
 from monte.algorithm import Algorithm
-from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
-from monte.orders import Order
+from monte.orders import Order, OrderType
 
 
 class BuyAndHold(Algorithm):
 
+    finished_buying: bool
+
     def __init__(
-            self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, name: str,
+            self, machine_settings: MachineSettings, name: str,
             starting_cash: float, symbols: list[str]) -> None:
 
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
-        super().__init__(alpaca_api, machine_settings, name, starting_cash, symbols)
+        super().__init__(machine_settings, name, starting_cash, symbols)
+
+        self.finished_buying = False
 
     def get_derived_columns(self) -> dict[str, DerivedColumn]:
         """
@@ -49,8 +53,25 @@ class BuyAndHold(Algorithm):
         Runs on every time frame during the testing phase of the simulation. This is the main body of the
         algorithm.
         """
-        # Testing code, called on every time frame
-        ...
+
+        if not self.finished_buying:
+            # Determine if the portfolio has enough money to buy any more shares
+            can_buy_more_shares = False
+            for _, position in self.portfolio.positions.items():
+                if self.portfolio.cash > position.price:
+                    can_buy_more_shares = True
+                    break
+
+            # If we can buy more shares, place an order of 1 share for all symbols in self.symbols
+            if can_buy_more_shares:
+                for symbol in self.symbols:
+                    self.portfolio.place_order(symbol, 1, OrderType.BUY)
+
+            # If we can't buy more shares, prevent the algo from even attempting to
+            else:
+                self.finished_buying = True
+
+        display.print_total_value(self.name, self.portfolio, current_datetime)
 
     def cleanup(self) -> None:
         """

@@ -91,14 +91,13 @@ class DerivedColumn():
         return fulfilled_dependencies
 
 
-def derived_column(dependencies: list[Callable] = []):
+def derived_column():
     """
-    Wraps around a derived column function to add caching and dependency management.
+    Wraps around a derived column function to add caching in a way compatible with dataframes.
     """
 
     def derived_column_inner(func: Callable) -> Callable:
         func.cache_ = {}
-        func.dependencies = dependencies
 
         @wraps(func)
         def inner(df: pd.DataFrame, *args, **kwargs) -> Any:

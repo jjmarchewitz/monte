@@ -22,7 +22,6 @@ class Portfolio():
 
     # TODO: Dataframe that stores the returns at each time delta, with timestamps.
 
-    alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
     starting_cash: float
     cash: float
@@ -32,9 +31,8 @@ class Portfolio():
     _order_queue: list[Order]
     _current_order_id_number: int
 
-    def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings,
+    def __init__(self, machine_settings: MachineSettings,
                  starting_cash: float = 10000, name: str = "") -> None:
-        self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
         self.starting_cash = starting_cash
         self.cash = starting_cash
@@ -133,9 +131,9 @@ class Portfolio():
         Helper function that creates new Positions with this Portfolio's AlpacaAPIBundle, MachineSettings,
         and AssetManager instances.
         """
-        return Position(self.alpaca_api, self.machine_settings, self.am, symbol, initial_quantity)
+        return Position(self.machine_settings, self.am, symbol, initial_quantity)
 
-    def place_order(self, symbol: str, quantity: float, order_type: OrderType = OrderType.BUY) -> Order:
+    def place_order(self, symbol: str, quantity: float, order_type: OrderType) -> Order:
         """
         Place a buy or sell order on this Portfolio. The order will try to be executed in one or more
         TimeFrames relative to the current one.
@@ -144,6 +142,10 @@ class Portfolio():
         # OrderType
         if order_type not in OrderType:
             raise ValueError("Invalid order type.")
+
+        # Check that the quantity is valid
+        if quantity <= 0:
+            raise ValueError("Order quantities must be positive and non-zero.")
 
         # Set the order number and increment it for the next order
         order_num = self._current_order_id_number
@@ -242,8 +244,7 @@ class Portfolio():
 
             # If no position exists for this symbol, create a new one
             else:
-                self.positions[order.symbol] = self._create_position(
-                    order.symbol, order.quantity)
+                self.positions[order.symbol] = self._create_position(order.symbol, order.quantity)
 
             # Update the order status
             order.status = OrderStatus.COMPLETED
@@ -264,6 +265,7 @@ class Portfolio():
             # Otherwise, execute the order
             else:
                 self.positions[order.symbol].quantity -= order.quantity
+
                 self.cash += self.am.get_testing_df(
                     order.symbol).iloc[-1].vwap * order.quantity
                 order.status = OrderStatus.COMPLETED

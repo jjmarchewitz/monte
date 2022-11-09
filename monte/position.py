@@ -18,15 +18,13 @@ class Position():
     the training_df and testing_df associated with the Asset an instance of Position is pointing to.
     """
 
-    alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
     am: AssetManager
     symbol: str
     initial_quantity: float
 
-    def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings,
+    def __init__(self, machine_settings: MachineSettings,
                  am: AssetManager, symbol: str, initial_quantity: float) -> None:
-        self.alpaca_api = alpaca_api
         self.machine_settings = machine_settings
         self.am = am
         self.symbol = symbol

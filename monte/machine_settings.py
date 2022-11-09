@@ -72,6 +72,10 @@ class MachineSettings():
         if self.start_date > self.end_date:
             raise ValueError("The end date must come after the start date.")
 
+        # Raise an error if the end date is on or after the current real-life day
+        if self.end_date.date() >= datetime.today().date():
+            raise ValueError(f"The end date must be before today's date: {datetime.today().date()}")
+
     def validate_training_data_percentage(self) -> None:
         """
         Checks that ``self.training_data_percentage`` is valid and can be used in the trading machine.

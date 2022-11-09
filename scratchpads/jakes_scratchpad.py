@@ -4,7 +4,8 @@ from datetime import datetime
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
-from algorithms.buy_and_hold import BuyAndHold
+from algorithms.benchmarks.buy_and_hold import BuyAndHold
+from algorithms.benchmarks.buy_and_hold_sp import BuyAndHoldSP500
 from algorithms.proportional_to_returns import ProportionalToReturns
 from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
@@ -26,7 +27,7 @@ def main():
     ms = MachineSettings(
         alpaca_api=AlpacaAPIBundle(),
         start_date=datetime(2016, 3, 8),
-        end_date=datetime(2022, 11, 8),
+        end_date=datetime(2016, 11, 7),
         training_data_percentage=0,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )
@@ -43,10 +44,15 @@ def main():
     symbols = ["AAPL", "GOOG"]
     # symbols = ["GME"]
 
-    buy_and_hold = BuyAndHold(ms, "B&H", 10_000, symbols)
+    starting_cash = 10_000
+
+    buy_and_hold = BuyAndHold(ms, "B&H", starting_cash, symbols)
     trading_machine.add_algo(buy_and_hold)
 
-    prop_ret = ProportionalToReturns(ms, "PtR", 10_000, symbols)
+    buy_and_hold_sp = BuyAndHoldSP500(ms, "S&P", starting_cash)
+    trading_machine.add_algo(buy_and_hold_sp)
+
+    prop_ret = ProportionalToReturns(ms, "PtR", starting_cash, symbols)
     trading_machine.add_algo(prop_ret)
 
     trading_machine.run()

@@ -3,6 +3,8 @@ from __future__ import annotations
 import time
 from datetime import timedelta
 
+from tabulate import tabulate
+
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.asset_manager import AssetManager, DataDestination
@@ -41,6 +43,9 @@ class TradingMachine():
             if not isinstance(algo.portfolio, Portfolio):
                 raise TypeError(
                     "The portfolio attribute of the algorithm must be an instance of Portfolio.")
+
+            if algo in self.algo_instances:
+                continue
 
             algo.portfolio.am = self.am
 
@@ -137,14 +142,19 @@ class TradingMachine():
 
         # Print out final returns for all algos tested
         print("\n\n -- RESULTS -- \n")
+        results = []
         for algo in self.algo_instances:
-            # TODO: Tabulate
-            print(f"{algo.name} | ${round(algo.portfolio.total_value, 2):,} | "
-                  f"{round(algo.portfolio.current_return, 3):+}%")
-        print("\n\n")
+            results.append({
+                "Name": algo.name,
+                "Total Value": f"${round(algo.portfolio.total_value, 2):,.2f}",
+                "Return": f"{round(algo.portfolio.current_return, 3):+.3f}%",
+            })
+
+        print(tabulate(results, headers="keys", tablefmt="outline", colalign=("center", "center", "center")))
+        print("\n")
 
         # Print out the total runtime
-        print("Total runtime was")
+        print("Total runtime was ", end="")
         total_runtime = int(end_time - self.epoch_start_time)
         hours, remainder = divmod(total_runtime, 3600)
         minutes, seconds = divmod(remainder, 60)

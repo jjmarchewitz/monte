@@ -205,8 +205,15 @@ def _get_alpaca_data(
     data.
     """
     # Get one buffer's worth of data
-    buffer_data = machine_settings.alpaca_api.async_market_data_bars.get_bulk_bars(
-        symbols, machine_settings.time_frame, start_date, end_date)
+    while True:
+        try:
+            buffer_data = machine_settings.alpaca_api.async_market_data_bars.get_bulk_bars(
+                symbols, machine_settings.time_frame, start_date, end_date)
+            break
+        except:
+            print(f"Failed to get data from alpaca. Re-requesting data between {start_date}, "
+                  f"and {end_date}.")
+            continue
 
     # Get a list of all the trading days during this date range
     trading_days = get_list_of_trading_days_in_range(machine_settings, start_date, end_date)

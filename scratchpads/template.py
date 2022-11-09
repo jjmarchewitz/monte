@@ -25,8 +25,11 @@ def main():
     # Define a list of symbols to trade on
     symbols = ["AAPL", "GOOG"]  # to the moon!
 
+    # Define the starting cash that the algos will have
+    starting_cash = 10_000
+
     # Create an instance of a trading algorithm
-    algo1 = proportional_to_returns.ProportionalToReturns(ms, "Test Alg", 10_000, symbols)
+    algo1 = proportional_to_returns.ProportionalToReturns(ms, "Test Alg", starting_cash, symbols)
 
     # Add the trading algorithm to the trading machine
     trading_machine.add_algo(algo1)

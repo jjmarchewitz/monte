@@ -4,7 +4,7 @@ from datetime import datetime
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
-from algorithms import proportional_to_returns
+from algorithms.benchmarks.buy_and_hold import BuyAndHold
 from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
 from monte.machine_settings import MachineSettings
@@ -29,7 +29,7 @@ def main():
     starting_cash = 10_000
 
     # Create an instance of a trading algorithm
-    algo1 = proportional_to_returns.ProportionalToReturns(ms, "Test Alg", starting_cash, symbols)
+    algo1 = BuyAndHold(ms, "Buy and Hold", starting_cash, symbols)
 
     # Add the trading algorithm to the trading machine
     trading_machine.add_algo(algo1)

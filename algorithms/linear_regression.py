@@ -56,7 +56,21 @@ class LinearRegressionAlgo(Algorithm):
         acquired). Train any models here.
         """
         # Training code, called once
-        ...
+       # for symbol in self.symbols:
+
+        #  df = self.portfolio.get_training_df(symbol)
+
+        #  X = df.norm_last_2.values
+        #  y = df.returns_last_2.values
+
+        #  x_train_norm, x_test_norm, y_train_returns, y_test_returns = train_test_split(
+        #      X, y, test_size=0.30)
+        #  x_train_norm = np.reshape(x_train_norm, (-1, 1))
+        #   x_test_norm = np.reshape(x_test_norm, (-1, 1))
+        #   y_train_returns = np.reshape(y_train_returns, (-1, 1))
+        #   y_test_returns = np.reshape(y_test_returns, (-1, 1))
+        #   model = LinearRegression()
+        #   model_fit = model.fit(x_train_norm, y_train_returns)
 
     def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]) -> None:
         """

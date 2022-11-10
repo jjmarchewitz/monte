@@ -29,13 +29,13 @@ def main():
     k = 1.5
     # Create an instance of a trading algorithm
     algo1 = NearestNeighbors(alpaca_api, ms, "Nearest Neighbors Alg",
-                             10_000, ['GME'], (-epsilon, epsilon), k)
+                             10_000, ['AAPL'], (-epsilon, epsilon), k)
 
     algo2 = LinearRegressionAlgo(alpaca_api, ms, "Linear Regression Alg", 10_000,
-                                 ['GME'], (-epsilon, epsilon), k)
+                                 ['AAPL'], (-epsilon, epsilon), k)
 
     # Add the trading algorithm to the trading machine
-    trading_machine.add_algo_instance(algo2)
+    trading_machine.add_algo_instance(algo1)
 
     # Run the trading machine
     trading_machine.run()

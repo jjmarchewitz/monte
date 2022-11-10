@@ -35,7 +35,7 @@ class AsyncAlpacaBars():
     # class
     # TODO: Move to using the newer Alpaca API (alpaca-py)
 
-    def __init__(self, key_id: str, secret_id: str, base_url: str) -> None:
+    def __init__(self, key_id: str, secret_id: str, base_url: str):
         # HTTPS header, this contains the API key info to authenticate with Alpaca
         self.headers = {
             "APCA-API-KEY-ID": key_id,
@@ -46,7 +46,7 @@ class AsyncAlpacaBars():
         self.base_url = base_url
 
     async def get_bars(self, symbol: str, time_frame: TimeFrame, start_date: datetime, end_date: datetime,
-                       output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000) -> None:
+                       output_dict: dict[str, pd.DataFrame], adjustment: str = 'all', limit: int = 10000):
         """
         Asynchronously performs one requests for historical bars from the Alpaca API.
         """
@@ -139,7 +139,7 @@ class AsyncAlpacaBars():
 
     async def _async_get_bulk_bars(self, symbols: list[str], time_frame: TimeFrame, start_date: datetime,
                                    end_date: datetime, output_dict: dict[str, pd.DataFrame],
-                                   adjustment: str = 'all', limit: int = 10000) -> None:
+                                   adjustment: str = 'all', limit: int = 10000):
         """
         High-level coroutine that manages getting bar data for all symbols provided. Spawns one coroutine
         per symbol.
@@ -169,7 +169,7 @@ class AlpacaAPIBundle():
     _async_market_data_instances: list[AsyncAlpacaBars]
     T = TypeVar('T')
 
-    def __init__(self) -> None:
+    def __init__(self):
         # Get the repo dir as a string
         repo_dir = self._get_repo_root_dir()
 

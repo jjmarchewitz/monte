@@ -24,7 +24,7 @@ class Position():
     initial_quantity: float
 
     def __init__(self, machine_settings: MachineSettings,
-                 am: AssetManager, symbol: str, initial_quantity: float) -> None:
+                 am: AssetManager, symbol: str, initial_quantity: float):
         self.machine_settings = machine_settings
         self.am = am
         self.symbol = symbol

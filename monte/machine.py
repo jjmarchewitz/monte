@@ -8,6 +8,7 @@ from tabulate import tabulate
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.asset_manager import AssetManager, DataDestination
+from monte.broker import Broker
 from monte.machine_settings import MachineSettings
 from monte.portfolio import Portfolio
 
@@ -23,12 +24,12 @@ class TradingMachine():
     algo_instances: list[Algorithm]
     epoch_start_time: float
 
-    def __init__(self, machine_settings: MachineSettings) -> None:
+    def __init__(self, machine_settings: MachineSettings):
         self.machine_settings = machine_settings
         self.am = AssetManager(machine_settings)
         self.algo_instances = []
 
-    def add_algo(self, *args: Algorithm) -> None:
+    def add_algo(self, *args: Algorithm):
         """
         Add one or more algorithms to the trading machine. The algorithms must be instances of a subclass of
         monte.Algorithm.
@@ -51,7 +52,7 @@ class TradingMachine():
 
             self.algo_instances.append(algo)
 
-    def startup(self) -> None:
+    def startup(self):
         """
         Pre-simulation startup behaviors.
         """
@@ -73,7 +74,7 @@ class TradingMachine():
         # is constructed and spawned with all of the assets it needs to get data for as an argument.
         self.am.startup()
 
-    def run(self) -> None:
+    def run(self):
         """
         Runs the trading machine, start to finish.
         """
@@ -119,14 +120,14 @@ class TradingMachine():
         # Run Machine cleanup code
         self.cleanup()
 
-    def _train_algos(self) -> None:
+    def _train_algos(self):
         """
         Calls the train() function on all algorithms
         """
         for algo in self.algo_instances:
             algo.train()
 
-    def cleanup(self) -> None:
+    def cleanup(self):
         """
         Post-simulation cleanup behaviors.
         """

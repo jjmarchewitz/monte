@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from collections.abc import ItemsView
@@ -25,21 +24,16 @@ class Portfolio():
     machine_settings: MachineSettings
     starting_cash: float
     cash: float
-    name: str
     positions: dict[str, Position]
-    am: AssetManager
-    _order_queue: list[Order]
-    _current_order_id_number: int
 
     def __init__(self, machine_settings: MachineSettings,
-                 starting_cash: float = 10000, name: str = "") -> None:
+                 starting_cash: float = 10000):
         self.machine_settings = machine_settings
         self.starting_cash = starting_cash
         self.cash = starting_cash
-        self.name = name
         self.positions = {}
-        self._order_queue = []
-        self._current_order_id_number = 0
+        # self._order_queue = []
+        # self._current_order_id_number = 0
 
     def __getitem__(self, key: str) -> Position:
         return self.positions[key]
@@ -93,26 +87,26 @@ class Portfolio():
         """
         return ((self.total_value - self.starting_cash) / self.starting_cash) * 100
 
-    def watch(self, symbol: str) -> None:
-        """
-        Start watching a new asset. Can only be called before the simulation runs.
-        """
-        self.am.watch_asset(symbol)
-        self.positions[symbol] = self._create_position(symbol, 0)
+    # def watch(self, symbol: str):
+    #     """
+    #     Start watching a new asset. Can only be called before the simulation runs.
+    #     """
+    #     self.am.watch_asset(symbol)
+    #     self.positions[symbol] = self._create_position(symbol, 0)
 
-    def is_watching(self, symbol: str) -> bool:
-        """
-        Returns True if a symbol is already being watched, False otherwise.
-        """
-        return self.am.is_watching_asset(symbol)
+    # def is_watching(self, symbol: str) -> bool:
+    #     """
+    #     Returns True if a symbol is already being watched, False otherwise.
+    #     """
+    #     return self.am.is_watching_asset(symbol)
 
-    def unwatch(self, symbol: str) -> bool:
-        """
-        Removes a given asset from the AssetManager.
-        """
-        return self.am.unwatch_asset(symbol)
+    # def unwatch(self, symbol: str) -> bool:
+    #     """
+    #     Removes a given asset from the AssetManager.
+    #     """
+    #     return self.am.unwatch_asset(symbol)
 
-    def _delete_empty_positions(self) -> None:
+    def _delete_empty_positions(self):
         """
         Removes all Positions with a quantity of 0 from the Portfolio.
         """
@@ -133,139 +127,139 @@ class Portfolio():
         """
         return Position(self.machine_settings, self.am, symbol, initial_quantity)
 
-    def place_order(self, symbol: str, quantity: float, order_type: OrderType) -> Order:
-        """
-        Place a buy or sell order on this Portfolio. The order will try to be executed in one or more
-        TimeFrames relative to the current one.
-        """
-        # Check that the order type passed in is a valid order type from the enum
-        # OrderType
-        if order_type not in OrderType:
-            raise ValueError("Invalid order type.")
+    # def place_order(self, symbol: str, quantity: float, order_type: OrderType) -> Order:
+    #     """
+    #     Place a buy or sell order on this Portfolio. The order will try to be executed in one or more
+    #     TimeFrames relative to the current one.
+    #     """
+    #     # Check that the order type passed in is a valid order type from the enum
+    #     # OrderType
+    #     if order_type not in OrderType:
+    #         raise ValueError("Invalid order type.")
 
-        # Check that the quantity is valid
-        if quantity <= 0:
-            raise ValueError("Order quantities must be positive and non-zero.")
+    #     # Check that the quantity is valid
+    #     if quantity <= 0:
+    #         raise ValueError("Order quantities must be positive and non-zero.")
 
-        # Set the order number and increment it for the next order
-        order_num = self._current_order_id_number
-        self._current_order_id_number += 1
+    #     # Set the order number and increment it for the next order
+    #     order_num = self._current_order_id_number
+    #     self._current_order_id_number += 1
 
-        # Create a new order object with the correct attributes and append it to the
-        # order queue
-        new_order = Order(order_num, symbol, quantity,
-                          order_type, OrderStatus.PENDING)
-        self._order_queue.append(new_order)
+    #     # Create a new order object with the correct attributes and append it to the
+    #     # order queue
+    #     new_order = Order(order_num, symbol, quantity,
+    #                       order_type, OrderStatus.PENDING)
+    #     self._order_queue.append(new_order)
 
-        return new_order
+    #     return new_order
 
-    def get_order(self, order_id: int) -> Union[Order, None]:
-        """
-        Returns an order that is currently in the order queue, given that order's ID.
-        """
-        result = None
+    # def get_order(self, order_id: int) -> Union[Order, None]:
+    #     """
+    #     Returns an order that is currently in the order queue, given that order's ID.
+    #     """
+    #     result = None
 
-        for order in self._order_queue:
-            if order.id_number == order_id:
-                result = order
+    #     for order in self._order_queue:
+    #         if order.id_number == order_id:
+    #             result = order
 
-        return result
+    #     return result
 
-    def cancel_order(self, order_id: int) -> tuple[bool, Union[Order, None]]:
-        """
-        Cancel an order that is currently on the order queue.
-        """
-        was_order_successfully_cancelled = False
-        cancelled_order = None
+    # def cancel_order(self, order_id: int) -> tuple[bool, Union[Order, None]]:
+    #     """
+    #     Cancel an order that is currently on the order queue.
+    #     """
+    #     was_order_successfully_cancelled = False
+    #     cancelled_order = None
 
-        # Check through all of the orders and remove the one that matches the provided ID
-        for index, order in enumerate(self._order_queue):
-            if order.id_number == order_id:
-                cancelled_order = self._order_queue.pop(index)
-                cancelled_order.status = OrderStatus.CANCELLED
-                was_order_successfully_cancelled = True
-                break
+    #     # Check through all of the orders and remove the one that matches the provided ID
+    #     for index, order in enumerate(self._order_queue):
+    #         if order.id_number == order_id:
+    #             cancelled_order = self._order_queue.pop(index)
+    #             cancelled_order.status = OrderStatus.CANCELLED
+    #             was_order_successfully_cancelled = True
+    #             break
 
-        return (was_order_successfully_cancelled, cancelled_order)
+    #     return (was_order_successfully_cancelled, cancelled_order)
 
-    def process_pending_orders(self) -> list[Order]:
-        """
-        Process orders that are currently in the order queue. Returns any orders that were attempted and
-        updates each order's status based on whether or not it was executed successfully.
-        """
-        list_of_processed_orders = []
-        new_order_queue = []
+    # def process_pending_orders(self) -> list[Order]:
+    #     """
+    #     Process orders that are currently in the order queue. Returns any orders that were attempted and
+    #     updates each order's status based on whether or not it was executed successfully.
+    #     """
+    #     list_of_processed_orders = []
+    #     new_order_queue = []
 
-        # Check through every order in the order queue
-        for order in self._order_queue:
+    #     # Check through every order in the order queue
+    #     for order in self._order_queue:
 
-            # Check that the order type passed in is a valid order type from the enum
-            # OrderType
-            if order.order_type not in OrderType:
-                raise ValueError("Invalid order type.")
+    #         # Check that the order type passed in is a valid order type from the enum
+    #         # OrderType
+    #         if order.order_type not in OrderType:
+    #             raise ValueError("Invalid order type.")
 
-            # Process the order based on buy/sell
-            if order.order_type == OrderType.BUY:
-                self._execute_buy_order(order)
-            elif order.order_type == OrderType.SELL:
-                self._execute_sell_order(order)
+    #         # Process the order based on buy/sell
+    #         if order.order_type == OrderType.BUY:
+    #             self._execute_buy_order(order)
+    #         elif order.order_type == OrderType.SELL:
+    #             self._execute_sell_order(order)
 
-            # Add the order back to the queue if it is still pending
-            if order.status == OrderStatus.PENDING:
-                new_order_queue.append(order)
+    #         # Add the order back to the queue if it is still pending
+    #         if order.status == OrderStatus.PENDING:
+    #             new_order_queue.append(order)
 
-            # Add the order to the output list if it completed or failed
-            else:
-                list_of_processed_orders.append(order)
+    #         # Add the order to the output list if it completed or failed
+    #         else:
+    #             list_of_processed_orders.append(order)
 
-        self._order_queue = new_order_queue
+    #     self._order_queue = new_order_queue
 
-        return list_of_processed_orders
+    #     return list_of_processed_orders
 
-    def _execute_buy_order(self, order: Order) -> None:
-        """
-        Attempts to execute a buy order.
-        """
-        order_cost = self.am.get_testing_df(
-            order.symbol).iloc[-1].vwap * order.quantity
+    # def _execute_buy_order(self, order: Order):
+    #     """
+    #     Attempts to execute a buy order.
+    #     """
+    #     order_cost = self.am.get_testing_df(
+    #         order.symbol).iloc[-1].vwap * order.quantity
 
-        # If the portfolio has insufficient funds to make the purchase, the order fails
-        if self.cash < order_cost:
-            order.status = OrderStatus.FAILED
+    #     # If the portfolio has insufficient funds to make the purchase, the order fails
+    #     if self.cash < order_cost:
+    #         order.status = OrderStatus.FAILED
 
-        # Otherwise, execute the order
-        else:
-            # Take the money out of the portfolio's account
-            self.cash -= order_cost
+    #     # Otherwise, execute the order
+    #     else:
+    #         # Take the money out of the portfolio's account
+    #         self.cash -= order_cost
 
-            # If there is an existing position for this symbol, add to its existing quantity
-            if self.contains_position(order.symbol):
-                self.positions[order.symbol].quantity += order.quantity
+    #         # If there is an existing position for this symbol, add to its existing quantity
+    #         if self.contains_position(order.symbol):
+    #             self.positions[order.symbol].quantity += order.quantity
 
-            # If no position exists for this symbol, create a new one
-            else:
-                self.positions[order.symbol] = self._create_position(order.symbol, order.quantity)
+    #         # If no position exists for this symbol, create a new one
+    #         else:
+    #             self.positions[order.symbol] = self._create_position(order.symbol, order.quantity)
 
-            # Update the order status
-            order.status = OrderStatus.COMPLETED
+    #         # Update the order status
+    #         order.status = OrderStatus.COMPLETED
 
-    def _execute_sell_order(self, order: Order) -> None:
-        """
-        Attempts to execute a sell order.
-        """
-        # If the portfolio doesn't contain the symbol being sold, the order fails
-        if not self.contains_position(order.symbol):
-            order.status = OrderStatus.FAILED
+    # def _execute_sell_order(self, order: Order):
+    #     """
+    #     Attempts to execute a sell order.
+    #     """
+    #     # If the portfolio doesn't contain the symbol being sold, the order fails
+    #     if not self.contains_position(order.symbol):
+    #         order.status = OrderStatus.FAILED
 
-        else:
-            # If the portfolio has too little of the asset for this sell order, the order fails
-            if self.positions[order.symbol].quantity < order.quantity:
-                order.status = OrderStatus.FAILED
+    #     else:
+    #         # If the portfolio has too little of the asset for this sell order, the order fails
+    #         if self.positions[order.symbol].quantity < order.quantity:
+    #             order.status = OrderStatus.FAILED
 
-            # Otherwise, execute the order
-            else:
-                self.positions[order.symbol].quantity -= order.quantity
+    #         # Otherwise, execute the order
+    #         else:
+    #             self.positions[order.symbol].quantity -= order.quantity
 
-                self.cash += self.am.get_testing_df(
-                    order.symbol).iloc[-1].vwap * order.quantity
-                order.status = OrderStatus.COMPLETED
+    #             self.cash += self.am.get_testing_df(
+    #                 order.symbol).iloc[-1].vwap * order.quantity
+    #             order.status = OrderStatus.COMPLETED

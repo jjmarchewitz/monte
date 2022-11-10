@@ -25,11 +25,10 @@ class MachineSettings():
     data_buffer_days: int
     time_zone: pytz.tzinfo.BaseTzInfo
 
-    def __init__(
-            self, alpaca_api: AlpacaAPIBundle, start_date: datetime, end_date: datetime, training_data_percentage: float,
-            time_frame: TimeFrame, derived_columns: dict[str, DerivedColumn] = {},
-            max_rows_in_test_df: int = 10,
-            time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone('US/Eastern')) -> None:
+    def __init__(self, alpaca_api: AlpacaAPIBundle, start_date: datetime, end_date: datetime,
+                 training_data_percentage: float, time_frame: TimeFrame,
+                 derived_columns: dict[str, DerivedColumn] = {},
+                 max_rows_in_test_df: int = 10, time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone('US/Eastern')):
         self.alpaca_api = alpaca_api
         self.start_date = start_date
         self.end_date = end_date
@@ -55,7 +54,7 @@ class MachineSettings():
 
         self.validate_data_buffer_days()
 
-    def validate_dates(self) -> None:
+    def validate_dates(self):
         """
         Checks that ``self.start_date`` and ``self.end_date`` are valid and can be used in the trading
         machine.
@@ -76,7 +75,7 @@ class MachineSettings():
         if self.end_date.date() >= datetime.today().date():
             raise ValueError(f"The end date must be before today's date: {datetime.today().date()}")
 
-    def validate_training_data_percentage(self) -> None:
+    def validate_training_data_percentage(self):
         """
         Checks that ``self.training_data_percentage`` is valid and can be used in the trading machine.
         """
@@ -85,7 +84,7 @@ class MachineSettings():
                 f"machine_settings.training_data_percentage must be a value between 0 and 1 "
                 f"(inclusive). The current value is {self.training_data_percentage}")
 
-    def validate_time_frame(self) -> None:
+    def validate_time_frame(self):
         """
         Checks that ``self.time_frame`` is valid and can be used in the trading machine.
         """
@@ -104,7 +103,7 @@ class MachineSettings():
         elif self.time_frame.unit in (TimeFrameUnit.Week, TimeFrameUnit.Month):
             raise ValueError(f"Cannot have a TimeFrameUnit of {self.time_frame.unit}")
 
-    def validate_data_buffer_days(self) -> None:
+    def validate_data_buffer_days(self):
         """
         Checks that ``self.data_buffer_days`` is valid and can be used in the trading machine.
         """
@@ -113,7 +112,7 @@ class MachineSettings():
                 f"Data buffers need to be greater than or equal to 7 days. The current data buffer is "
                 f"{self.data_buffer_days} days")
 
-    def add_tz_info_to_dates(self) -> None:
+    def add_tz_info_to_dates(self):
         """
         Adds timezone info to ``self.start_date`` and ``self.end_date``.
         """
@@ -220,7 +219,7 @@ class MachineSettings():
                 "machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
                 "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
-    def add_derived_columns(self, new_columns: dict[str, DerivedColumn]) -> None:
+    def add_derived_columns(self, new_columns: dict[str, DerivedColumn]):
         """
         Adds derived columns contained in ``new_columns`` to ``self.derived_columns`` if the column names
         have no clashes. Also updates ``self.max_rows_in_test_df`` and ``self.start_buffer_days`` based on

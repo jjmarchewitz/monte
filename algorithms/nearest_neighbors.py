@@ -15,7 +15,7 @@ class NearestNeighbors(Algorithm):
     def __init__(
             self, machine_settings: MachineSettings, name: str,
             starting_cash: float, symbols: list[str], decision_interval: tuple[float, float],
-            variability_constant: float) -> None:
+            variability_constant: float):
 
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
         super().__init__(machine_settings, name, starting_cash, symbols)
@@ -37,14 +37,14 @@ class NearestNeighbors(Algorithm):
 
         return derived_columns
 
-    def startup(self) -> None:
+    def startup(self):
         """
         Runs before the simulation starts (and before any training data is acquired).
         """
         for symbol in self.symbols:
             self.portfolio.watch(symbol)
 
-    def train(self) -> None:
+    def train(self):
         """
         Runs right before the end of the training phase of the simulation (after the training data is
         acquired). Train any models here.
@@ -52,13 +52,13 @@ class NearestNeighbors(Algorithm):
         # Training code, called once
         ...
 
-    def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]) -> None:
+    def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
         """
         Runs on every time frame during the testing phase of the simulation. This is the main body of the
         algorithm.
         """
 
-        for symbol, position in self.portfolio.positions.items():
+        for symbol, position in self.portfolio.items():
 
             df = position.testing_df
 
@@ -72,7 +72,7 @@ class NearestNeighbors(Algorithm):
         display.print_total_value(self.name, self.portfolio, current_datetime)
         # Testing code, called on every time frame
 
-    def cleanup(self) -> None:
+    def cleanup(self):
         """
         Runs after the end of the testing phase of the simulation. Run any needed post-simulation code here.
         """

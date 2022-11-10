@@ -34,7 +34,7 @@ class DerivedColumn():
     kwargs: dict
     column_dependencies: list[str]
 
-    def __init__(self, func: Callable, num_rows: int, *args, column_dependencies=[], **kwargs) -> None:
+    def __init__(self, func: Callable, num_rows: int, *args, column_dependencies=[], **kwargs):
         self.func = func
         self.num_rows_needed = num_rows
         self.args = args

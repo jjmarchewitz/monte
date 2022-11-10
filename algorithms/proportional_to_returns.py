@@ -15,7 +15,7 @@ from monte.orders import Order, OrderType
 class ProportionalToReturns(Algorithm):
 
     def __init__(self, machine_settings: MachineSettings, name: str, starting_cash: float,
-                 symbols: list[str]) -> None:
+                 symbols: list[str]):
 
         # TODO: Make the declaration of Portfolio more explicit. Somehow force the user to do it themselves,
         # but in a standard way
@@ -36,7 +36,7 @@ class ProportionalToReturns(Algorithm):
 
         return derived_columns
 
-    def startup(self) -> None:
+    def startup(self):
         """
         Runs before the simulation starts (and before any training data is acquired).
         """
@@ -49,7 +49,7 @@ class ProportionalToReturns(Algorithm):
             for symbol in self.symbols:
                 self.portfolio.place_order(symbol, 1, OrderType.BUY)
 
-    def train(self) -> None:
+    def train(self):
         """
         Runs right before the end of the training phase of the simulation (after the training data is
         acquired). Train any models here.
@@ -57,13 +57,13 @@ class ProportionalToReturns(Algorithm):
         # Training code, called once
         ...
 
-    def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]) -> None:
+    def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
         """
         Runs on every time frame during the testing phase of the simulation. This is the main body of the
         algorithm.
         """
         # Testing code, called on every time frame
-        for symbol, position in self.portfolio.positions.items():
+        for symbol, position in self.portfolio.items():
             df = position.testing_df
 
             current_returns = df.iloc[-1].returns_vwap
@@ -76,7 +76,7 @@ class ProportionalToReturns(Algorithm):
         # Print the current datetime with the portfolio's current total value and current return
         display.print_total_value(self.name, self.portfolio, current_datetime)
 
-    def cleanup(self) -> None:
+    def cleanup(self):
         """
         Runs after the end of the testing phase of the simulation. Run any needed post-simulation code here.
         """

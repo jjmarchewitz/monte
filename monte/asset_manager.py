@@ -40,10 +40,10 @@ class DataDestination(Enum):
     TESTING_DATA = 2
 
 
-class Asset:
+class CommonAssetData:
     """
-    Represents one single asset from the markets, this object constructs and manages dataframes for the given
-    symbol.
+    Stores the training and testing dataframes for the asset, as well as other data needed to update and
+    increment the dataframes.
     """
 
     machine_settings: MachineSettings
@@ -53,7 +53,9 @@ class Asset:
     testing_df: pd.DataFrame
     _finished_populating_start_buffer: bool
 
-    def __init__(self, machine_settings: MachineSettings, symbol: str) -> None:
+    # TODO: Reference counting
+
+    def __init__(self, machine_settings: MachineSettings, symbol: str):
         self.machine_settings = machine_settings
         self.symbol = symbol
 
@@ -94,7 +96,7 @@ class Asset:
         """
         return self.testing_df.iloc[-1].datetime
 
-    def reset_main_dfs(self) -> None:
+    def reset_main_dfs(self):
         """
         Creates a new, empty dataframe with all of the base columns and derived columns. The result is
         stored in self.df.
@@ -104,14 +106,14 @@ class Asset:
         self.training_df = pd.DataFrame({}, columns=columns)
         self.testing_df = pd.DataFrame({}, columns=columns)
 
-    def reset_buffer(self) -> None:
+    def reset_buffer(self):
         """
         Creates a new, empty dataframe with only the base columns (NOT derived columns). The result is
         stored in self.buffer.
         """
         self.buffer = pd.DataFrame({}, columns=self.base_columns)
 
-    def increment_dataframe(self, data_destination: DataDestination) -> None:
+    def increment_dataframe(self, data_destination: DataDestination):
         """
         Performs all of the actions needed to increment the destination dataframe (indicated by
         ``data_destination``) forward by one time_frame. This includes moving a row from the buffer
@@ -157,7 +159,7 @@ class Asset:
                 destination_df.at[destination_df.index[-1],
                                   column_title] = column_obj(destination_df)
 
-    def _switch_to_testing_data(self) -> None:
+    def _switch_to_testing_data(self):
         """
         Performs any actions needed to tansition to the testing phase of the data from the training phase.
         This includes copying over a start buffer of data to the testing dataframe, as well as removing
@@ -170,7 +172,7 @@ class Asset:
 
         self._remove_start_buffer_data_from_training_df()
 
-    def _remove_start_buffer_data_from_training_df(self) -> None:
+    def _remove_start_buffer_data_from_training_df(self):
         """
         Removes data with timestamps before the simulation start date.
         """
@@ -279,7 +281,7 @@ def _get_alpaca_data(
 def _get_alpaca_data_as_process(
         output_queue: Queue,
         machine_settings: MachineSettings, symbols: list[str],
-        start_date: datetime, end_date: datetime) -> None:
+        start_date: datetime, end_date: datetime):
     """
     This function is meant to be run as a mp.Process. Downloads and cleans all of the Alpaca bars data for
     ``symbols`` between ``start_date`` and ``end_date``. This function requests the data for a large date
@@ -319,14 +321,14 @@ class AssetManager:
     """
 
     machine_settings: MachineSettings
-    watched_assets: dict[str, Asset]
+    watched_assets: dict[str, CommonAssetData]
     data_getter_process: Process
     buffered_df_queue: Queue
     simulation_running: bool
     data_destination: DataDestination
     testing_df_threshold: TradingDay
 
-    def __init__(self, machine_settings: MachineSettings) -> None:
+    def __init__(self, machine_settings: MachineSettings):
         self.machine_settings = machine_settings
 
         self.watched_assets = {}  # Dict of Assets
@@ -339,7 +341,7 @@ class AssetManager:
 
         self.testing_df_threshold = self.threshold_date_to_start_using_testing_df()
 
-    def startup(self) -> None:
+    def startup(self):
         """
         Runs at simulation startup. Adds the start buffer data to the Assets being watched and kicks off
         the data getter process.
@@ -368,7 +370,7 @@ class AssetManager:
 
         self.add_start_buffer_data()
 
-    def cleanup(self) -> None:
+    def cleanup(self):
         """
         Runs at the end of the simulation and performs cleanup tasks.
         """
@@ -386,7 +388,7 @@ class AssetManager:
         """
         return self.watched_assets[symbol].testing_df
 
-    def items(self) -> ItemsView[str, Asset]:
+    def items(self) -> ItemsView[str, CommonAssetData]:
         """
         Returns an ItemsView instance for all of the assets being watched by the asset_manager.
         """
@@ -416,7 +418,7 @@ class AssetManager:
 
         return trading_days[threshold_index]
 
-    def increment_dataframes(self) -> None:
+    def increment_dataframes(self):
         """
         Increments the dataframes of all assets forward by one row/time_frame. Raises a StopIteration
         exception when complete.
@@ -453,7 +455,7 @@ class AssetManager:
         for asset in self.watched_assets.values():
             asset.increment_dataframe(self.data_destination)
 
-    def _populate_buffers(self) -> None:
+    def _populate_buffers(self):
         """
         Populates the buffer of all watched assets with the next set of buffer data from the data getter
         process. Raises a StopIteration exception when there is no more data to get.
@@ -468,7 +470,7 @@ class AssetManager:
         else:
             raise TypeError("Received invalid data from the buffered_df_queue")
 
-    def _switch_to_testing_data(self) -> None:
+    def _switch_to_testing_data(self):
         """
         Switches to the testing phase of the data.
         """
@@ -477,7 +479,7 @@ class AssetManager:
         for asset in self.watched_assets.values():
             asset._switch_to_testing_data()
 
-    def add_start_buffer_data(self) -> None:
+    def add_start_buffer_data(self):
         """
         Adds a start buffer's worth of data to the currently watched Assets at the current data_destination.
         """
@@ -514,7 +516,7 @@ class AssetManager:
             while not self.watched_assets[symbol].buffer.empty:
                 self.watched_assets[symbol].increment_dataframe(self.data_destination)
 
-    def watch_asset(self, symbol: str) -> None:
+    def watch_asset(self, symbol: str):
         """
         Start watching a new asset. Can only be called before the simulation runs.
         """
@@ -523,7 +525,7 @@ class AssetManager:
 
         # Cannot watch a symbol already being watched
         elif not self.is_watching_asset(symbol):
-            self.watched_assets[symbol] = Asset(self.machine_settings, symbol)
+            self.watched_assets[symbol] = CommonAssetData(self.machine_settings, symbol)
 
     def is_watching_asset(self, symbol: str) -> bool:
         """
@@ -544,7 +546,7 @@ class AssetManager:
         else:
             return False
 
-    def _get_reference_asset(self) -> Asset:
+    def _get_reference_asset(self) -> CommonAssetData:
         """
         Returns the reference asset, used to keep the AssetManager running even when there are no assets.
         Also used to return the current timestamp and datetime.

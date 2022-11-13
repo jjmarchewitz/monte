@@ -59,7 +59,7 @@ def main():
     n_sharpe = NaiveSharpe(ms, "Naive Sharpe", starting_cash, symbols)
     trading_machine.add_algo(n_sharpe)
 
-    epsilon = 0.000001
+    epsilon = 1e-5
     k = 1.5
 
     near_neighbors = NearestNeighbors(ms, "Nearest Neighbor", starting_cash, symbols, (-epsilon, epsilon), k)

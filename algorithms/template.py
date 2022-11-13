@@ -5,19 +5,18 @@ from datetime import datetime
 import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
 from monte.algorithm import Algorithm
-from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
-from monte.orders import Order
+from monte.orders import Order, OrderType
 
 
 class Template(Algorithm):
 
     def __init__(
-            self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, name: str,
+            self, machine_settings: MachineSettings, name: str,
             starting_cash: float, symbols: list[str]) -> None:
 
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
-        super().__init__(alpaca_api, machine_settings, name, starting_cash, symbols)
+        super().__init__(machine_settings, name, starting_cash, symbols)
 
     def get_derived_columns(self) -> dict[str, DerivedColumn]:
         """

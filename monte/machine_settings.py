@@ -5,6 +5,7 @@ import pytz
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 from derived_columns import DerivedColumn
+from monte.api import AlpacaAPIBundle
 
 
 class MachineSettings():
@@ -12,7 +13,8 @@ class MachineSettings():
     A class to store important settings for the trading machine. Can automatically derive many of these
     settings.
     """
-    # TODO: Make alpaca_api one of the MachineSettings??
+
+    alpaca_api: AlpacaAPIBundle
     start_date: datetime
     end_date: datetime
     training_data_percentage: float
@@ -24,10 +26,11 @@ class MachineSettings():
     time_zone: pytz.tzinfo.BaseTzInfo
 
     def __init__(
-            self, start_date: datetime, end_date: datetime, training_data_percentage: float,
+            self, alpaca_api: AlpacaAPIBundle, start_date: datetime, end_date: datetime, training_data_percentage: float,
             time_frame: TimeFrame, derived_columns: dict[str, DerivedColumn] = {},
             max_rows_in_test_df: int = 10,
             time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone('US/Eastern')) -> None:
+        self.alpaca_api = alpaca_api
         self.start_date = start_date
         self.end_date = end_date
         self.training_data_percentage = training_data_percentage
@@ -38,7 +41,7 @@ class MachineSettings():
         self.max_rows_in_test_df = max_rows_in_test_df
 
         self.validate_dates()
-        self.validate_trading_data_percentage()
+        self.validate_training_data_percentage()
         self.validate_time_frame()
 
         # Add timezone info to start_date and end_date
@@ -69,7 +72,11 @@ class MachineSettings():
         if self.start_date > self.end_date:
             raise ValueError("The end date must come after the start date.")
 
-    def validate_trading_data_percentage(self) -> None:
+        # Raise an error if the end date is on or after the current real-life day
+        if self.end_date.date() >= datetime.today().date():
+            raise ValueError(f"The end date must be before today's date: {datetime.today().date()}")
+
+    def validate_training_data_percentage(self) -> None:
         """
         Checks that ``self.training_data_percentage`` is valid and can be used in the trading machine.
         """

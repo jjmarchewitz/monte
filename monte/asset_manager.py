@@ -46,7 +46,6 @@ class Asset:
     symbol.
     """
 
-    alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
     base_columns: list[str]
     buffer: pd.DataFrame
@@ -54,9 +53,7 @@ class Asset:
     testing_df: pd.DataFrame
     _finished_populating_start_buffer: bool
 
-    def __init__(self, alpaca_api: AlpacaAPIBundle,
-                 machine_settings: MachineSettings, symbol: str) -> None:
-        self.alpaca_api = alpaca_api
+    def __init__(self, machine_settings: MachineSettings, symbol: str) -> None:
         self.machine_settings = machine_settings
         self.symbol = symbol
 
@@ -201,18 +198,25 @@ class Asset:
 
 
 def _get_alpaca_data(
-        alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, symbols: list[str],
+        machine_settings: MachineSettings, symbols: list[str],
         start_date: date, end_date: date) -> dict[str, pd.DataFrame]:
     """
     Download Alpaca bars for all ``symbols`` between ``start_date`` and ``end_date``. Clean up the downloaded
     data.
     """
     # Get one buffer's worth of data
-    buffer_data = alpaca_api.async_market_data_bars.get_bulk_bars(
-        symbols, machine_settings.time_frame, start_date, end_date)
+    while True:
+        try:
+            buffer_data = machine_settings.alpaca_api.async_market_data_bars.get_bulk_bars(
+                symbols, machine_settings.time_frame, start_date, end_date)
+            break
+        except:
+            print(f"Failed to get data from alpaca. Re-requesting data between {start_date}, "
+                  f"and {end_date}.")
+            continue
 
     # Get a list of all the trading days during this date range
-    trading_days = get_list_of_trading_days_in_range(alpaca_api, start_date, end_date)
+    trading_days = get_list_of_trading_days_in_range(machine_settings, start_date, end_date)
 
     # For each symbol and associated buffer that the Alpaca API returned
     for symbol, buffer in buffer_data.items():
@@ -273,7 +277,7 @@ def _get_alpaca_data(
 
 
 def _get_alpaca_data_as_process(
-        output_queue: Queue, alpaca_api: AlpacaAPIBundle,
+        output_queue: Queue,
         machine_settings: MachineSettings, symbols: list[str],
         start_date: datetime, end_date: datetime) -> None:
     """
@@ -287,14 +291,13 @@ def _get_alpaca_data_as_process(
 
     # Get a list of start and end dates pairs that can be used in separate data requests.
     buffer_ranges = get_list_of_buffer_ranges(
-        alpaca_api, machine_settings.data_buffer_days, start_date, end_date)
+        machine_settings, machine_settings.data_buffer_days, start_date, end_date)
 
     # Request each buffer's worth of data in a row
     for buffer_range in buffer_ranges:
         buffer_start_date = buffer_range[0]
         buffer_end_date = buffer_range[1]
         buffer_data = _get_alpaca_data(
-            alpaca_api,
             machine_settings,
             symbols,
             buffer_start_date,
@@ -315,7 +318,6 @@ class AssetManager:
     between the buffer dataframe and the training and testing dataframes.
     """
 
-    alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
     watched_assets: dict[str, Asset]
     data_getter_process: Process
@@ -324,8 +326,7 @@ class AssetManager:
     data_destination: DataDestination
     testing_df_threshold: TradingDay
 
-    def __init__(self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings) -> None:
-        self.alpaca_api = alpaca_api
+    def __init__(self, machine_settings: MachineSettings) -> None:
         self.machine_settings = machine_settings
 
         self.watched_assets = {}  # Dict of Assets
@@ -350,8 +351,6 @@ class AssetManager:
         for asset in self.watched_assets.values():
             asset.reset_main_dfs()
 
-        self.add_start_buffer_data()
-
         self.simulation_running = True
 
         self.data_getter_process = Process(
@@ -359,7 +358,6 @@ class AssetManager:
             target=_get_alpaca_data_as_process,
             args=(
                 self.buffered_df_queue,
-                self.alpaca_api,
                 self.machine_settings,
                 list(self.watched_assets.keys()),
                 self.machine_settings.start_date,
@@ -367,6 +365,8 @@ class AssetManager:
             daemon=True)
 
         self.data_getter_process.start()
+
+        self.add_start_buffer_data()
 
     def cleanup(self) -> None:
         """
@@ -398,13 +398,13 @@ class AssetManager:
         data phase.
         """
         trading_days = get_list_of_trading_days_in_range(
-            self.alpaca_api,
+            self.machine_settings,
             self.machine_settings.start_date,
             self.machine_settings.end_date)
 
         # An extra trading day must be added for off-by-one reasons
         extra_trading_day = get_list_of_trading_days_in_range(
-            self.alpaca_api,
+            self.machine_settings,
             self.machine_settings.end_date,
             self.machine_settings.end_date + timedelta(days=30)
         )[0]
@@ -483,7 +483,7 @@ class AssetManager:
         """
         # Go back and get a lot of trading days from before the start_date
         trading_days_before_current = get_list_of_trading_days_in_range(
-            self.alpaca_api,
+            self.machine_settings,
             (
                 self.machine_settings.start_date -
                 timedelta(days=self.machine_settings.start_buffer_days) -
@@ -500,7 +500,6 @@ class AssetManager:
 
         # Get the start buffer data
         start_buffer_data = _get_alpaca_data(
-            self.alpaca_api,
             self.machine_settings,
             list(self.watched_assets.keys()),
             buffer_start_date,
@@ -524,7 +523,7 @@ class AssetManager:
 
         # Cannot watch a symbol already being watched
         elif not self.is_watching_asset(symbol):
-            self.watched_assets[symbol] = Asset(self.alpaca_api, self.machine_settings, symbol)
+            self.watched_assets[symbol] = Asset(self.machine_settings, symbol)
 
     def is_watching_asset(self, symbol: str) -> bool:
         """

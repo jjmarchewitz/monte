@@ -3,6 +3,8 @@ from __future__ import annotations
 import time
 from datetime import timedelta
 
+from tabulate import tabulate
+
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.asset_manager import AssetManager, DataDestination
@@ -16,36 +18,38 @@ class TradingMachine():
     explaining exactly how it works.
     """
 
-    alpaca_api: AlpacaAPIBundle
     machine_settings: MachineSettings
     am: AssetManager
     algo_instances: list[Algorithm]
     epoch_start_time: float
 
-    def __init__(self, alpaca_api: AlpacaAPIBundle,
-                 machine_settings: MachineSettings) -> None:
-        self.alpaca_api = alpaca_api
+    def __init__(self, machine_settings: MachineSettings) -> None:
         self.machine_settings = machine_settings
-        self.am = AssetManager(alpaca_api, machine_settings)
+        self.am = AssetManager(machine_settings)
         self.algo_instances = []
 
-    def add_algo_instance(self, algorithm_with_portfolio: Algorithm) -> None:
+    def add_algo(self, *args: Algorithm) -> None:
         """
-        Add a new algorithm to the trading machine. The algorithm must be an instance of a subclass of
-        Algorithm.
+        Add one or more algorithms to the trading machine. The algorithms must be instances of a subclass of
+        monte.Algorithm.
         """
 
-        if not issubclass(type(algorithm_with_portfolio), Algorithm):
-            raise TypeError(
-                "You must pass an instance of a subclass of Algorithm into add_algo_instance().")
+        for algo in args:
 
-        if not isinstance(algorithm_with_portfolio.portfolio, Portfolio):
-            raise TypeError(
-                "The portfolio attribute of the algorithm must be an instance of Portfolio.")
+            if not issubclass(type(algo), Algorithm):
+                raise TypeError(
+                    "You must pass an instance of a subclass of Algorithm into add_algos().")
 
-        algorithm_with_portfolio.portfolio.am = self.am
+            if not isinstance(algo.portfolio, Portfolio):
+                raise TypeError(
+                    "The portfolio attribute of the algorithm must be an instance of Portfolio.")
 
-        self.algo_instances.append(algorithm_with_portfolio)
+            if algo in self.algo_instances:
+                continue
+
+            algo.portfolio.am = self.am
+
+            self.algo_instances.append(algo)
 
     def startup(self) -> None:
         """
@@ -108,9 +112,6 @@ class TradingMachine():
                     # Process orders
                     processed_orders = portfolio.process_pending_orders()
 
-                    # Clean up the portfolio
-                    portfolio._delete_empty_positions()
-
                     # Run the algorithm
                     current_datetime = portfolio.am._get_reference_asset().datetime()
                     algo.run_one_time_frame(current_datetime, processed_orders)
@@ -141,22 +142,28 @@ class TradingMachine():
 
         # Print out final returns for all algos tested
         print("\n\n -- RESULTS -- \n")
+        results = []
         for algo in self.algo_instances:
-            print(f"{algo.name} | ${round(algo.portfolio.total_value, 2):,} | "
-                  f"{round(algo.portfolio.current_return, 3):+}%")
-        print("\n\n")
+            results.append({
+                "Name": algo.name,
+                "Total Value": f"${round(algo.portfolio.total_value, 2):,.2f}",
+                "Return": f"{round(algo.portfolio.current_return, 3):+.3f}%",
+            })
+
+        print(tabulate(results, headers="keys", tablefmt="outline", colalign=("center", "center", "center")))
+        print("\n")
 
         # Print out the total runtime
-        print(" -- RUNTIME -- \n")
+        print("Total runtime was ", end="")
         total_runtime = int(end_time - self.epoch_start_time)
         hours, remainder = divmod(total_runtime, 3600)
         minutes, seconds = divmod(remainder, 60)
 
         if hours != 0:
-            print(f"{hours}h {minutes}m {seconds}s")
+            print(f"{hours}h {minutes}m {seconds}s.")
         elif minutes != 0:
-            print(f"{minutes}m {seconds}s")
+            print(f"{minutes}m {seconds}s.")
         else:
-            print(f"{seconds}s")
+            print(f"{seconds}s.")
 
         print("\n\n")

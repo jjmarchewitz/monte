@@ -1,26 +1,27 @@
 from __future__ import annotations
 
 from datetime import datetime
+from enum import Enum
 
 import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
+from monte import display
 from monte.algorithm import Algorithm
 from monte.api import AlpacaAPIBundle
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
 
 
-class TestAlg(Algorithm):
+class ProportionalToReturns(Algorithm):
 
-    def __init__(
-            self, alpaca_api: AlpacaAPIBundle, machine_settings: MachineSettings, name: str,
-            starting_cash: float, symbols: list[str]) -> None:
+    def __init__(self, machine_settings: MachineSettings, name: str, starting_cash: float,
+                 symbols: list[str]) -> None:
 
         # TODO: Make the declaration of Portfolio more explicit. Somehow force the user to do it themselves,
         # but in a standard way
 
         # Sets up instance variables and instantiates a Portfolio as self.portfolio
-        super().__init__(alpaca_api, machine_settings, name, starting_cash, symbols)
+        super().__init__(machine_settings, name, starting_cash, symbols)
 
     def get_derived_columns(self) -> dict[str, DerivedColumn]:
         """
@@ -28,13 +29,9 @@ class TestAlg(Algorithm):
         """
         # Add any derived columns to the dictionary.
         derived_columns = {
-            # "net_l10": DerivedColumn(dcolumns.net, 10, "vwap"),
-            "avg_l10": DerivedColumn(dcolumns.mean, 10, "vwap"),
-            # "avg_l30": DerivedColumn(dcolumns.mean, 30, "vwap"),
-            # "std_dev_l10": DerivedColumn(dcolumns.std_dev, 10, "vwap"),
-            "returns_l10": DerivedColumn(dcolumns.returns, 10, "vwap"),
-            # "fft_l20": DerivedColumn(dcolumns.fourier_transform, 20, "vwap"),
-            "avg_returns_l10": DerivedColumn(dcolumns.mean, 10, "returns_l10", column_dependencies=["returns_l10"]),
+            "avg_vwap": DerivedColumn(dcolumns.mean, 100, "vwap"),
+            "returns_vwap": DerivedColumn(dcolumns.returns, 100, "vwap"),
+            "avg_returns": DerivedColumn(dcolumns.mean, 100, "returns_vwap", column_dependencies=["returns_vwap"]),
         }
 
         return derived_columns
@@ -48,8 +45,9 @@ class TestAlg(Algorithm):
             self.portfolio.watch(symbol)
 
         # Buy 10 shares of all symbols
-        for symbol in self.symbols:
-            self.portfolio.place_order(symbol, 10, OrderType.BUY)
+        for _ in range(1, 10):
+            for symbol in self.symbols:
+                self.portfolio.place_order(symbol, 1, OrderType.BUY)
 
     def train(self) -> None:
         """
@@ -65,22 +63,18 @@ class TestAlg(Algorithm):
         algorithm.
         """
         # Testing code, called on every time frame
-        for symbol in self.symbols:
-            df = self.portfolio.get_testing_df(symbol)
+        for symbol, position in self.portfolio.positions.items():
+            df = position.testing_df
 
-            # If the percent change over the last 10 rows is less than -1%, buy a share.
-            if df.iloc[-1].returns_l10 < -1:
-                self.portfolio.place_order(symbol, 1, OrderType.BUY)
+            current_returns = df.iloc[-1].returns_vwap
 
-            # If the percent change over the last 10 rows is more than 1%, sell a share.
-            elif df.iloc[-1].returns_l10 > 1:
-                self.portfolio.place_order(symbol, 1, OrderType.SELL)
+            if current_returns < -0.01:
+                self.portfolio.place_order(symbol, -int(current_returns * 100), OrderType.BUY)
+            elif current_returns > 0.01:
+                self.portfolio.place_order(symbol, int(current_returns * 100), OrderType.SELL)
 
         # Print the current datetime with the portfolio's current total value and current return
-        print(
-            f"{current_datetime.date()} {current_datetime.hour:02d}:{current_datetime.minute:02d} | "
-            f"${round(self.portfolio.total_value, 2):,.2f} | "
-            f"{round(self.portfolio.current_return, 3):+.3f}%")
+        display.print_total_value(self.name, self.portfolio, current_datetime)
 
     def cleanup(self) -> None:
         """

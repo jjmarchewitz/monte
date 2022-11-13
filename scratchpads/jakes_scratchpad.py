@@ -4,17 +4,20 @@ from datetime import datetime
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
-from algorithms import test
+from algorithms.benchmarks.buy_and_hold import BuyAndHold
+from algorithms.benchmarks.buy_and_hold_sp import BuyAndHoldSP500
+from algorithms.proportional_to_returns import ProportionalToReturns
 from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
 from monte.machine_settings import MachineSettings
 
 
 def main():
-    alpaca_api = AlpacaAPIBundle()
 
+    # TODO: Broker object
+    # TODO: Add argument validation across the backend.
     # TODO: Add logging (print statements).
-    # TODO: Portfolios store executed order history
+    # TODO: Positions store executed order history
     # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
     # TODO: Move algos and scratchpads to a separate repo, publish monte on pypi
     # TODO: Markdown documentation explaining the high-level concepts of this repo and some implementation
@@ -22,13 +25,14 @@ def main():
     # TODO: Options trading
 
     ms = MachineSettings(
+        alpaca_api=AlpacaAPIBundle(),
         start_date=datetime(2016, 3, 8),
-        end_date=datetime(2022, 10, 23),
-        training_data_percentage=0.1,
+        end_date=datetime(2016, 11, 7),
+        training_data_percentage=0,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )
 
-    trading_machine = TradingMachine(alpaca_api, ms)
+    trading_machine = TradingMachine(ms)
 
     # symbols = [
     #     "AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
@@ -37,11 +41,19 @@ def main():
     #     "ABT", "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE",
     #     "ROK"]
 
-    symbols = ["GME"]
+    symbols = ["AAPL", "GOOG"]
+    # symbols = ["GME"]
 
-    algo1 = test.TestAlg(alpaca_api, ms, "Test Alg", 10_000, symbols)
+    starting_cash = 10_000
 
-    trading_machine.add_algo_instance(algo1)
+    buy_and_hold = BuyAndHold(ms, "B&H", starting_cash, symbols)
+    trading_machine.add_algo(buy_and_hold)
+
+    buy_and_hold_sp = BuyAndHoldSP500(ms, "S&P", starting_cash)
+    trading_machine.add_algo(buy_and_hold_sp)
+
+    prop_ret = ProportionalToReturns(ms, "PtR", starting_cash, symbols)
+    trading_machine.add_algo(prop_ret)
 
     trading_machine.run()
 

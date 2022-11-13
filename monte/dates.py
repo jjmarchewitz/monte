@@ -6,6 +6,7 @@ from alpaca_trade_api import entity
 from pytz import timezone
 
 from monte.api import AlpacaAPIBundle
+from monte.machine_settings import MachineSettings
 
 
 @dataclass
@@ -20,17 +21,17 @@ class TradingDay():
     close_time: datetime
 
 
-def get_list_of_trading_days_in_range(alpaca_api: AlpacaAPIBundle,
+def get_list_of_trading_days_in_range(machine_settings: MachineSettings,
                                       start_date: date, end_date: date) -> list[TradingDay]:
     """
     Returns a list of days (as TradingDay instances) that U.S. markets are open between the start and end
     dates provided. The result is inclusive of both the start and end dates.
     """
-    raw_market_days = _get_raw_trading_dates_in_range(alpaca_api, start_date, end_date)
+    raw_market_days = _get_raw_trading_dates_in_range(machine_settings, start_date, end_date)
     return _get_trading_day_obj_list_from_date_list(raw_market_days)
 
 
-def _get_raw_trading_dates_in_range(alpaca_api: AlpacaAPIBundle,
+def _get_raw_trading_dates_in_range(machine_settings: MachineSettings,
                                     start_date: date, end_date: date) -> list[entity.Calendar]:
     """
     This should not be used by end-users.
@@ -38,7 +39,7 @@ def _get_raw_trading_dates_in_range(alpaca_api: AlpacaAPIBundle,
     Returns a list of days (as alpaca_trade_api.Calendar instances) that U.S. markets are open between the
     start and end dates provided. The result is inclusive of both the start and end dates.
     """
-    return alpaca_api.trading.get_calendar(start_date.isoformat(), end_date.isoformat())
+    return machine_settings.alpaca_api.trading.get_calendar(start_date.isoformat(), end_date.isoformat())
 
 
 @no_type_check
@@ -95,13 +96,13 @@ def _get_trading_day_obj_list_from_date_list(
     return trading_days
 
 
-def get_list_of_buffer_ranges(alpaca_api: AlpacaAPIBundle, buffer_length: int, start_date: date,
+def get_list_of_buffer_ranges(machine_settings: MachineSettings, buffer_length: int, start_date: date,
                               end_date: date) -> list[tuple[date, date]]:
     """
     Returns a list of date ranges with length ``buffer_length`` that all add up to span from ``start_date``
     to ``end_date``.
     """
-    trading_days = get_list_of_trading_days_in_range(alpaca_api, start_date, end_date)
+    trading_days = get_list_of_trading_days_in_range(machine_settings, start_date, end_date)
 
     start_index = 0
     end_index = min(buffer_length - 1, len(trading_days) - 1)

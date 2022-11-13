@@ -60,7 +60,7 @@ class NaiveSharpe(Algorithm):
         acquired). Train any models here.
         """
         # Training code, called once
-        breakpoint()
+        ...
 
     def run_one_time_frame(self, current_datetime: datetime, processed_orders: list[Order]):
         """

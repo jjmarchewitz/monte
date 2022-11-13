@@ -399,6 +399,7 @@ class AssetManager:
         Returns the TradingDay where the AssetManager should switch to the test data phase from the training
         data phase.
         """
+        # TODO: Make this threshold be in terms of rows instead of days
         trading_days = get_list_of_trading_days_in_range(
             self.machine_settings,
             self.machine_settings.start_date,

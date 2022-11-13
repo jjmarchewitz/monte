@@ -19,14 +19,14 @@ class Position():
     """
 
     machine_settings: MachineSettings
-    am: AssetManager
+    asset_manager: AssetManager
     symbol: str
     initial_quantity: float
 
     def __init__(self, machine_settings: MachineSettings,
                  am: AssetManager, symbol: str, initial_quantity: float):
         self.machine_settings = machine_settings
-        self.am = am
+        self.asset_manager = am
         self.symbol = symbol
         self.quantity = initial_quantity
 
@@ -35,21 +35,21 @@ class Position():
         """
         Returns the training dataframe for the Asset this Position represents.
         """
-        return self.am.get_training_df(self.symbol)
+        return self.asset_manager.get_training_df(self.symbol)
 
     @property
     def testing_df(self) -> pd.DataFrame:
         """
         Returns the testing dataframe for the Asset this Position represents.
         """
-        return self.am.get_testing_df(self.symbol)
+        return self.asset_manager.get_testing_df(self.symbol)
 
     @property
     def price(self) -> float:
         """
         Returns the most recent volume-weighted average price (vwap) of the underlying Asset.
         """
-        return self.am.get_testing_df(self.symbol).iloc[-1].vwap
+        return self.asset_manager.get_testing_df(self.symbol).iloc[-1].vwap
 
     @property
     def total_value(self) -> float:

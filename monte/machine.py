@@ -20,13 +20,13 @@ class TradingMachine():
     """
 
     machine_settings: MachineSettings
-    am: AssetManager
+    asset_manager: AssetManager
     algo_instances: list[Algorithm]
     epoch_start_time: float
 
     def __init__(self, machine_settings: MachineSettings):
         self.machine_settings = machine_settings
-        self.am = AssetManager(machine_settings)
+        self.asset_manager = AssetManager(machine_settings)
         self.algo_instances = []
 
     def add_algo(self, *args: Algorithm):
@@ -39,16 +39,16 @@ class TradingMachine():
 
             if not issubclass(type(algo), Algorithm):
                 raise TypeError(
-                    "You must pass an instance of a subclass of Algorithm into add_algos().")
+                    "You must pass an instance of a subclass of monte.algorithm.Algorithm into add_algos().")
 
-            if not isinstance(algo.portfolio, Portfolio):
+            if not isinstance(algo.get_broker(), Broker):
                 raise TypeError(
-                    "The portfolio attribute of the algorithm must be an instance of Portfolio.")
+                    "The get_broker() method of the algorithm must return an instance of monte.broker.Broker.")
 
             if algo in self.algo_instances:
                 continue
 
-            algo.portfolio.am = self.am
+            algo.get_broker().set_asset_manager(self.asset_manager)
 
             self.algo_instances.append(algo)
 
@@ -72,7 +72,7 @@ class TradingMachine():
         # Run startup code for asset_manager. This must happen after the algos startup code so that the algos
         # can 'watch' all of the assets they need first. When am.startup() is called, the data getter process
         # is constructed and spawned with all of the assets it needs to get data for as an argument.
-        self.am.startup()
+        self.asset_manager.startup()
 
     def run(self):
         """
@@ -83,13 +83,14 @@ class TradingMachine():
         self.startup()
 
         algos_have_been_trained = False
+        first_iteration = True
 
         # Run the algorithms
         while True:
 
             # Update the dataframes in the asset_manager
             try:
-                self.am.increment_dataframes()
+                self.asset_manager.increment_dataframes()
             except StopIteration:
 
                 # If the algorithms were never trained, train them
@@ -98,23 +99,32 @@ class TradingMachine():
 
                 break
 
+            # Runs on the first iteration if starting from the training data phase
+            if first_iteration and self.asset_manager.data_destination is DataDestination.TRAINING_DATA:
+                print("Entering training phase of the simulation, downloading training data.")
+                first_iteration = False
+
             # If the asset_manager is in the testing data phase, run all of the algorithms
-            if self.am.data_destination is DataDestination.TESTING_DATA:
+            elif self.asset_manager.data_destination is DataDestination.TESTING_DATA:
 
                 # Runs if the trading_machine just entered the testing data phase.
                 if not algos_have_been_trained:
+                    print("Calling train() on all algorithms.")
                     self._train_algos()
                     algos_have_been_trained = True
+                    print("Entering testing phase of the simulation.")
 
                 # Process any orders and run each algorithm
                 for algo in self.algo_instances:
-                    portfolio = algo.portfolio
 
-                    # Process orders
-                    processed_orders = portfolio.process_pending_orders()
+                    # Process pending orders
+                    processed_orders = algo.get_broker().process_pending_orders()
+
+                    # Remove any empty positions in the portfolio
+                    algo.get_broker().portfolio._delete_empty_positions()
 
                     # Run the algorithm
-                    current_datetime = portfolio.am._get_reference_asset().datetime()
+                    current_datetime = self.asset_manager.latest_datetime
                     algo.run_one_time_frame(current_datetime, processed_orders)
 
         # Run Machine cleanup code
@@ -139,16 +149,16 @@ class TradingMachine():
             algo.cleanup()
 
         # Run cleanup code for asset_manager
-        self.am.cleanup()
+        self.asset_manager.cleanup()
 
         # Print out final returns for all algos tested
         print("\n\n -- RESULTS -- \n")
         results = []
         for algo in self.algo_instances:
             results.append({
-                "Name": algo.name,
-                "Total Value": f"${round(algo.portfolio.total_value, 2):,.2f}",
-                "Return": f"{round(algo.portfolio.current_return, 3):+.3f}%",
+                "Name": algo.get_name(),
+                "Total Value": f"${round(algo.get_broker().portfolio.total_value, 2):,.2f}",
+                "Return": f"{round(algo.get_broker().portfolio.current_return, 3):+.3f}%",
             })
 
         print(tabulate(results, headers="keys", tablefmt="outline", colalign=("center", "center", "center")))

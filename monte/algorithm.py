@@ -16,23 +16,16 @@ class Algorithm(ABC):
     Abstract base class for trading algorithms used with the monte backtester.
     """
 
-    machine_settings: MachineSettings
-    portfolio: Portfolio
-    name: str
-    symbols: list[str]
-
     def __init__(self, machine_settings: MachineSettings, name: str,
                  starting_cash: float, symbols: list[str]):
-        self.machine_settings = machine_settings
-        self.name = name
-        self.portfolio = Portfolio(self.machine_settings, starting_cash)
-        self.symbols = symbols
+        ...
 
+    @abstractmethod
     def get_name(self) -> str:
         """
         Returns the name of this instance, used to help identify this instance in print statements.
         """
-        return self.name
+        ...
 
     @abstractmethod
     def get_broker(self) -> Broker:

@@ -20,17 +20,15 @@ class BuyAndHold(Algorithm):
             self, machine_settings: MachineSettings, name: str,
             starting_cash: float, symbols: list[str]):
 
-        # Sets up instance variables and instantiates a Portfolio as self.portfolio
-        # super().__init__(machine_settings, name, starting_cash, symbols)
-
         self.broker = Broker(machine_settings, starting_cash)
         self.name = name
+        self.symbols = symbols
 
         self.finished_buying = False
 
-    def get_broker_instance(self) -> Broker:
+    def get_broker(self) -> Broker:
         """
-        DOC:
+        Returns this algorithm's broker instance.
         """
         return self.broker
 
@@ -74,8 +72,8 @@ class BuyAndHold(Algorithm):
         if not self.finished_buying:
             # Determine if the portfolio has enough money to buy any more shares
             can_buy_more_shares = False
-            for _, position in self.broker.portfolio.items():
-                if self.portfolio.cash > position.price:
+            for _, asset in self.broker.assets.items():
+                if self.broker.portfolio.cash > asset.price:
                     can_buy_more_shares = True
                     break
 
@@ -88,7 +86,7 @@ class BuyAndHold(Algorithm):
             else:
                 self.finished_buying = True
 
-        display.print_total_value(self.name, self.portfolio, current_datetime)
+        display.print_total_value(self.name, self.broker, current_datetime)
 
     def cleanup(self):
         """

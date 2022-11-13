@@ -5,6 +5,7 @@ from datetime import datetime
 import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
 from monte.algorithm import Algorithm
+from monte.broker import Broker
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
 
@@ -15,8 +16,21 @@ class Template(Algorithm):
             self, machine_settings: MachineSettings, name: str,
             starting_cash: float, symbols: list[str]):
 
-        # Sets up instance variables and instantiates a Portfolio as self.portfolio
-        super().__init__(machine_settings, name, starting_cash, symbols)
+        self.broker = Broker(machine_settings, starting_cash)
+        self.name = name
+        self.symbols = symbols
+
+    def get_broker(self) -> Broker:
+        """
+        Returns this algorithm's broker instance.
+        """
+        return self.broker
+
+    def get_name(self) -> str:
+        """
+        Returns the name of this instance, used to help identify this instance in print statements.
+        """
+        return self.name
 
     def get_derived_columns(self) -> dict[str, DerivedColumn]:
         """
@@ -33,7 +47,7 @@ class Template(Algorithm):
         """
         # Watch all of your symbols from here
         for symbol in self.symbols:
-            self.portfolio.watch(symbol)
+            self.broker.watch(symbol)
 
     def train(self):
         """

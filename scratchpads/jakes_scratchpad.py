@@ -4,8 +4,10 @@ from datetime import datetime
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
-from algorithms.benchmarks.buy_and_hold import BuyAndHold
-from algorithms.benchmarks.buy_and_hold_sp import BuyAndHoldSP500
+from algorithms.benchmarks import BuyAndHold, BuyAndHoldSP500
+from algorithms.linear_regression import LinearRegressionAlgo
+from algorithms.naive_sharpe import NaiveSharpe
+from algorithms.nearest_neighbors import NearestNeighbors
 from algorithms.proportional_to_returns import ProportionalToReturns
 from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
@@ -14,7 +16,6 @@ from monte.machine_settings import MachineSettings
 
 def main():
 
-    # TODO: Broker object
     # TODO: Add argument validation across the backend.
     # TODO: Add logging (print statements).
     # TODO: Positions store executed order history
@@ -26,34 +27,46 @@ def main():
 
     ms = MachineSettings(
         alpaca_api=AlpacaAPIBundle(),
-        start_date=datetime(2016, 3, 8),
-        end_date=datetime(2016, 11, 7),
-        training_data_percentage=0,
+        start_date=datetime(2016, 1, 1),
+        end_date=datetime(2022, 11, 12),
+        training_data_percentage=0.2,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )
 
     trading_machine = TradingMachine(ms)
 
-    # symbols = [
-    #     "AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
-    #     "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC",
-    #     "ABBV", "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS",
-    #     "ABT", "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE",
-    #     "ROK"]
+    symbols = [
+        "AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
+        "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC",
+        "ABBV", "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS",
+        "ABT", "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE",
+        "ROK"]
 
-    symbols = ["AAPL", "GOOG"]
+    # symbols = ["AAPL", "GOOG"]
     # symbols = ["GME"]
 
     starting_cash = 10_000
 
-    buy_and_hold = BuyAndHold(ms, "B&H", starting_cash, symbols)
+    buy_and_hold = BuyAndHold(ms, "Buy and Hold - Symbols", starting_cash, symbols)
     trading_machine.add_algo(buy_and_hold)
 
-    buy_and_hold_sp = BuyAndHoldSP500(ms, "S&P", starting_cash)
+    buy_and_hold_sp = BuyAndHoldSP500(ms, "Buy and Hold - S&P 500", starting_cash)
     trading_machine.add_algo(buy_and_hold_sp)
 
-    prop_ret = ProportionalToReturns(ms, "PtR", starting_cash, symbols)
+    prop_ret = ProportionalToReturns(ms, "Proportional to Returns", starting_cash, symbols)
     trading_machine.add_algo(prop_ret)
+
+    n_sharpe = NaiveSharpe(ms, "Naive Sharpe", starting_cash, symbols)
+    trading_machine.add_algo(n_sharpe)
+
+    epsilon = 1e-5
+    k = 1.5
+
+    near_neighbors = NearestNeighbors(ms, "Nearest Neighbor", starting_cash, symbols, (-epsilon, epsilon), k)
+    trading_machine.add_algo(near_neighbors)
+
+    lin_reg = LinearRegressionAlgo(ms, "Linear Regression", starting_cash, symbols, (-epsilon, epsilon), k)
+    trading_machine.add_algo(lin_reg)
 
     trading_machine.run()
 

@@ -6,6 +6,7 @@ import derived_columns.definitions as dcolumns
 from derived_columns import DerivedColumn
 from monte import display
 from monte.algorithm import Algorithm
+from monte.broker import Broker
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
 
@@ -17,11 +18,24 @@ class NearestNeighbors(Algorithm):
             starting_cash: float, symbols: list[str], decision_interval: tuple[float, float],
             variability_constant: float):
 
-        # Sets up instance variables and instantiates a Portfolio as self.portfolio
-        super().__init__(machine_settings, name, starting_cash, symbols)
+        self.broker = Broker(machine_settings, starting_cash)
+        self.name = name
+        self.symbols = symbols
 
         self.lower_bound, self.upper_bound = decision_interval
         self.variability_constant = variability_constant
+
+    def get_broker(self) -> Broker:
+        """
+        Returns this algorithm's broker instance.
+        """
+        return self.broker
+
+    def get_name(self) -> str:
+        """
+        Returns the name of this instance, used to help identify this instance in print statements.
+        """
+        return self.name
 
     def get_derived_columns(self) -> dict[str, DerivedColumn]:
         """
@@ -42,7 +56,7 @@ class NearestNeighbors(Algorithm):
         Runs before the simulation starts (and before any training data is acquired).
         """
         for symbol in self.symbols:
-            self.portfolio.watch(symbol)
+            self.broker.watch(symbol)
 
     def train(self):
         """
@@ -58,18 +72,18 @@ class NearestNeighbors(Algorithm):
         algorithm.
         """
 
-        for symbol, position in self.portfolio.items():
+        for symbol, asset in self.broker.assets.items():
 
-            df = position.testing_df
+            df = asset.testing_df
 
             # breakpoint()
             if df.iloc[-1].nearest_neighbor_last_5 < self.lower_bound:
-                self.portfolio.place_order(symbol, 20, OrderType.BUY)
+                self.broker.place_order(symbol, 20, OrderType.BUY)
 
             elif df.iloc[-1].nearest_neighbor_last_5 > self.upper_bound:
-                self.portfolio.place_order(symbol, 20, OrderType.SELL)
+                self.broker.place_order(symbol, 20, OrderType.SELL)
 
-        display.print_total_value(self.name, self.portfolio, current_datetime)
+        display.print_total_value(self.name, self.broker, current_datetime)
         # Testing code, called on every time frame
 
     def cleanup(self):

@@ -14,7 +14,7 @@ class Asset():
     symbol: str
     quantity: int
 
-    def __init__(self, asset_manager: AssetManager, symbol: str) -> None:
+    def __init__(self, asset_manager: AssetManager, symbol: str):
         self.asset_manager = asset_manager
         self.symbol = symbol
         self.quantity = 0
@@ -50,14 +50,14 @@ class Broker():
     _order_queue: list[Order]
     _current_order_id_number: int
 
-    def __init__(self, machine_settings: MachineSettings, starting_cash: float = 10_000) -> None:
+    def __init__(self, machine_settings: MachineSettings, starting_cash: float = 10_000):
         self.machine_settings = machine_settings
         self.portfolio = Portfolio(machine_settings, starting_cash)
         self.assets = {}
         self._order_queue = []
         self._current_order_id_number = 0
 
-    def set_asset_manager(self, asset_manager: AssetManager) -> None:
+    def set_asset_manager(self, asset_manager: AssetManager):
         """
         DOC:
         """
@@ -67,7 +67,7 @@ class Broker():
         self.asset_manager = asset_manager
         self.portfolio.set_asset_manager(asset_manager)
 
-    def watch(self, symbol) -> None:
+    def watch(self, symbol):
         """
         DOC:
         """
@@ -170,7 +170,7 @@ class Broker():
 
         return list_of_processed_orders
 
-    def _execute_buy_order(self, order: Order) -> None:
+    def _execute_buy_order(self, order: Order):
         """
         Attempts to execute a buy order.
         """
@@ -196,7 +196,7 @@ class Broker():
             # Update the order status
             order.status = OrderStatus.COMPLETED
 
-    def _execute_sell_order(self, order: Order) -> None:
+    def _execute_sell_order(self, order: Order):
         """
         Attempts to execute a sell order.
         """

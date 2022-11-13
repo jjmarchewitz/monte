@@ -36,7 +36,7 @@ class Portfolio():
     def __getitem__(self, key: str) -> Position:
         return self.positions[key]
 
-    def set_asset_manager(self, am: AssetManager) -> None:
+    def set_asset_manager(self, am: AssetManager):
         """
         DOC:
         """

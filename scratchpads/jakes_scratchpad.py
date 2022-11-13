@@ -28,21 +28,21 @@ def main():
     ms = MachineSettings(
         alpaca_api=AlpacaAPIBundle(),
         start_date=datetime(2016, 1, 1),
-        end_date=datetime(2022, 11, 12),
+        end_date=datetime(2018, 11, 12),
         training_data_percentage=0.2,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )
 
     trading_machine = TradingMachine(ms)
 
-    symbols = [
-        "AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
-        "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC",
-        "ABBV", "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS",
-        "ABT", "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE",
-        "ROK"]
+    # symbols = [
+    #     "AAPL", "GOOG", "IVV", "AMD", "NVDA", "INTC", "QQQ", "DIA", "AMZN", "TSLA", "UNH", "JNJ",
+    #     "XOM", "V", "TSM", "META", "WMT", "JPM", "LLY", "SUN", "CVX", "PG", "HD", "MA", "BAC",
+    #     "ABBV", "PFE", "KO", "NVO", "PEP", "MRK", "BABA", "COST", "AVGO", "TM", "ASML", "DIS",
+    #     "ABT", "ORCL", "TMUS", "MCD", "AZN", "CSCO", "VZ", "WFC", "CRM", "TXN", "UPS", "NKE",
+    #     "ROK"]
 
-    # symbols = ["AAPL", "GOOG"]
+    symbols = ["AAPL", "GOOG"]
     # symbols = ["GME"]
 
     starting_cash = 10_000

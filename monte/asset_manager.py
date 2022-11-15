@@ -552,6 +552,7 @@ class AssetManager:
         Returns the reference asset, used to keep the AssetManager running even when there are no assets.
         Also used to return the current timestamp and datetime.
         """
+        # TODO: Get rid of reference asset
         return self.watched_assets[self._reference_symbol]
 
     @property

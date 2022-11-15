@@ -3,6 +3,7 @@ from __future__ import annotations
 import time
 from datetime import timedelta
 
+import pandas as pd
 from tabulate import tabulate
 
 from monte.algorithm import Algorithm
@@ -23,6 +24,7 @@ class TradingMachine():
     asset_manager: AssetManager
     algo_instances: list[Algorithm]
     epoch_start_time: float
+    _results_df: pd.DataFrame
 
     def __init__(self, machine_settings: MachineSettings):
         self.machine_settings = machine_settings
@@ -137,6 +139,13 @@ class TradingMachine():
         for algo in self.algo_instances:
             algo.train()
 
+    @property
+    def results_df(self):
+        """
+        Returns a dataframe with all of the algorithm names and their final portfolio value and returns.
+        """
+        return self._results_df
+
     def cleanup(self):
         """
         Post-simulation cleanup behaviors.
@@ -152,7 +161,12 @@ class TradingMachine():
         self.asset_manager.cleanup()
 
         # Print out final returns for all algos tested
-        print("\n\n -- RESULTS -- \n")
+        print("\n\n -- RESULTS --\n")
+        print(f"\nSimulated {len(self.algo_instances)} trading algorithms and "
+              f"{len(self.asset_manager.watched_assets.keys())} assets from "
+              f"{self.machine_settings.start_date.date().isoformat()} to "
+              f"{self.machine_settings.end_date.date().isoformat()} using a time frame of "
+              f"{self.machine_settings.time_frame.amount} {self.machine_settings.time_frame.unit}(s)\n")
         results = []
         for algo in self.algo_instances:
             results.append({
@@ -160,6 +174,8 @@ class TradingMachine():
                 "Total Value": f"${round(algo.get_broker().portfolio.total_value, 2):,.2f}",
                 "Return": f"{round(algo.get_broker().portfolio.current_return, 3):+.3f}%",
             })
+
+        self._results_df = pd.DataFrame(results)
 
         print(tabulate(results, headers="keys", tablefmt="outline", colalign=("center", "center", "center")))
         print("\n")

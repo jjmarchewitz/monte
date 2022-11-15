@@ -16,6 +16,8 @@ from monte.machine_settings import MachineSettings
 
 def main():
 
+    # TODO: Run multiple TradingMachine instances simultaneously, on separate processes (?)
+    #           - The purpose would be to run with multiple date ranges/time frames to compare results
     # TODO: Add argument validation across the backend.
     # TODO: Add logging (print statements).
     # TODO: Positions store executed order history
@@ -28,7 +30,7 @@ def main():
     ms = MachineSettings(
         alpaca_api=AlpacaAPIBundle(),
         start_date=datetime(2016, 1, 1),
-        end_date=datetime(2018, 11, 12),
+        end_date=datetime(2016, 4, 12),
         training_data_percentage=0.2,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )
@@ -67,6 +69,9 @@ def main():
 
     lin_reg = LinearRegressionAlgo(ms, "Linear Regression", starting_cash, symbols, (-epsilon, epsilon), k)
     trading_machine.add_algo(lin_reg)
+
+    # TODO: Allow users to add statistics for post-run
+    # trading_machine.add_run_statistic(func, *args, **kwargs)?
 
     trading_machine.run()
 

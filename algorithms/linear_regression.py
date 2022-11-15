@@ -48,9 +48,9 @@ class LinearRegressionAlgo(Algorithm):
         # Add any derived columns to the dictionary.
         derived_columns = {
             'returns_last_2': DerivedColumn(dcolumns.returns, 2, "vwap"),
-            'infimum_last_5': DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
-            'norm_last_2': DerivedColumn(dcolumns.infimum_norm, 1, 'infimum_last_5', 'returns_last_2',
-                                         column_dependencies=['returns_last_2', 'infimum_last_5']),
+            f'infimum_last_5_K{self.variability_constant}': DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
+            f'norm_last_2_K{self.variability_constant}': DerivedColumn(dcolumns.infimum_norm, 1, f'infimum_last_5_K{self.variability_constant}', 'returns_last_2',
+                                                                       column_dependencies=[f'infimum_last_5_K{self.variability_constant}', 'returns_last_2']),
             # 'prediction_returns': DerivedColumn(dcolumns.linear_regression_prediction, 2,
             # 'returns_last_2', 'norm_last_2')
         }
@@ -98,8 +98,9 @@ class LinearRegressionAlgo(Algorithm):
             # breakpoint()
             df = asset.testing_df
     # hw
-            X = df.norm_last_2.values
-            y = df.returns_last_2.values
+
+            X = df[f'norm_last_2_K{self.variability_constant}'].values
+            y = df[f'infimum_last_5_K{self.variability_constant}'].values
 
             x_train_norm, x_test_norm, y_train_returns, y_test_returns = train_test_split(
                 X, y, test_size=0.30)

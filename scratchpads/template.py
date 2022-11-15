@@ -4,7 +4,7 @@ from datetime import datetime
 
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
-from algorithms.benchmarks.buy_and_hold import BuyAndHold
+from algorithms.benchmarks import BuyAndHold
 from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
 from monte.machine_settings import MachineSettings
@@ -14,7 +14,7 @@ def main():
     # Configure settings for the simulation
     ms = MachineSettings(
         alpaca_api=AlpacaAPIBundle(),
-        start_date=datetime(2016, 3, 8),
+        start_date=datetime(2016, 4, 1),
         end_date=datetime(2022, 10, 23),
         training_data_percentage=0.1,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour))
@@ -23,7 +23,7 @@ def main():
     trading_machine = TradingMachine(ms)
 
     # Define a list of symbols to trade on
-    symbols = ["AAPL", "GOOG"]  # to the moon!
+    symbols = ["GME"]  # to the moon!
 
     # Define the starting cash that the algos will have
     starting_cash = 10_000

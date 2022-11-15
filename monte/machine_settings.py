@@ -246,9 +246,8 @@ class MachineSettings():
                 if existing_derived_column != new_derived_column:
                     raise ValueError(
                         f"Attempted to add a new derived column with the same name as an existing column "
-                        f"but a different function or arguments. The column name is {column_title}. \n"
-                        f"Existing Derived Column: {existing_derived_column}\n"
-                        f"New Derived Column: {new_derived_column}")
+                        f"but a different function or arguments. This is possibly because two algorithms "
+                        f"use the same name with different values. The column name is {column_title}. \n")
 
             # Else, add the new derived column to self.derived_columns
             else:

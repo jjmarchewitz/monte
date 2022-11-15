@@ -44,10 +44,13 @@ class NearestNeighbors(Algorithm):
         # Add any derived columns to the dictionary.
         derived_columns = {
             'returns_last_2': DerivedColumn(dcolumns.returns, 2, "vwap"),
-            'infimum_last_5': DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
-            'nearest_neighbor_last_5': DerivedColumn(dcolumns.nearest_neighbor, 5, 'infimum_last_5',
-                                                     'returns_last_2', column_dependencies=['returns_last_2', 'infimum_last_5']),
-        }
+            f'infimum_last_5_K{self.variability_constant}':
+                DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
+            f'nearest_neighbor_last_5_K{self.variability_constant}':
+                DerivedColumn(
+                    dcolumns.nearest_neighbor, 5, f'infimum_last_5_K{self.variability_constant}',
+                    'returns_last_2',
+                    column_dependencies=['returns_last_2', f'infimum_last_5_K{self.variability_constant}']), }
 
         return derived_columns
 
@@ -77,10 +80,10 @@ class NearestNeighbors(Algorithm):
             df = asset.testing_df
 
             # breakpoint()
-            if df.iloc[-1].nearest_neighbor_last_5 < self.lower_bound:
+            if df.iloc[-1][f'nearest_neighbor_last_5_K{self.variability_constant}'] < self.lower_bound:
                 self.broker.place_order(symbol, 20, OrderType.BUY)
 
-            elif df.iloc[-1].nearest_neighbor_last_5 > self.upper_bound:
+            elif df.iloc[-1][f'nearest_neighbor_last_5_K{self.variability_constant}'] > self.upper_bound:
                 self.broker.place_order(symbol, 20, OrderType.SELL)
 
         display.print_total_value(self.name, self.broker, current_datetime)

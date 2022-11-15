@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from enum import Enum
 
 import numpy as np
 from sklearn.linear_model import LinearRegression

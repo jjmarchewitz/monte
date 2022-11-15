@@ -6,6 +6,7 @@ from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
 from algorithms.benchmarks import BuyAndHold, BuyAndHoldSP500
 from algorithms.linear_regression import LinearRegressionAlgo
+from algorithms.nearest_neighbors import NearestNeighbors
 from monte.api import AlpacaAPIBundle
 from monte.machine import TradingMachine
 from monte.machine_settings import MachineSettings
@@ -34,18 +35,27 @@ def main():
         for epsilon_exponent in range(8, -9, -1):
             for k_mantissa in range(1, 10):
                 for k_exponent in range(3, -4, -1):
+                    for algo_class in (LinearRegressionAlgo, NearestNeighbors):
 
-                    # mantissa * (10 ^ exponent)
-                    epsilon = epsilon_mantissa * (10 ** epsilon_exponent)
-                    k = k_mantissa * (10 ** k_exponent)
+                        # mantissa * (10 ^ exponent)
+                        epsilon = epsilon_mantissa * (10 ** epsilon_exponent)
+                        k = k_mantissa * (10 ** k_exponent)
 
-                    # Give the algo a name, use scientific notation to display the epsilon and k values
-                    algo_name = f"E={epsilon:e}; K={k:e}"
+                        # Get the class name as a string (i.e. 'LinearRegressionAlgo')
+                        algo_class_name = algo_class.__name__
 
-                    algo = LinearRegressionAlgo(
-                        ms, algo_name, starting_cash, symbols, (-epsilon, epsilon), k)
+                        # Use the upper-case letters of the class to act as a shorthand (i.e. 'LRA')
+                        algo_class_shorthand = "".join([c for c in algo_class_name if c.isupper()])
 
-                    trading_machine.add_algo(algo)
+                        # Give the algo a name, use scientific notation to display the epsilon and k values
+                        algo_nickname = f"{algo_class_shorthand}; E={epsilon:.2e}; K={k:.2e}"
+
+                        # Instantiate the algorithm
+                        algo = algo_class(
+                            ms, algo_nickname, starting_cash, symbols, (-epsilon, epsilon), k)
+
+                        # Add the algo to the trading machine
+                        trading_machine.add_algo(algo)
 
     buy_and_hold = BuyAndHold(ms, "Buy and Hold - Symbols", starting_cash, symbols)
     trading_machine.add_algo(buy_and_hold)

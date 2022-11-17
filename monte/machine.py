@@ -76,6 +76,7 @@ class TradingMachine():
         # is constructed and spawned with all of the assets it needs to get data for as an argument.
         self.asset_manager.startup()
 
+    # TODO: run_as_process function to run the trading machine on a separate process
     def run(self):
         """
         Runs the trading machine, start to finish.

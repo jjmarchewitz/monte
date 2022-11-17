@@ -16,11 +16,12 @@ from monte.machine_settings import MachineSettings
 
 def main():
 
+    # TODO: ColumnManager/ColumnGroup
     # TODO: Run multiple TradingMachine instances simultaneously, on separate processes (?)
     #           - The purpose would be to run with multiple date ranges/time frames to compare results
     # TODO: Add argument validation across the backend.
     # TODO: Add logging (print statements).
-    # TODO: Positions store executed order history
+    # TODO: Assets/Positions store executed order history
     # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
     # TODO: Move algos and scratchpads to a separate repo, publish monte on pypi
     # TODO: Markdown documentation explaining the high-level concepts of this repo and some implementation
@@ -69,9 +70,6 @@ def main():
 
     lin_reg = LinearRegressionAlgo(ms, "Linear Regression", starting_cash, symbols, (-epsilon, epsilon), k)
     trading_machine.add_algo(lin_reg)
-
-    # TODO: Allow users to add statistics for post-run
-    # trading_machine.add_run_statistic(func, *args, **kwargs)?
 
     trading_machine.run()
 

@@ -163,11 +163,6 @@ class TradingMachine():
 
         # Print out final returns for all algos tested
         print("\n\n -- RESULTS --\n")
-        print(f"\nSimulated {len(self.algo_instances)} trading algorithms and "
-              f"{len(self.asset_manager.watched_assets.keys())} assets from "
-              f"{self.machine_settings.start_date.date().isoformat()} to "
-              f"{self.machine_settings.end_date.date().isoformat()} using a time frame of "
-              f"{self.machine_settings.time_frame.amount} {self.machine_settings.time_frame.unit}(s)\n")
         results = []
         for algo in self.algo_instances:
             results.append({
@@ -180,6 +175,12 @@ class TradingMachine():
 
         print(tabulate(results, headers="keys", tablefmt="outline", colalign=("center", "center", "center")))
         print("\n")
+
+        print(f"\nSimulated {len(self.algo_instances)} trading algorithms and "
+              f"{len(self.asset_manager.watched_assets.keys())} assets from "
+              f"{self.machine_settings.start_date.date().isoformat()} to "
+              f"{self.machine_settings.end_date.date().isoformat()} using a time frame of "
+              f"{self.machine_settings.time_frame.amount} {self.machine_settings.time_frame.unit}(s)\n")
 
         # Print out the total runtime
         print("Total runtime was ", end="")

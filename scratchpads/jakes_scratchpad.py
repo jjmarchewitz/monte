@@ -17,9 +17,14 @@ from monte.machine_settings import MachineSettings
 def main():
 
     # TODO: ColumnManager/ColumnGroup
+    #           - Use a MultiIndex
+    # TODO: Customizable trading fees [ex. TradingFee(0.25, TradingFeeType.PCT) or TradingFee(1, TradingFeeType.FLAT_FEE)  ]
     # TODO: Run multiple TradingMachine instances simultaneously, on separate processes (?)
     #           - The purpose would be to run with multiple date ranges/time frames to compare results
     # TODO: Add argument validation across the backend.
+    # TODO: Support requests to multiple stock exchanges (including Crypto). Automatically switch the
+    # API used based on the exchange in the front of the symbol.
+    # TODO: Check if a given symbol is valid (its exchange exists and the asset exists on the exchange).
     # TODO: Add logging (print statements).
     # TODO: Assets/Positions store executed order history
     # TODO: Add graphing, should be able to compare two (or more) algorithms in live time

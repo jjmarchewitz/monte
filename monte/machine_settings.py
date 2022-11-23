@@ -25,6 +25,8 @@ class MachineSettings():
     data_buffer_days: int
     time_zone: pytz.tzinfo.BaseTzInfo
 
+    # TODO: Default to user's current timezone instead of US/Eastern
+
     def __init__(self, alpaca_api: AlpacaAPIBundle, start_date: datetime, end_date: datetime,
                  training_data_percentage: float, time_frame: TimeFrame,
                  derived_columns: dict[str, DerivedColumn] = {},
@@ -46,10 +48,10 @@ class MachineSettings():
         # Add timezone info to start_date and end_date
         self.add_tz_info_to_dates()
 
-        # Derive the start buffer days if it is not provided
+        # Derive the start buffer days
         self.start_buffer_days = self.calculate_start_buffer_days()
 
-        # Derive the data buffer days if it is not provided
+        # Derive the data buffer days
         self.data_buffer_days = self.calculate_data_buffer_days()
 
         self.validate_data_buffer_days()

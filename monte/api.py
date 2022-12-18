@@ -163,6 +163,7 @@ class AlpacaAPIBundle():
     alpaca_config.json
     """
 
+    # TODO: Switch to circular queues for this (collections.deque from the stdlib)
     _trading_instances: list[REST]
     _market_data_instances: list[REST]
     _crypto_instances: list[REST]

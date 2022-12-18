@@ -4,8 +4,8 @@ from datetime import datetime
 import pytz
 from alpaca_trade_api import TimeFrame, TimeFrameUnit
 
-from derived_columns import DerivedColumn
 from monte.api import AlpacaAPIBundle
+from monte.column import Column
 
 
 class MachineSettings():
@@ -19,7 +19,7 @@ class MachineSettings():
     end_date: datetime
     training_data_percentage: float
     time_frame: TimeFrame
-    derived_columns: dict[str, DerivedColumn]
+    derived_columns: dict[str, Column]
     max_rows_in_test_df: int
     start_buffer_days: int
     data_buffer_days: int
@@ -27,10 +27,10 @@ class MachineSettings():
 
     # TODO: Default to user's current timezone instead of US/Eastern
 
-    def __init__(self, alpaca_api: AlpacaAPIBundle, start_date: datetime, end_date: datetime,
-                 training_data_percentage: float, time_frame: TimeFrame,
-                 derived_columns: dict[str, DerivedColumn] = {},
-                 max_rows_in_test_df: int = 10, time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone('US/Eastern')):
+    def __init__(
+            self, alpaca_api: AlpacaAPIBundle, start_date: datetime, end_date: datetime,
+            training_data_percentage: float, time_frame: TimeFrame, derived_columns: dict[str, Column] = {},
+            max_rows_in_test_df: int = 10, time_zone: pytz.tzinfo.BaseTzInfo = pytz.timezone('US/Eastern')):
         self.alpaca_api = alpaca_api
         self.start_date = start_date
         self.end_date = end_date
@@ -152,7 +152,7 @@ class MachineSettings():
 
         return start_buffer_days
 
-    def get_start_buffer_days_needed_by_derived_column(self, dcol: DerivedColumn, rows_per_day: int) -> int:
+    def get_start_buffer_days_needed_by_derived_column(self, dcol: Column, rows_per_day: int) -> int:
         """
         Returns the number of start buffer days needed by a derived column and its entire dependency tree.
 
@@ -226,7 +226,7 @@ class MachineSettings():
                 "machine_settings.time_frame.unit must be one of (TimeFrameUnit.Minute, "
                 "TimeFrameUnit.Hour, TimeFrameUnit.Day)")
 
-    def add_derived_columns(self, new_columns: dict[str, DerivedColumn]):
+    def add_derived_columns(self, new_columns: dict[str, Column]):
         """
         Adds derived columns contained in ``new_columns`` to ``self.derived_columns`` if the column names
         have no clashes. Also updates ``self.max_rows_in_test_df`` and ``self.start_buffer_days`` based on
@@ -235,9 +235,9 @@ class MachineSettings():
         for column_title, new_derived_column in new_columns.items():
 
             # Check that the new derivec column is an instance of Derived Column
-            if not isinstance(new_derived_column, DerivedColumn):
+            if not isinstance(new_derived_column, Column):
                 raise ValueError(
-                    "Only instances of DerivedColumn can be added as a derived column.")
+                    "Only instances of Column can be added as a derived column.")
 
             # If a derived column with the same name exists
             if column_title in self.derived_columns.keys():

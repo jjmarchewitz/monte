@@ -3,9 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 
-from derived_columns import DerivedColumn
 from monte.api import AlpacaAPIBundle
 from monte.broker import Broker
+from monte.column import Column
 from monte.machine_settings import MachineSettings
 from monte.orders import Order
 from monte.portfolio import Portfolio
@@ -35,7 +35,7 @@ class Algorithm(ABC):
         ...
 
     @abstractmethod
-    def get_derived_columns(self) -> dict[str, DerivedColumn]:
+    def get_derived_columns(self) -> dict[str, Column]:
         """
         Returns a dictionary of derived columns this algorithm needs in order to run.
         """

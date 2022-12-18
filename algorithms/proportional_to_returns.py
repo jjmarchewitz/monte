@@ -3,10 +3,10 @@ from __future__ import annotations
 from datetime import datetime
 
 import derived_columns.definitions as dcolumns
-from derived_columns import DerivedColumn
 from monte import display
 from monte.algorithm import Algorithm
 from monte.broker import Broker
+from monte.column import Column
 from monte.machine_settings import MachineSettings
 from monte.orders import Order, OrderType
 
@@ -32,16 +32,16 @@ class ProportionalToReturns(Algorithm):
         """
         return self.name
 
-    def get_derived_columns(self) -> dict[str, DerivedColumn]:
+    def get_derived_columns(self) -> list[Column]:
         """
         Returns a dictionary containing the derived columns this algorithm needs to run.
         """
         # Add any derived columns to the dictionary.
-        derived_columns = {
-            "avg_vwap": DerivedColumn(dcolumns.mean, 100, "vwap"),
-            "returns_vwap": DerivedColumn(dcolumns.returns, 100, "vwap"),
-            "avg_returns": DerivedColumn(dcolumns.mean, 100, "returns_vwap", column_dependencies=["returns_vwap"]),
-        }
+        derived_columns = [
+            Column("avg_vwap", dcolumns.mean, 100, "vwap"),
+            Column("returns_vwap", dcolumns.returns, 100, "vwap"),
+            Column("avg_returns", dcolumns.mean, 100, "returns_vwap", column_dependencies=["returns_vwap"]),
+        ]
 
         return derived_columns
 

@@ -6,10 +6,10 @@ from scipy.fft import fft, fftfreq
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
-from derived_columns._base import derived_column
+from monte.column import wrap_column
 
 
-@derived_column()
+@wrap_column()
 def net(df: pd.DataFrame, num_rows: int, col: str) -> float:
     """
     Returns the difference in value between the bottom-most row and the nth-to-last row of the given column.
@@ -17,7 +17,7 @@ def net(df: pd.DataFrame, num_rows: int, col: str) -> float:
     return df.iloc[-num_rows][col] - df.iloc[-1][col]
 
 
-@derived_column()
+@wrap_column()
 def mean(df: pd.DataFrame, num_rows: int, col: str) -> float:
     """
     Returns the mean value of the bottom n-rows of the given column.
@@ -28,7 +28,7 @@ def mean(df: pd.DataFrame, num_rows: int, col: str) -> float:
     return total / num_rows
 
 
-@derived_column()
+@wrap_column()
 def std_dev(df: pd.DataFrame, num_rows: int, col: str) -> float:
     """
     Returns the standard deviation of the bottom n-rows of the given column.
@@ -39,7 +39,7 @@ def std_dev(df: pd.DataFrame, num_rows: int, col: str) -> float:
     return (sum_of_squared_differences / num_rows) ** 0.5
 
 
-@derived_column()
+@wrap_column()
 def returns(df: pd.DataFrame, num_rows: int, col: str) -> float:
     """
     Returns the percent change over the bottom n-rows of the given column.
@@ -49,7 +49,7 @@ def returns(df: pd.DataFrame, num_rows: int, col: str) -> float:
     return ((final - initial) / initial)
 
 
-@derived_column()
+@wrap_column()
 def infimum(df: pd.DataFrame, num_rows: int, col: str, k: float) -> float:
     """
 
@@ -66,7 +66,7 @@ def infimum(df: pd.DataFrame, num_rows: int, col: str, k: float) -> float:
     return lower_bound
 
 
-@derived_column()
+@wrap_column()
 def infimum_norm(df: pd.DataFrame, num_rows: int, infimum_column: str, returns_column: str) -> float:
    # breakpoint()
     rolling_avg = mean(df, num_rows, returns_column)
@@ -77,7 +77,7 @@ def infimum_norm(df: pd.DataFrame, num_rows: int, infimum_column: str, returns_c
     return value
 
 
-@derived_column()
+@wrap_column()
 def linear_regression_prediction(
         df: pd.DataFrame, num_rows: int, returns_column: str, inf_norm_column: str) -> float:
 
@@ -91,7 +91,7 @@ def linear_regression_prediction(
     return prediction
 
 
-@derived_column()
+@wrap_column()
 def nearest_neighbor(df: pd.DataFrame, num_rows: int, infimum_column: str, returns_column: str) -> float:
     """
 
@@ -140,7 +140,7 @@ class FFTResult:
     fftfreq: ArrayLike
 
 
-@derived_column()
+@wrap_column()
 def fourier_transform(df: pd.DataFrame, num_rows: int, col: str):
     """
     Returns the Fast Fourier Transform of the bottom n-rows of a given column.
@@ -155,7 +155,7 @@ def fourier_transform(df: pd.DataFrame, num_rows: int, col: str):
     return result
 
 
-@derived_column()
+@wrap_column()
 def naive_sharpe(df: pd.DataFrame, num_rows: int, col: str) -> float:
     """
     Returns the Percent Change of a series divided by the std dev of a series

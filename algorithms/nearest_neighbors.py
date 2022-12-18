@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 import derived_columns.definitions as dcolumns
-from derived_columns import DerivedColumn
+from derived_columns import Column
 from monte import display
 from monte.algorithm import Algorithm
 from monte.broker import Broker
@@ -37,17 +37,17 @@ class NearestNeighbors(Algorithm):
         """
         return self.name
 
-    def get_derived_columns(self) -> dict[str, DerivedColumn]:
+    def get_derived_columns(self) -> dict[str, Column]:
         """
         Returns a dictionary containing the derived columns this algorithm needs to run.
         """
         # Add any derived columns to the dictionary.
         derived_columns = {
-            'returns_last_2': DerivedColumn(dcolumns.returns, 2, "vwap"),
+            'returns_last_2': Column(dcolumns.returns, 2, "vwap"),
             f'infimum_last_5_K{self.variability_constant}':
-                DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
+                Column(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
             f'nearest_neighbor_last_5_K{self.variability_constant}':
-                DerivedColumn(
+                Column(
                     dcolumns.nearest_neighbor, 5, f'infimum_last_5_K{self.variability_constant}',
                     'returns_last_2',
                     column_dependencies=['returns_last_2', f'infimum_last_5_K{self.variability_constant}']), }

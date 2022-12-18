@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 import derived_columns.definitions as dcolumns
-from derived_columns import DerivedColumn
+from derived_columns import Column
 from monte import display
 from monte.algorithm import Algorithm
 from monte.broker import Broker
@@ -33,16 +33,16 @@ class NaiveSharpe(Algorithm):
         """
         return self.name
 
-    def get_derived_columns(self) -> dict[str, DerivedColumn]:
+    def get_derived_columns(self) -> dict[str, Column]:
         """
         Returns a dictionary containing the derived columns this algorithm needs to run.
         """
         # Add any derived columns to the dictionary.
         n = 30
         derived_columns = {
-            "returns_n_hr": DerivedColumn(dcolumns.returns, n, "vwap"),
-            "std_n_hr": DerivedColumn(dcolumns.std_dev, n, "vwap"),
-            "naivesharpe": DerivedColumn(dcolumns.naive_sharpe, n, "vwap")
+            "returns_n_hr": Column(dcolumns.returns, n, "vwap"),
+            "std_n_hr": Column(dcolumns.std_dev, n, "vwap"),
+            "naivesharpe": Column(dcolumns.naive_sharpe, n, "vwap")
         }
         return derived_columns
 

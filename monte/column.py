@@ -7,7 +7,36 @@ from typing import Any
 
 import pandas as pd
 
-# TODO: Move this to the monte top-level package instead of the derived columns top-level package
+
+def wrap_column():
+    """
+    Wraps around a column function to add caching in a way compatible with dataframes.
+    """
+
+    def column_inner(func: Callable) -> Callable:
+        func.cache_ = {}
+
+        @wraps(func)
+        def inner(df: pd.DataFrame, *args, **kwargs) -> Any:
+
+            # TODO: Make this identifier work properly if users pass an argument in either as arg or as kwarg
+            current_identifier = DFIdentifier(
+                df.iloc[-1].symbol, df.iloc[-1].timestamp, args, tuple(sorted(kwargs.items())))
+
+            # Purge cache if incoming identifier's timestamp is different.
+            if any(existing_identifier.timestamp != current_identifier.timestamp
+                    for existing_identifier in func.cache_.keys()):
+                func.cache_ = {}
+
+            # If the current identifier is not in the cache, add it to the cache
+            if current_identifier not in func.cache_:
+                func.cache_[current_identifier] = func(df, *args, **kwargs)
+
+            return func.cache_[current_identifier]
+
+        return inner
+
+    return column_inner
 
 
 # Using eq=True and frozen=True makes the dataclass automatically hashable
@@ -22,37 +51,43 @@ class DFIdentifier():
     kwargs: tuple
 
 
-class DerivedColumn():
+class Column():
     """
-    Turns a function written to be a derived column into an instance of this class so it can be used in
+    Turns a function written to be a column into an instance of this class so it can be used in
     the trading machine.
     """
 
     # TODO: Derived columns that are called periodically, once every n-TimeFrames
 
+    title: str
     func: Callable
     num_rows_needed: int
     args: tuple
     kwargs: dict
     column_dependencies: list[str]
+    _next_id: int = 100
 
-    def __init__(self, func: Callable, num_rows: int, *args, column_dependencies=[], **kwargs):
+    def __init__(self, title: str, func: Callable, num_rows: int, *args, column_dependencies=[], **kwargs):
+        self.title = title
         self.func = func
         self.num_rows_needed = num_rows
         self.args = args
         self.kwargs = kwargs
         self.column_dependencies = column_dependencies
 
+        self.id = Column._next_id
+        Column._next_id += 1
+
     def __call__(self, df: pd.DataFrame) -> Any:
         return self.func(df, self.num_rows_needed, *self.args, **self.kwargs)
 
     def __eq__(self, __o: object) -> bool:
-        # If the incoming object is not a DerivedColumn, immediately return false
-        if not isinstance(__o, DerivedColumn):
+        # If the incoming object is not a Column, immediately return false
+        if not isinstance(__o, Column):
             return False
 
         # Otherwise, check that all of the values of its attributes are the same
-        # Only include data that uniquely defines this DerivedColumn. func, num_rows, args, and kwargs count
+        # Only include data that uniquely defines this Column. func, num_rows, args, and kwargs count
         # for this, but other instance attributes don't because they don't define how the derived column
         # function is called.
         if (__o.func == self.func and
@@ -64,7 +99,7 @@ class DerivedColumn():
             return False
 
     def dependencies_are_fulfilled(
-            self, df: pd.DataFrame, all_derived_columns_in_simulation: dict[str, DerivedColumn]) -> bool:
+            self, df: pd.DataFrame, all_derived_columns_in_simulation: dict[str, Column]) -> bool:
         """
         Returns true if all of this derived column's dependencies have enough data to start calculating the
         derived column.
@@ -91,34 +126,3 @@ class DerivedColumn():
 
         fulfilled_dependencies = all_dependencies_fulfilled and has_num_rows_needed
         return fulfilled_dependencies
-
-
-def derived_column():
-    """
-    Wraps around a derived column function to add caching in a way compatible with dataframes.
-    """
-
-    def derived_column_inner(func: Callable) -> Callable:
-        func.cache_ = {}
-
-        @wraps(func)
-        def inner(df: pd.DataFrame, *args, **kwargs) -> Any:
-
-            # TODO: Make this identifier work properly if users pass an argument in either as arg or as kwarg
-            current_identifier = DFIdentifier(
-                df.iloc[-1].symbol, df.iloc[-1].timestamp, args, tuple(sorted(kwargs.items())))
-
-            # Purge cache if incoming identifier's timestamp is different.
-            if any(existing_identifier.timestamp != current_identifier.timestamp
-                    for existing_identifier in func.cache_.keys()):
-                func.cache_ = {}
-
-            # If the current identifier is not in the cache, add it to the cache
-            if current_identifier not in func.cache_:
-                func.cache_[current_identifier] = func(df, *args, **kwargs)
-
-            return func.cache_[current_identifier]
-
-        return inner
-
-    return derived_column_inner

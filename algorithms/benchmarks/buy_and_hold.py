@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 import derived_columns.definitions as dcolumns
-from derived_columns import DerivedColumn
+from derived_columns import Column
 from monte import display
 from monte.algorithm import Algorithm
 from monte.broker import Broker
@@ -38,7 +38,7 @@ class BuyAndHold(Algorithm):
         """
         return self.name
 
-    def get_derived_columns(self) -> dict[str, DerivedColumn]:
+    def get_derived_columns(self) -> dict[str, Column]:
         """
         Returns a dictionary containing the derived columns this algorithm needs to run.
         """

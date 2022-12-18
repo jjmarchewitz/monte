@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from alpaca_trade_api import TimeFrame, TimeFrameUnit
+# TODO: Switch to alpaca-py
+from alpaca.data.timeframe import TimeFrame, TimeFrameUnit
 
 from algorithms.benchmarks import BuyAndHold, BuyAndHoldSP500
 from algorithms.linear_regression import LinearRegressionAlgo
@@ -22,12 +23,14 @@ def main():
     # TODO: Run multiple TradingMachine instances simultaneously, on separate processes (?)
     #           - The purpose would be to run with multiple date ranges/time frames to compare results
     # TODO: Add argument validation across the backend.
+    # TODO: Add custom exceptions module
     # TODO: Support requests to multiple stock exchanges (including Crypto). Automatically switch the
     # API used based on the exchange in the front of the symbol.
     # TODO: Check if a given symbol is valid (its exchange exists and the asset exists on the exchange).
     # TODO: Add logging (print statements).
     # TODO: Assets/Positions store executed order history
-    # TODO: Add graphing, should be able to compare two (or more) algorithms in live time
+    # TODO: Add graphing, should be able to compare two (or more) algorithms in live time (and not just
+    # returns)
     # TODO: Move algos and scratchpads to a separate repo, publish monte on pypi
     # TODO: Markdown documentation explaining the high-level concepts of this repo and some implementation
     # details.
@@ -54,6 +57,8 @@ def main():
     # symbols = ["GME"]
 
     starting_cash = 10_000
+
+
 
     buy_and_hold = BuyAndHold(ms, "Buy and Hold - Symbols", starting_cash, symbols)
     trading_machine.add_algo(buy_and_hold)

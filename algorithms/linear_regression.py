@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
 import derived_columns.definitions as dcolumns
-from derived_columns import DerivedColumn
+from derived_columns import Column
 from monte import display
 from monte.algorithm import Algorithm
 from monte.broker import Broker
@@ -42,17 +42,17 @@ class LinearRegressionAlgo(Algorithm):
         """
         return self.name
 
-    def get_derived_columns(self) -> dict[str, DerivedColumn]:
+    def get_derived_columns(self) -> dict[str, Column]:
         """
         Returns a dictionary containing the derived columns this algorithm needs to run.
         """
         # Add any derived columns to the dictionary.
         derived_columns = {
-            'returns_last_2': DerivedColumn(dcolumns.returns, 2, "vwap"),
-            f'infimum_last_5_K{self.variability_constant}': DerivedColumn(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
-            f'norm_last_2_K{self.variability_constant}': DerivedColumn(dcolumns.infimum_norm, 1, f'infimum_last_5_K{self.variability_constant}', 'returns_last_2',
-                                                                       column_dependencies=[f'infimum_last_5_K{self.variability_constant}', 'returns_last_2']),
-            # 'prediction_returns': DerivedColumn(dcolumns.linear_regression_prediction, 2,
+            'returns_last_2': Column(dcolumns.returns, 2, "vwap"),
+            f'infimum_last_5_K{self.variability_constant}': Column(dcolumns.infimum, 5, 'returns_last_2', self.variability_constant),
+            f'norm_last_2_K{self.variability_constant}': Column(dcolumns.infimum_norm, 1, f'infimum_last_5_K{self.variability_constant}', 'returns_last_2',
+                                                                column_dependencies=[f'infimum_last_5_K{self.variability_constant}', 'returns_last_2']),
+            # 'prediction_returns': Column(dcolumns.linear_regression_prediction, 2,
             # 'returns_last_2', 'norm_last_2')
         }
 

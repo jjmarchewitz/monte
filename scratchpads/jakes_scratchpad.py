@@ -31,7 +31,7 @@ def main():
     ms = MachineSettings(
         alpaca_api=AlpacaAPIBundle(),
         start_date=datetime(2016, 1, 1),
-        end_date=datetime(2016, 4, 12),
+        end_date=datetime(2016, 12, 12),
         training_data_percentage=0.2,
         time_frame=TimeFrame(1, TimeFrameUnit.Hour),
     )

@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "monte",
+    "monte-py",
+    "monte-r"
+]

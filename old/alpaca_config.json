@@ -1,0 +1,105 @@
+{
+    "ENDPOINT": "https://paper-api.alpaca.markets",
+    "API_KEYS": [
+        {
+            "API_KEY_ID": "PK9SGOA95VQ5DLDHA1BX",
+            "SECRET_KEY": "4TUj95KLyJuq4sZfK3Pt1uSrLI6efUrnWRG7KZDJ"
+        },
+        {
+            "API_KEY_ID": "PKKQS9ZXCX21ZEFOVZJZ",
+            "SECRET_KEY": "nXa1M0cs7Eez5SgIAnEgSJGYkGBz8DrKG9X7EaWi"
+        },
+        {
+            "API_KEY_ID": "PKZ97CG0KTVUL4LOMDON",
+            "SECRET_KEY": "jNoqZyw15H5fV5wuxx1Ockt7X5PBsbGxrmiOw1Ij"
+        },
+        {
+            "API_KEY_ID": "PK7NY1PAO0GJLZCISZ5N",
+            "SECRET_KEY": "L31lhAob6qeCY4LB9dKLpg7wsWnkMFsrbCECmg0D"
+        },
+        {
+            "API_KEY_ID": "PKO5SWIQXI5Z8GBZTN1E",
+            "SECRET_KEY": "as5bsBq2FvZOfXueSdmYzRKcBOeD0dqJUuN5pXOo"
+        },
+        {
+            "API_KEY_ID": "PKUDZR5TAK1DV7E9CR7B",
+            "SECRET_KEY": "m28ZKRUzVZlibQPFd6vvyv0h68l5lRVnalWlwIS4"
+        },
+        {
+            "API_KEY_ID": "PKFTRWPYGVM0AIVOQIFX",
+            "SECRET_KEY": "1zreXZXtX0XKHQxIvfIVgq1Ie6riVZvZcoNrOogk"
+        },
+        {
+            "API_KEY_ID": "PKXUPRFSF57DITCIGHY0",
+            "SECRET_KEY": "lCUM56i0oAmj5hBfMtOibwiyXLZ2if1H4dtTW3U7"
+        },
+        {
+            "API_KEY_ID": "PK0CWSZ0CJV8IIX8LJTU",
+            "SECRET_KEY": "Ja9Jr827CZT3exLM0Z3fLZ2BWwfuxOXcYmoBlZA2"
+        },
+        {
+            "API_KEY_ID": "PKU47X5O1WY1J9DGZOBS",
+            "SECRET_KEY": "hsbfZfNWczyLa6p2e7Eu9FhcdDTihTrF0dnO52PR"
+        },
+        {
+            "API_KEY_ID": "PKFD6YH98MUBCQOEPPZ7",
+            "SECRET_KEY": "QklFOZWUieJSUjBtEIqHqreookE1zXvBOBjopoYj"
+        },
+        {
+            "API_KEY_ID": "PKEVCG7AZT8ZAPB51QZ4",
+            "SECRET_KEY": "nd2OUPO8dEVMXvAWfrbAv8JvvMwKOKbSOeRccbkM"
+        },
+        {
+            "API_KEY_ID": "PKO1AFE6NOLZC2O9COPK",
+            "SECRET_KEY": "dTuNFjc7sWldJFfBAA94lIYYiRagHgayyVuo8kRI"
+        },
+        {
+            "API_KEY_ID": "PKGNYYOGGZYGWC5E5X6H",
+            "SECRET_KEY": "2UC5pJrtS4gGI9lZR5z0C6xC8Q9Enx6bYZ8GeOSh"
+        },
+        {
+            "API_KEY_ID": "PKMK8AYK7OLPR92QBTR6",
+            "SECRET_KEY": "NnIzLihLhT7jvTjYV30nCTPNSRgz5zfJB3cJcUDQ"
+        },
+        {
+            "API_KEY_ID": "PK177VYMUDSKA2VR2YV9",
+            "SECRET_KEY": "7CQlJbNBL1Qi6cyliGDBkgfowcS83gLk200MbJaG"
+        },
+        {
+            "API_KEY_ID": "PK0O9XTIFLJDXZBQD07D",
+            "SECRET_KEY": "G85LcBxgb9Zz0vp7wvbNf1xj5ozEun93y0ObqsUg"
+        },
+        {
+            "API_KEY_ID": "PKF8DF29WPIZASXH0VUE",
+            "SECRET_KEY": "KmsMlbO8Q4fNSp69zA4o2XzdMuudGRNBtnmHRnuj"
+        },
+        {
+            "API_KEY_ID": "PKCA0CK48IXUD99LQQAR",
+            "SECRET_KEY": "Ib9ERBe80X9sHUVKU9kHtSDt3tX4H5aTu9yJuOo9"
+        },
+        {
+            "API_KEY_ID": "PKJ0N49GUR1PA5TLCYU0",
+            "SECRET_KEY": "MAVFY88Kk4OmjmugF5DPPpP3fNLXAwfQCnRZq292"
+        },
+        {
+            "API_KEY_ID": "PKVB40SIS63I9LUC04QE",
+            "SECRET_KEY": "Iq4iQpRLtmXWjKXiKboYRrichcRkN4i1hXjF9mv3"
+        },
+        {
+            "API_KEY_ID": "PK8NDLP7WZ4W5C48LYVY",
+            "SECRET_KEY": "A35WraHxcnQuZFsdHuqBIwd5kI103y5CphylzHsI"
+        },
+        {
+            "API_KEY_ID": "PK626CZ70AH4CTHYB4ZR",
+            "SECRET_KEY": "cTvDKJvtbbg1rO0kHQhAR8Xj56FI5dJ7JnLb8X4D"
+        },
+        {
+            "API_KEY_ID": "PKBIELBEORNRDGXWQXCD",
+            "SECRET_KEY": "m1ULptTvZJqeftw2ci3i6wTLDyjZPNYnBoOGTCKU"
+        },
+        {
+            "API_KEY_ID": "PKT9IOLXZBDH7PZKQ63O",
+            "SECRET_KEY": "JjWq1De3lI26AbGGl6Xcb8L5pO8qqVPE1dRhYwCE"
+        }
+    ]
+}

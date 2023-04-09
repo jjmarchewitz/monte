@@ -9,5 +9,5 @@
 
 ## Development
 
-* `devtools::load_all(".")`
+* `devtools::load_all("{PATH_TO_YOUR_REPO}/monte/monte-r/monte")`
 * `monte::{whatever function}`

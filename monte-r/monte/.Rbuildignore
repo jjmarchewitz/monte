@@ -1,1 +1,2 @@
 ^src/\.cargo$
+^cran-comments\.md$

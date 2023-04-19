@@ -8,4 +8,4 @@
 
 ## Development
 
-* Rebuild with `maturin develop`
+* Rebuild with `maturin develop`. This installs `monte` into the current python env

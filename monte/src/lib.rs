@@ -1,6 +1,7 @@
 pub mod constants;
 pub mod datasets;
 pub mod io;
+pub mod learn;
 pub mod models;
 pub mod preprocessing;
 pub mod sci;

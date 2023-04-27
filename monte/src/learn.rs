@@ -1,9 +1,9 @@
 pub mod cluster;
 pub mod ensemble;
-pub mod feature_extraction;
 pub mod feature_selection;
-pub mod linear;
+pub mod linear_models;
 pub mod metrics;
 pub mod model_selection;
+pub mod multiclass;
 pub mod svm;
 pub mod tree;

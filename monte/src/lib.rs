@@ -7,6 +7,5 @@ pub mod learn;
 pub mod prelude;
 pub mod preprocessing;
 pub mod signal;
-pub mod sim;
 pub mod stats;
 pub mod time;

@@ -15,6 +15,6 @@ license = "MIT OR Apache-2.0"
 # TODO: add a bunch of opt-in features that keep compile time low
 
 [dependencies]
-chrono = "0.4"
-rayon = "1.7"
+chrono = "0.4.24"
+rayon = "1.7.0"
 thiserror = "1.0.40"

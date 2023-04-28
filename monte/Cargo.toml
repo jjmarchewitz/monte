@@ -1,10 +1,18 @@
 [package]
+version = "0.1.1"
 name = "monte"
-version = "0.1.0"
+description = "Fundamental operations for scientific computing directly with Polars"
+authors = ["Jake Marchewitz <jakemarchewitz@gmail.com>"]
 edition = "2021"
+readme = "../README.md"
+repository = "https://github.com/monte-rs/monte"
+license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 # TODO: add a bunch of opt-in features that keep compile time low
 
 [dependencies]
+chrono = "0.4"
+rayon = "1.7"
+thiserror = "1.0.40"

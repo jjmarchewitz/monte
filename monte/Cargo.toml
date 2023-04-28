@@ -4,8 +4,8 @@ name = "monte"
 authors = ["Jake Marchewitz <jakemarchewitz@gmail.com>"]
 description = "Fundamental operations for scientific computing directly with Polars"
 categories = ["math", "statistics", "machine-learning"]
-keywords = ["polars", "sklearn", "scikit-learn", "scipy", "clustering", "cluster", "machine learning", "machine",
-            "learning", "svm", "signal", "processing", "signal processing"]
+keywords = ["polars", "sklearn", "scikit-learn", "scipy", "clustering", "cluster", "machine-learning", "machine",
+            "learning", "svm", "signal", "processing", "signal-processing", "dsp", "digital-signal-processing"]
 edition = "2021"
 readme = "../README.md"
 repository = "https://github.com/monte-rs/monte"

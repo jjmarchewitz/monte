@@ -1,7 +1,0 @@
-[workspace]
-
-members = [
-    "monte",
-    "monte-py",
-    "monte-r/monte/src/rust"
-]

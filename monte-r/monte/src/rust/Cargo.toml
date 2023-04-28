@@ -8,4 +8,4 @@ crate-type = [ 'staticlib' ]
 name = 'monte'
 
 [dependencies]
-extendr-api = '*'
+extendr-api = '0.4'

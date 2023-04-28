@@ -1,0 +1,1 @@
+//! Computes bins for histograms

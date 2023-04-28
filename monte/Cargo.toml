@@ -1,9 +1,9 @@
 [package]
-version = "0.1.2"
+version = "0.1.3"
 name = "monte"
 authors = ["Jake Marchewitz <jakemarchewitz@gmail.com>"]
 description = "Fundamental operations for scientific computing directly with Polars"
-categories = ["math", "statistics", "machine-learning"]
+categories = ["mathematics", "science", "simulation"]
 keywords = ["polars", "sklearn", "scikit-learn", "scipy", "machine-learning"]
 edition = "2021"
 readme = "../README.md"

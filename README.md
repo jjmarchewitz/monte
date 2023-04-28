@@ -1,6 +1,6 @@
 # monte
 
-WARNING: This crate is in early stages and breaking changes WILL occur.
+WARNING: This crate is still in development and breaking changes WILL occur.
 Feel free to poke around and maybe even contribute :)
 
 ## Motivation

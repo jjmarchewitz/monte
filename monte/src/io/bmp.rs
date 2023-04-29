@@ -1,2 +1,2 @@
-//! JPG image files
+//! Bitmap files.
 //! use https://crates.io/crates/image

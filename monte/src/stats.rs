@@ -1,3 +1,5 @@
+//! https://www.statsmodels.org/stable/api.html
+
 pub mod average;
 pub mod correlate;
 pub mod distribution;

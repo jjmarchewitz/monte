@@ -1,0 +1,15 @@
+{
+  "include": [
+    "src/**/*"
+  ],
+  "compilerOptions": {
+    "outDir": "dist/cjs",
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "target": "ES2015",
+    "module": "commonjs",
+    "moduleResolution": "node16",
+    "emitDeclarationOnly": true
+  },
+}

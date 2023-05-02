@@ -1,0 +1,9 @@
+node_modules
+tsconfig.*
+test
+**/test
+*.spec.ts
+*.spec.js
+.swcrc
+src
+.github

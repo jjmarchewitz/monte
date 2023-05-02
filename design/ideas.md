@@ -14,3 +14,7 @@ monte is named that for several reasons.
 * Turn monte into a generalized dataset replay package
 * Rust, Python, and R support
 * Add datasets to a hash map and increment all of the datasets at the same time
+* Have a community poll that serves as public data collection for a public dataset
+* Future language support: scala/julia? have to wait for Polars to support them (hint hint 😁)
+* Don't worry about LazyFrames, they are an intermediate step that we don't need to support as an argument
+* The Rust API should only use dataframes as a fundamental unit but make the Python API work with both DataFrames and Series

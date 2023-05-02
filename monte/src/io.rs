@@ -9,4 +9,5 @@ pub mod mat;
 pub mod mp3;
 pub mod ogg;
 pub mod png;
+pub mod sklearn;
 pub mod wav;

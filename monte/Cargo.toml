@@ -17,6 +17,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 chrono = "0.4"
 csv = "1.2.1"
+monte-core = { path = "../monte-core" }
 polars = { version = "0.28", features = [] }
 rayon = "1.7"
 reqwest = { version = "0.11", features = ["blocking", "json"] }

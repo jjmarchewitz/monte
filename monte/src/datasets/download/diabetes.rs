@@ -1,4 +1,5 @@
 // use polars::{frame::DataFrame, series::Series};
+use monte_core::traits::Downloadable;
 use polars::prelude::*;
 use serde::Deserialize;
 use std::error::Error;
@@ -17,10 +18,14 @@ struct DiabetesRecord {
     class: Option<String>,
 }
 
-pub fn get_as_dataframe() -> Result<DataFrame, Box<dyn Error>> {
-    let url =
+impl Downloadable for DiabetesRecord {
+    fn get_url() -> &'static str {
         "https://raw.githubusercontent.com/monte-rs/monte-datasets/main/diabetes/diabetes.json"
-            .to_owned();
+    }
+}
+
+pub fn get_as_dataframe() -> Result<DataFrame, Box<dyn Error>> {
+    let url = DiabetesRecord::get_url();
 
     let response = reqwest::blocking::get(url)?.text()?;
 
@@ -67,54 +72,3 @@ pub fn get_as_dataframe() -> Result<DataFrame, Box<dyn Error>> {
 
     Ok(df)
 }
-
-// pub fn get() -> Result<DataFrame, Box<dyn Error>> {
-//     let url =
-//         "https://raw.githubusercontent.com/monte-rs/monte-datasets/main/diabetes/diabetes.csv"
-//             .to_owned();
-
-//     let record_data = reqwest::blocking::get(url)?.text()?;
-
-//     let mut reader = csv::Reader::from_reader(record_data.as_bytes());
-
-//     let mut id = Vec::<i32>::new();
-//     let mut preg = Vec::<Option<i32>>::new();
-//     let mut plas = Vec::<Option<i32>>::new();
-//     let mut pres = Vec::<Option<i32>>::new();
-//     let mut skin = Vec::<Option<i32>>::new();
-//     let mut insu = Vec::<Option<i32>>::new();
-//     let mut mass = Vec::<Option<f32>>::new();
-//     let mut pedi = Vec::<Option<f32>>::new();
-//     let mut age = Vec::<Option<i32>>::new();
-//     let mut class = Vec::<Option<String>>::new();
-
-//     for record in reader.deserialize() {
-//         let record: DiabetesRecord = record?;
-
-//         id.push(record.id);
-//         preg.push(record.preg);
-//         plas.push(record.plas);
-//         pres.push(record.pres);
-//         skin.push(record.skin);
-//         insu.push(record.insu);
-//         mass.push(record.mass);
-//         pedi.push(record.pedi);
-//         age.push(record.age);
-//         class.push(record.class);
-//     }
-
-//     let df = df!(
-//         "id" => id,
-//         "preg" => preg,
-//         "plas" => plas,
-//         "pres" => pres,
-//         "skin" => skin,
-//         "insu" => insu,
-//         "mass" => mass,
-//         "pedi" => pedi,
-//         "age" => age,
-//         "class" => class,
-//     )?;
-
-//     Ok(df)
-// }

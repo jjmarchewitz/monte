@@ -4,5 +4,6 @@ members = [
     "monte",
     "monte-py",
     "monte-r/monte/src/rust",
-    "macros"
+    "monte-macros",
+    "monte-core"
 ]

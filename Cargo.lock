@@ -1003,10 +1003,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "macros"
-version = "0.1.0"
-
-[[package]]
 name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1054,6 +1050,7 @@ version = "0.1.4"
 dependencies = [
  "chrono",
  "csv",
+ "monte-core",
  "polars",
  "rayon",
  "reqwest",
@@ -1061,6 +1058,21 @@ dependencies = [
  "serde_json",
  "thiserror",
  "tokio",
+]
+
+[[package]]
+name = "monte-core"
+version = "0.1.0"
+dependencies = [
+ "polars",
+]
+
+[[package]]
+name = "monte-macros"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 1.0.109",
 ]
 
 [[package]]

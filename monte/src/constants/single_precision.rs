@@ -16,3 +16,5 @@ pub const LOG2E: f32 = double_precision::LOG2E as f32;
 pub const LOG10E: f32 = double_precision::LOG10E as f32;
 pub const LN2: f32 = double_precision::LN2 as f32;
 pub const LN10: f32 = double_precision::LN10 as f32;
+pub const GOLDEN: f32 = double_precision::GOLDEN as f32;
+pub const GOLDEN_RATIO: f32 = double_precision::GOLDEN_RATIO as f32;

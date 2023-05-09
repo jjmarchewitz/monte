@@ -23,6 +23,7 @@ impl DownloadUrl for DiabetesRecord {
     }
 }
 
+// TODO: write a derive macro for this
 pub fn get_as_dataframe() -> Result<DataFrame, Box<dyn Error>> {
     let url = DiabetesRecord::get_url();
 

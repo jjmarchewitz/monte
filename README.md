@@ -11,6 +11,12 @@ With Polars they can. Polars provides the speed, we provide a rich set of operat
 
 ## Status
 
+<!-- Symbols for easy copy/paste.
+    Not Started: 🔴
+    In-Progress: 🟡
+    Done: 🟢
+-->
+
 <table>
     <tr>
         <th>Module</th>
@@ -21,14 +27,14 @@ With Polars they can. Polars provides the speed, we provide a rich set of operat
     </tr>
     <tr>
         <td>constants</td>
-        <td>🔴</td>
+        <td>🟡</td>
         <td>🔴</td>
         <td>🔴</td>
         <td>🔴</td>
     </tr>
     <tr>
         <td>datasets</td>
-        <td>🔴</td>
+        <td>🟡</td>
         <td>🔴</td>
         <td>🔴</td>
         <td>🔴</td>
@@ -42,7 +48,7 @@ With Polars they can. Polars provides the speed, we provide a rich set of operat
     </tr>
     <tr>
         <td>learn</td>
-        <td>🔴</td>
+        <td>🟡</td>
         <td>🔴</td>
         <td>🔴</td>
         <td>🔴</td>
@@ -56,7 +62,7 @@ With Polars they can. Polars provides the speed, we provide a rich set of operat
     </tr>
     <tr>
         <td>preprocessing</td>
-        <td>🔴</td>
+        <td>🟡</td>
         <td>🔴</td>
         <td>🔴</td>
         <td>🔴</td>

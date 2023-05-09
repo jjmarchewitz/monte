@@ -1,5 +1,4 @@
-// use polars::{frame::DataFrame, series::Series};
-use monte_core::traits::Downloadable;
+use monte_core::traits::DownloadUrl;
 use polars::prelude::*;
 use serde::Deserialize;
 use std::error::Error;
@@ -15,10 +14,10 @@ struct DiabetesRecord {
     mass: Option<f32>,
     pedi: Option<f32>,
     age: Option<i32>,
-    class: Option<String>,
+    class: Option<i32>,
 }
 
-impl Downloadable for DiabetesRecord {
+impl DownloadUrl for DiabetesRecord {
     fn get_url() -> &'static str {
         "https://raw.githubusercontent.com/monte-rs/monte-datasets/main/diabetes/diabetes.json"
     }
@@ -40,7 +39,7 @@ pub fn get_as_dataframe() -> Result<DataFrame, Box<dyn Error>> {
     let mut mass = Vec::<Option<f32>>::new();
     let mut pedi = Vec::<Option<f32>>::new();
     let mut age = Vec::<Option<i32>>::new();
-    let mut class = Vec::<Option<String>>::new();
+    let mut class = Vec::<Option<i32>>::new();
 
     for record in record_data.into_iter() {
         id.push(record.id);

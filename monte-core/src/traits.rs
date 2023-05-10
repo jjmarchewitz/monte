@@ -1,10 +1,7 @@
-use polars::frame::DataFrame;
-use std::error::Error;
+// use polars::prelude::DataFrame;
+// use std::error::Error;
 
-pub trait DownloadUrl {
-    fn get_url() -> &'static str;
-}
-
-pub trait DownloadIntoDataframe: DownloadUrl {
-    fn get_as_dataframe() -> Result<DataFrame, Box<dyn Error>>;
+pub trait DownloadIntoDataframe {
+    type DataFrame;
+    fn download_into_df() -> Result<Self::DataFrame, Box<dyn std::error::Error>>;
 }

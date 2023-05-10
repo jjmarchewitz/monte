@@ -1,9 +1,8 @@
 [workspace]
-
 members = [
     "monte",
     "monte-py",
     "monte-r/monte/src/rust",
-    "monte-macros",
+    "monte-macros/*",
     "monte-core"
 ]

@@ -414,6 +414,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "download-into-dataframe"
+version = "0.1.0"
+dependencies = [
+ "darling",
+ "polars 0.29.0",
+ "polars-core 0.29.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.15",
+]
+
+[[package]]
 name = "dyn-clone"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1119,6 +1131,7 @@ version = "0.1.4"
 dependencies = [
  "chrono",
  "csv",
+ "download-into-dataframe",
  "monte-core",
  "polars 0.29.0",
  "rayon",
@@ -1136,14 +1149,6 @@ name = "monte-core"
 version = "0.1.0"
 dependencies = [
  "polars 0.28.0",
-]
-
-[[package]]
-name = "monte-macros"
-version = "0.1.0"
-dependencies = [
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -1918,9 +1923,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.26"
+version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4424af4bf778aae2051a77b60283332f386554255d722233d09fbfc7e30da2fc"
+checksum = "8f4f29d145265ec1c483c7c654450edde0bfe043d3938d6972630663356d9500"
 dependencies = [
  "proc-macro2",
 ]

@@ -27,3 +27,6 @@ serde_repr = "0.1.12"
 serde_with = "3.0.0"
 thiserror = "1.0"
 tokio = "1.28"
+
+# monte-macros
+download-into-dataframe = { path = "../monte-macros/download-into-dataframe" }

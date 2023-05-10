@@ -1,9 +1,9 @@
-use monte::datasets::download;
+use monte::datasets::{download_dataset, DownloadableDataset};
 // use polars::prelude::*;
 use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let df = download::get(download::Dataset::Diabetes)?;
+    let df = download_dataset(DownloadableDataset::Diabetes)?;
 
     dbg!(df);
 

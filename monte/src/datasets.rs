@@ -3,5 +3,7 @@
 //! Include downloads for other ones (MUST be available long-term from a trustworthy source).
 //! Use tokio to download datasets. Maybe chop up dataset into chunks and request each separately?
 
-pub mod download;
-pub mod generate;
+mod download;
+mod generate;
+
+pub use download::{download_dataset, DownloadableDataset};

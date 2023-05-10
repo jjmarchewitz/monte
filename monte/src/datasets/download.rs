@@ -1,9 +1,12 @@
 mod diabetes;
 
+use monte_core::traits::DownloadIntoDataframe;
 use polars::frame::DataFrame;
 use std::error::Error;
 
-pub enum Dataset {
+use diabetes::DiabetesRecord;
+
+pub enum DownloadableDataset {
     Diabetes,
     EEG,
     ILPD,
@@ -12,9 +15,9 @@ pub enum Dataset {
 }
 
 // TODO: should this be a method or a separate function?
-pub fn get(dataset: Dataset) -> Result<DataFrame, Box<dyn Error>> {
+pub fn download_dataset(dataset: DownloadableDataset) -> Result<DataFrame, Box<dyn Error>> {
     match dataset {
-        Dataset::Diabetes => diabetes::get_as_dataframe(),
+        DownloadableDataset::Diabetes => DiabetesRecord::download_into_df(),
         _ => todo!(),
     }
 }

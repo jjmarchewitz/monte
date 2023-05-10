@@ -1,5 +1,4 @@
 use darling::FromDeriveInput;
-// use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Data, DataStruct, DeriveInput, Fields};
 
@@ -11,17 +10,10 @@ struct DownloadIntoDataframeOpts {
 
 #[proc_macro_derive(DownloadIntoDataframe, attributes(download_url))]
 pub fn download_into_dataframe(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    // let input = TokenStream::from(input);
     let input = parse_macro_input!(input as DeriveInput);
-
-    //
-
-    //
-
-    //
-
     let opts = DownloadIntoDataframeOpts::from_derive_input(&input).expect("Wrong options"); // TODO: err msg
 
+    //
     let url = opts.url;
     let url = quote! { #url };
 
@@ -35,23 +27,23 @@ pub fn download_into_dataframe(input: proc_macro::TokenStream) -> proc_macro::To
         _ => panic!("Expected a struct with named fields"),
     };
 
-    let field_vec_declarations = fields.iter().map(|field| {
+    let column_vec_declarations = fields.iter().map(|field| {
         let ident = &field.ident;
         let ty = &field.ty;
 
         quote! { let mut #ident = Vec::<#ty>::new(); }
     });
 
-    let push_into_field_vecs = fields.iter().map(|field| {
+    let push_json_data_into_column_vecs = fields.iter().map(|field| {
         let ident = &field.ident;
 
         quote! { #ident.push(record.#ident); }
     });
 
-    let vec_to_series = fields.iter().map(|field| {
+    let convert_column_vecs_to_series = fields.iter().map(|field| {
         let ident = &field.ident;
 
-        quote! { let #ident = ::polars::prelude::Series::new(stringify!(#ident), #ident); }
+        quote! { let #ident = ::polars::series::Series::new(stringify!(#ident), #ident); }
     });
 
     let series_names = fields.iter().map(|field| {
@@ -60,25 +52,23 @@ pub fn download_into_dataframe(input: proc_macro::TokenStream) -> proc_macro::To
         quote! { #ident }
     });
 
+    // Final trait implementation
     quote! {
         impl ::monte_core::traits::DownloadIntoDataframe for #struct_name {
-
-            type DataFrame = ::polars::frame::DataFrame;
-
-            fn download_into_df() -> Result<Self::DataFrame, Box<dyn std::error::Error>> {
+            fn download_into_df() -> Result<::polars::frame::DataFrame, Box<dyn std::error::Error>> {
                 let response = ::reqwest::blocking::get(#url)?.text()?;
 
-                let record_data: Vec<#struct_name> = ::serde_json::from_str(&response)?;
+                let json_record_data: Vec<#struct_name> = ::serde_json::from_str(&response)?;
 
-                #(#field_vec_declarations)*
+                #(#column_vec_declarations)*
 
-                for record in record_data.into_iter() {
-                    #(#push_into_field_vecs)*
+                for record in json_record_data.into_iter() {
+                    #(#push_json_data_into_column_vecs)*
                 }
 
-                #(#vec_to_series)*
+                #(#convert_column_vecs_to_series)*
 
-                let df = ::polars::prelude::DataFrame::new(vec![
+                let df = ::polars::frame::DataFrame::new(vec![
                     #(#series_names),*
                 ])?;
 

@@ -9,14 +9,18 @@
   * All learning models need to automatically handle any number of input features
   * !!! All learning models only take in frames (keep this?)
   * Lean into the language you're using. The core library should use Rust idioms, and the APIs should use the idioms from their respective languages
-* Use structs to handle functions having lots of options
-  * The Python API can convert the provided args and kwargs into an options struct
+* Use Builders with methods or options structs instead of functions having lots of args
+  * The Python API can convert provided args and kwargs into an options struct/builder
 * Custom error types
-  * thiserror?
+  * thiserror for static errors
+  * eyre/color-eyre for dynamic errors
 * Use good traits
   * Serde, Default, From, TryFrom, Clone/Copy
 * Use features to toggle sections of the code base
   * Any non-rust language should enable all features since we're serving a precompiled binary
+* 3-layer rule
+  * All imports should be at most 3 layers (monte::learn::LinearRegression, monte::stats::Bernoulli)
+  * Reasonable exceptions are allowed
 
 ## Testing
 

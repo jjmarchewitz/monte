@@ -1,7 +1,3 @@
-// use polars::prelude::DataFrame;
-// use std::error::Error;
+mod datasets;
 
-pub trait DownloadIntoDataframe {
-    type DataFrame;
-    fn download_into_df() -> Result<Self::DataFrame, Box<dyn std::error::Error>>;
-}
+pub use datasets::DownloadIntoDataframe;

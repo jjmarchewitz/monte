@@ -6,4 +6,4 @@
 mod download;
 mod generate;
 
-pub use download::{download_dataset, DownloadableDataset};
+pub use download::{download_dataset, Downloadable};

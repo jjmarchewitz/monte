@@ -1,4 +1,3 @@
-pub mod cv;
 pub mod lasso;
 pub mod linear;
 pub mod logistic;

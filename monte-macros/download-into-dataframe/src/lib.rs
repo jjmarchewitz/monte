@@ -3,17 +3,16 @@ use quote::quote;
 use syn::{parse_macro_input, Data, DataStruct, DeriveInput, Fields};
 
 #[derive(Debug, FromDeriveInput)]
-#[darling(attributes(download_url))]
+#[darling(attributes(download_into_dataframe))]
 struct DownloadIntoDataframeOpts {
     url: String,
 }
 
-#[proc_macro_derive(DownloadIntoDataframe, attributes(download_url))]
+#[proc_macro_derive(DownloadIntoDataframe, attributes(download_into_dataframe))]
 pub fn download_into_dataframe(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let opts = DownloadIntoDataframeOpts::from_derive_input(&input).expect("Wrong options"); // TODO: err msg
 
-    //
     let url = opts.url;
     let url = quote! { #url };
 

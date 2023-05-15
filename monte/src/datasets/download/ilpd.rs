@@ -3,7 +3,7 @@ use polars::prelude::*;
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug, DownloadIntoDataframe)]
-#[download_url(
+#[download_into_dataframe(
     url = "https://raw.githubusercontent.com/monte-rs/monte-datasets/main/ilpd/ilpd.json"
 )]
 pub struct ILPDRecord {

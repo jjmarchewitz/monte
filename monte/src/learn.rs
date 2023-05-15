@@ -1,4 +1,5 @@
 pub mod cluster;
+pub mod cv;
 pub mod decomposition;
 pub mod ensemble;
 pub mod feature_selection;

@@ -3,7 +3,9 @@ use polars::prelude::*;
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug, DownloadIntoDataframe)]
-#[download_url(url = "https://raw.githubusercontent.com/monte-rs/monte-datasets/main/pc4/pc4.json")]
+#[download_into_dataframe(
+    url = "https://raw.githubusercontent.com/monte-rs/monte-datasets/main/pc4/pc4.json"
+)]
 pub struct PC4Record {
     id: i32,
     #[serde(alias = "LOC_BLANK")]

@@ -3,7 +3,9 @@ use polars::prelude::*;
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug, DownloadIntoDataframe)]
-#[download_url(url = "https://raw.githubusercontent.com/monte-rs/monte-datasets/main/eeg/eeg.json")]
+#[download_into_dataframe(
+    url = "https://raw.githubusercontent.com/monte-rs/monte-datasets/main/eeg/eeg.json"
+)]
 pub struct EEGRecord {
     id: i32,
     #[serde(alias = "V1")]
